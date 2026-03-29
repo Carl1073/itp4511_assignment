@@ -36,56 +36,34 @@ public class CustomerDB {
         return DriverManager.getConnection(url, username, password);
     }
 
-    // -1 is error, 0 is success, 1 is no user, 2 is incorrect password
-    public int isValidUser(String user, String pwd) {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
-        String preQueryStatement = null;
-        int result = -1;
-        ResultSet rs = null;
-        try {
-            //1. get Connection 
-            cnnct = getConnection();
-            Statement stmnt = null;
-            //2. get the prepare Statement for checking username is exist
-            preQueryStatement = "SELECT * FROM customer WHERE "
-                    + "username =  ?";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            //3. update the placeholders with username and pwd 
-            pStmnt.setString(1, user);
-            //4. execute the query and assign to the result 
-            rs = pStmnt.executeQuery();
-            if (!rs.next()) {
-                pStmnt.close();
-                cnnct.close();
-                return 1; // 1 is username not exist
-            }
-            //2. get the prepare Statement for checking password is correct
-            preQueryStatement = "SELECT * FROM customer WHERE "
-                    + "username =  ? and  password =  ? ";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            //3. update the placeholders with username and pwd 
-            pStmnt.setString(1, user);
-            pStmnt.setString(2, pwd);
-            //4. execute the query and assign to the result 
-            rs = pStmnt.executeQuery();
+// -1 is error, 0 is success, 1 is no user, 2 is incorrect password
+  public LoginResult isValidUser(String user, String pwd) {
+    String sql = "SELECT * FROM customer WHERE username = ?";
+    
+    try (Connection cnnct = getConnection();
+         PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+        
+        pStmnt.setString(1, user);
+        
+        try (ResultSet rs = pStmnt.executeQuery()) {
             if (rs.next()) {
-                result = 0; // 0 is valid user
+                // User exists, check password
+                if (rs.getString("password").equals(pwd)) {
+                    // Success! Convert the current row to a bean
+                    CustomerBean bean = reseltSetToBean(rs);
+                    return new LoginResult(0, bean); 
+                } else {
+                    return new LoginResult(2, null); // Wrong password
+                }
             } else {
-                result = 2; // 2  is incorrect password
+                return new LoginResult(1, null); // User not found
             }
-            pStmnt.close();
-            cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
         }
-        return result;
+    } catch (SQLException | IOException ex) {
+        ex.printStackTrace();
+        return new LoginResult(-1, null); // System error
     }
+}
 
     public int getLargestCustId() {
         Connection cnnct = null;
@@ -102,12 +80,7 @@ public class CustomerDB {
             }
             pStmnt.close();
             cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
+        } catch (SQLException | IOException ex) {
             ex.printStackTrace();
         }
         return largestCustId;
@@ -162,12 +135,7 @@ public class CustomerDB {
             }
             pStmnt.close();
             cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
+        } catch (SQLException | IOException ex) {
             ex.printStackTrace();
         }
         return isSuccess;
@@ -202,9 +170,10 @@ public class CustomerDB {
         return isRepeated;
     }
 
-    public CustomerBean queryCust() {
+    public ArrayList<CustomerBean> queryCust() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
+        ArrayList<CustomerBean> cbs = new ArrayList<>();
 
         CustomerBean cb = null;
         try {
@@ -213,20 +182,16 @@ public class CustomerDB {
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             ResultSet rs = null;
             rs = pStmnt.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) {
                 cb = this.reseltSetToBean(rs);
+                cbs.add(cb);
             }
             pStmnt.close();
             cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
+        } catch (SQLException | IOException ex) {
             ex.printStackTrace();
         }
-        return cb;
+        return cbs;
     }
 
     public CustomerBean queryCustByID(String id) {
@@ -242,10 +207,7 @@ public class CustomerDB {
             ResultSet rs = null;
             rs = pStmnt.executeQuery();
             if (rs.next()) {
-                cb = new CustomerBean();
-                cb.setCustId(rs.getInt(1));
-                cb.setName(rs.getString(2));
-                cb.setTel(rs.getString(3));
+                cb = reseltSetToBean(rs);
             }
             pStmnt.close();
             cnnct.close();
@@ -264,7 +226,7 @@ public class CustomerDB {
 //        Connection cnnct = null;
 //        PreparedStatement pStmnt = null;
 //
-//        ArrayList<CustomerBean> cbs = new ArrayList<CustomerBean>();
+//        ArrayList<CustomerBean> cbs = new ArrayList<>();
 //        CustomerBean cb = null;
 //        try {
 //            cnnct = getConnection();

@@ -16,6 +16,6 @@
     </body>
     <script>
         alert("You have successfully register");
-         window.location.href = "clientHome.jsp";
+         window.location.href = "client/clientHome.jsp";
     </script>
 </html>

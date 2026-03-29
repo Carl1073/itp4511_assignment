@@ -29,8 +29,6 @@
             <p class="error"><%= request.getAttribute("errorMsg")%></p>
             <% }%>
 
-
-
             <input type="hidden" name="action" value="register"/>
             Name: <input type="text" name="name" value="<%= request.getAttribute("name") != null ? request.getAttribute("name") : ""%>"  required /><br/>
             Username: <input id="username" type="text" name="username" value="<%= request.getAttribute("username") != null ? request.getAttribute("username") : ""%>"  required/> <span id="username-feedback" style="margin-left: 10px;"></span><br/>

@@ -7,6 +7,7 @@ package ict.servlet;
 
 import ict.bean.CustomerBean;
 import ict.db.CustomerDB;
+import ict.db.LoginResult;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.*;
@@ -59,17 +60,25 @@ public class loginController extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String targetURL;
-
-        if (db.isValidUser(username, password) == 0)  {
+        LoginResult validUser = db.isValidUser(username, password);
+        if (validUser.status == 0)  {
             HttpSession session = request.getSession(true);
-            CustomerBean bean = new CustomerBean();
-            bean.setUsername(username);
-            bean.setPassword(password);
+            CustomerBean bean = validUser.customer;
 
-            session.setAttribute("userInfo", bean);
-            targetURL = "/welcome.jsp";
-        } else {
-            targetURL = "/loginError.jsp";
+            session.setAttribute("customerBean", bean);
+            targetURL = "client/clientHome.jsp";
+        } else{
+            String errorMsg = "";
+            switch (validUser.status){
+                case 1:
+                    errorMsg = "Username not register. Please register.";
+                    break;
+                case 2:
+                    errorMsg = "Password incorrect. Please check the password.";
+                    break;
+            }
+            request.setAttribute("errorMsg", errorMsg);
+            targetURL = "login.jsp";
         }
 
         RequestDispatcher rd;

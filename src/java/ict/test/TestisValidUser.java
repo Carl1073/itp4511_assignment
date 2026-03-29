@@ -7,19 +7,20 @@ package ict.test;
 
 import ict.bean.CustomerBean;
 import ict.db.CustomerDB;
+import ict.db.LoginResult;
 
 /**
  *
  * @author Tong
  */
-public class TestQueryCust {
+public class TestisValidUser {
 
     public static void main(String[] arg) {
         String url = "jdbc:mysql://localhost:3306/ITP4511_Assignment_DB";
         String username = "root";
         String password = "";
         CustomerDB custDb = new CustomerDB(url, username, password);
-//        CustomerBean cb = custDb.queryCust();
-//        System.out.println(cb.getName());
+        LoginResult cb = custDb.isValidUser("abc123", "123");
+        System.out.println(cb.customer);
     }
 }

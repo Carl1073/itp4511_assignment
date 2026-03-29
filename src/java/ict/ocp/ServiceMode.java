@@ -9,6 +9,6 @@ package ict.ocp;
  *
  * @author Tong
  */
-public class ServiceMode {
+public interface ServiceMode {
     
 }

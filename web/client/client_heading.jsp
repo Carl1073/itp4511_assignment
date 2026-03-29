@@ -1,7 +1,7 @@
 <%-- 
-    Document   : registerSuccess
-    Created on : 2026年3月24日, 下午08:48:03
-    Author     : Tong
+    Document   : client_heading
+    Created on : Mar 16, 2026, 3:36:15 PM
+    Author     : 240708635
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -14,8 +14,4 @@
     <body>
         <h1>Hello World!</h1>
     </body>
-    <script>
-        alert("You have successfully register");
-         window.location.href = "client/clientHome.jsp";
-    </script>
 </html>

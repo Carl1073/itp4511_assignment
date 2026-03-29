@@ -1,6 +1,5 @@
 <%-- Document : index Created on : Mar 16, 2026, 3:29:02 PM Author : 240708635 --%>
 
-<%@page import="ict.java.StartUp" %>
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
@@ -14,6 +13,9 @@
     <body>
         <h1>Community Care Health Consortium </h1>
         <h2>Login Page</h2>
+        <% if (request.getAttribute("errorMsg") != null) {%>
+        <p class="error"><%= request.getAttribute("errorMsg")%></p>
+        <% }%>
         <form action="loginController" method="post">
             Login as:
             <div class="segmented-control">
@@ -28,7 +30,7 @@
             </div>
             <input type="hidden" name="action" value="authenticate" />
             <label>Name: <input name="username" type="text" required="required" /></label><br />
-            <label>Password <input name="username" type="text" required="required" /></label><br />
+            <label>Password <input name="password" type="text" required="required" /></label><br />
 
             <br />
             <input type="submit" value="Login" id="login">
