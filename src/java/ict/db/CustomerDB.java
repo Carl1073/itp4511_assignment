@@ -35,6 +35,31 @@ public class CustomerDB {
         }
         return DriverManager.getConnection(url, username, password);
     }
+    
+    public void createDB(String createDB) {
+        Connection cnnct = null;
+        Statement stmnt = null;
+
+        try {
+            cnnct = getConnection();  // the connection 
+            stmnt = cnnct.createStatement();  // create statement
+
+            String sql
+                    = "CREATE DATABASE " + createDB;
+            stmnt.execute(sql);
+
+            stmnt.close();
+            cnnct.close();
+        } catch (SQLException ex) {
+            while (ex != null) {
+                ex.printStackTrace();
+                ex = ex.getNextException();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
 
 // -1 is error, 0 is success, 1 is no user, 2 is incorrect password
   public LoginResult isValidUser(String user, String pwd) {

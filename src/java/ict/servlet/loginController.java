@@ -43,8 +43,7 @@ public class loginController extends HttpServlet {
         String action = request.getParameter("action");
         System.out.println(action);
         if (!isAuthenticated(request) && !("authenticate".equalsIgnoreCase(action))) {
-                        System.out.println("test");
-
+            System.out.println("test");
             doLogin(request, response);
             return;
         }

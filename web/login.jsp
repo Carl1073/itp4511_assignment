@@ -1,6 +1,7 @@
 <%-- Document : index Created on : Mar 16, 2026, 3:29:02 PM Author : 240708635 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 
@@ -11,9 +12,7 @@
     </head>
 
     <jsp:useBean id="customerBean" class="ict.bean.CustomerBean" scope="session"/>
-    <%if(customerBean.getRole().equalsIgnoreCase("customer")){ %>
-        <jsp:forward page="client/clientHome.jsp" />
-    <%}%>
+
     <body>
         <h1>Community Care Health Consortium </h1>
         <h2>Login Page</h2>
