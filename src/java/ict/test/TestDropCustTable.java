@@ -5,7 +5,7 @@
  */
 package ict.test;
 
-import ict.db.CustomerDB;
+import ict.db.PatientDB;
 
 /**
  *
@@ -17,7 +17,7 @@ public class TestDropCustTable {
         String url = "jdbc:mysql://localhost:3306/ITP4511_Assignment_DB";
         String username = "root";
         String password = "";
-        CustomerDB custDb = new CustomerDB(url, username, password);
+        PatientDB custDb = new PatientDB(url, username, password);
         custDb.dropCustTable();
     }
 }

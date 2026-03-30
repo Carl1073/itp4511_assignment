@@ -12,9 +12,9 @@ import java.sql.Date;
  *
  * @author 240708635
  */
-public class CustomerBean implements Serializable, People {
+public class PatientBean implements Serializable, People {
 
-    private int custId;
+    private int patId;
     private String name;
     private String username;
     private String password;
@@ -25,13 +25,13 @@ public class CustomerBean implements Serializable, People {
     private String email;
     private String role;
 
-    public CustomerBean() {
+    public PatientBean() {
         setRole();
     }
 
-    public CustomerBean(int custId, String name, String username, String password, String gender, String address, Date dob,
+    public PatientBean(int patId, String name, String username, String password, String gender, String address, Date dob,
             String tel, String email) {
-        this.custId = custId;
+        this.patId = patId;
         this.name = name;
         this.username = username;
         this.password = password;
@@ -47,8 +47,8 @@ public class CustomerBean implements Serializable, People {
         return address;
     }
 
-    public int getCustId() {
-        return custId;
+    public int getPatId() {
+        return patId;
     }
 
     public Date getDob() {
@@ -83,8 +83,8 @@ public class CustomerBean implements Serializable, People {
         this.address = address;
     }
 
-    public void setCustId(int custId) {
-        this.custId = custId;
+    public void setPatId(int patId) {
+        this.patId = patId;
     }
 
     public void setDob(Date dob) {

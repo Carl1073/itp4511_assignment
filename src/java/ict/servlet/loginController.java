@@ -5,8 +5,8 @@
  */
 package ict.servlet;
 
-import ict.bean.CustomerBean;
-import ict.db.CustomerDB;
+import ict.bean.PatientBean;
+import ict.db.PatientDB;
 import ict.db.LoginResult;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,14 +21,14 @@ import javax.servlet.http.*;
 @WebServlet(name = "loginController", urlPatterns = {"/loginController"})
 public class loginController extends HttpServlet {
 
-    private CustomerDB db;
+    private PatientDB cdb;
 
     @Override
     public void init() {
         String dbUser = this.getServletContext().getInitParameter("dbUser");
         String dbPassword = this.getServletContext().getInitParameter("dbPassword");
         String dbUrl = this.getServletContext().getInitParameter("dbUrl");
-        db = new CustomerDB(dbUrl, dbUser, dbPassword);
+        cdb = new PatientDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -41,6 +41,7 @@ public class loginController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
+        String role = request.getParameter("role");
         System.out.println(action);
         if (!isAuthenticated(request) && !("authenticate".equalsIgnoreCase(action))) {
             System.out.println("test");
@@ -61,25 +62,31 @@ public class loginController extends HttpServlet {
             throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        String targetURL;
-        LoginResult validUser = db.isValidUser(username, password);
-        if (validUser.status == 0) {
-            HttpSession session = request.getSession(true);
-            CustomerBean bean = validUser.customer;
-            session.setAttribute("customerBean", bean);
-            targetURL = "client/clientHome.jsp";
-        } else {
-            String errorMsg = "";
-            switch (validUser.status) {
-                case 1:
-                    errorMsg = "Username not register. Please register.";
-                    break;
-                case 2:
-                    errorMsg = "Password incorrect. Please check the password.";
-                    break;
+        String role = request.getParameter("role");
+        String targetURL = "";
+        LoginResult validUser;
+        if (role.equalsIgnoreCase("patient")) {
+            validUser = cdb.isValidUser(username, password);
+            if (validUser.status == 0) {
+                HttpSession session = request.getSession(true);
+                PatientBean bean = validUser.patient;
+                session.setAttribute("patientBean", bean);
+                targetURL = "client/clientHome.jsp";
+            } else {
+                String errorMsg = "";
+                switch (validUser.status) {
+                    case 1:
+                        errorMsg = "Username not register. Please register.";
+                        break;
+                    case 2:
+                        errorMsg = "Password incorrect. Please check the password.";
+                        break;
+                }
+                request.setAttribute("errorMsg", errorMsg);
+                targetURL = "login.jsp";
             }
-            request.setAttribute("errorMsg", errorMsg);
-            targetURL = "login.jsp";
+        } else {
+            validUser = new LoginResult();
         }
 
         RequestDispatcher rd;
@@ -91,7 +98,7 @@ public class loginController extends HttpServlet {
         boolean result = false;
         HttpSession session = request.getSession();
 
-        if (session.getAttribute("customerBean") != null) {
+        if (session.getAttribute("patientBean") != null) {
             result = true;
         }
         return result;
@@ -109,7 +116,7 @@ public class loginController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         if (session != null) {
-            session.removeAttribute("customerBean");
+            session.removeAttribute("patientBean");
             session.invalidate();
         }
         doLogin(request, response);

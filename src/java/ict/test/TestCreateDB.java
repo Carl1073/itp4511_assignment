@@ -5,7 +5,7 @@
  */
 package ict.test;
 
-import ict.db.CustomerDB;
+import ict.db.PatientDB;
 
 /**
  *
@@ -17,8 +17,8 @@ public class TestCreateDB {
         String url ="jdbc:mysql://localhost:3306/";
         String username = "root";
         String password = "";   
-        CustomerDB custDb = new CustomerDB(url, username, password);
-        String dbname= "ITP4511_DB";
+        PatientDB custDb = new PatientDB(url, username, password);
+        String dbname= "ITP4511_Assignment_DB";
         custDb.createDB(dbname);
     }
 }

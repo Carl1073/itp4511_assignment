@@ -11,7 +11,7 @@
         <title>Login Page</title>
     </head>
 
-    <jsp:useBean id="customerBean" class="ict.bean.CustomerBean" scope="session"/>
+    <jsp:useBean id="customerBean" class="ict.bean.PatientBean" scope="session"/>
 
     <body>
         <h1>Community Care Health Consortium </h1>
@@ -22,7 +22,7 @@
         <form action="loginController" method="post">
             Login as:
             <div class="segmented-control">
-                <input type="radio" name="role" id="user" value="user" checked />
+                <input type="radio" name="role" id="customer" value="user" checked />
                 <label for="user">customer</label>
 
                 <input type="radio" name="role" id="staff" value="staff" />

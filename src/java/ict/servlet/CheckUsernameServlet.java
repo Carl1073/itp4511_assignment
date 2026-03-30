@@ -1,5 +1,5 @@
 
-import ict.db.CustomerDB;
+import ict.db.PatientDB;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -11,14 +11,14 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/checkUsername")
 public class CheckUsernameServlet extends HttpServlet {
 
-    private CustomerDB db;
+    private PatientDB db;
 
     @Override
     public void init() {
         String dbUser = "root";
         String dbPassword = "";
         String dbUrl = "jdbc:mysql://localhost:3306/ITP4511_Assignment_DB";
-        db = new CustomerDB(dbUrl, dbUser, dbPassword);
+        db = new PatientDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override

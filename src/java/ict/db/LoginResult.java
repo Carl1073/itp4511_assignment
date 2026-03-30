@@ -5,18 +5,21 @@
  */
 package ict.db;
 
-import ict.bean.CustomerBean;
+import ict.bean.PatientBean;
 
 /**
  *
  * @author Tong
  */
 public class LoginResult {
-    public int status;
-    public CustomerBean customer;
 
-    public LoginResult(int status, CustomerBean customer) {
+    public int status;
+    public PatientBean patient;
+
+    public LoginResult() {}
+
+    public LoginResult(int status, PatientBean patient) {
         this.status = status;
-        this.customer = customer;
+        this.patient = patient;
     }
 }

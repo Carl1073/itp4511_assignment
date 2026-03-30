@@ -5,8 +5,8 @@
  */
 package ict.test;
 
-import ict.bean.CustomerBean;
-import ict.db.CustomerDB;
+import ict.bean.PatientBean;
+import ict.db.PatientDB;
 
 /**
  *
@@ -18,7 +18,7 @@ public class TestQueryCust {
         String url = "jdbc:mysql://localhost:3306/ITP4511_Assignment_DB";
         String username = "root";
         String password = "";
-        CustomerDB custDb = new CustomerDB(url, username, password);
+        PatientDB custDb = new PatientDB(url, username, password);
 //        CustomerBean cb = custDb.queryCust();
 //        System.out.println(cb.getName());
     }

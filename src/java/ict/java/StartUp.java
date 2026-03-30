@@ -5,7 +5,7 @@
  */
 package ict.java;
 
-import ict.db.CustomerDB;
+import ict.db.PatientDB;
 
 
 /**
@@ -15,7 +15,7 @@ import ict.db.CustomerDB;
 public class StartUp {
     // Change the method to accept parameters
     public static void startUp(String url, String username, String password) {
-        CustomerDB custDb = new CustomerDB(url, username, password);
+        PatientDB custDb = new PatientDB(url, username, password);
         custDb.createCustTable();
     }
 }

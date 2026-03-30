@@ -5,8 +5,8 @@
  */
 package ict.servlet;
 
-import ict.bean.CustomerBean;
-import ict.db.CustomerDB;
+import ict.bean.PatientBean;
+import ict.db.PatientDB;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
@@ -22,14 +22,14 @@ import javax.servlet.http.*;
 @WebServlet(name = "registerController", urlPatterns = {"/registerController"})
 public class registerController extends HttpServlet {
 
-    private CustomerDB db;
+    private PatientDB db;
 
     @Override
     public void init() {
         String dbUser = "root";
         String dbPassword = "";
         String dbUrl = "jdbc:mysql://localhost:3306/ITP4511_Assignment_DB";
-        db = new CustomerDB(dbUrl, dbUser, dbPassword);
+        db = new PatientDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -52,48 +52,38 @@ public class registerController extends HttpServlet {
     }
 
     private void doRegister(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String name = request.getParameter("name");
-        String username = request.getParameter("username");
-        String pw = request.getParameter("pw");
+        // 1. Wrap parameters into a bean immediately
+        PatientBean cb = new PatientBean(
+                db.getLargestCustId() + 1,
+                request.getParameter("name"),
+                request.getParameter("username"),
+                request.getParameter("pw"),
+                request.getParameter("gender"),
+                request.getParameter("address"),
+                Date.valueOf(request.getParameter("dob")),
+                request.getParameter("tel"),
+                request.getParameter("email")
+        );
+
         String cpw = request.getParameter("cpw");
-        String gender = request.getParameter("gender");
-        String address = request.getParameter("address");
-        Date dob = Date.valueOf(request.getParameter("dob"));
-        String tel = request.getParameter("tel");
-        String email = request.getParameter("email");
+        StringBuilder errorMsg = new StringBuilder();
 
-        String errorMsg = "";
-        // Check duplicate username
-        if (db.isUsernameTaken(username)) {
-            errorMsg += "Username is already taken. Please choose another.<br/>";
+        // 2. Validation
+        if (db.isUsernameTaken(cb.getUsername())) {
+            errorMsg.append("Username is already taken.<br/>");
         }
-        //Check the pw and cpw is match
-        System.out.println(pw);
-        System.out.println(cpw);
+        if (!cb.getPassword().equals(cpw)) {
+            errorMsg.append("Passwords do not match.<br/>");
+        }
 
-        if (!pw.equals(cpw)) {
-            errorMsg += "Password is not match.<br/>";
-        }
-        if (!"".equals(errorMsg)) {
-            request.setAttribute("errorMsg", errorMsg);
-            request.setAttribute("name", name); // preserve input
-            request.setAttribute("username", username);
-            request.setAttribute("pw", pw);
-            request.setAttribute("cpw", cpw);
-            request.setAttribute("gender", gender);
-            request.setAttribute("address", address);
-            request.setAttribute("dob", dob);
-            request.setAttribute("tel", tel);
-            request.setAttribute("email", email);
+        // 3. Logic Flow
+        if (errorMsg.length() > 0) {
+            request.setAttribute("errorMsg", errorMsg.toString());
+            request.setAttribute("tempCustomer", cb); // Just send the whole bean back
             request.getRequestDispatcher("/register.jsp").forward(request, response);
-            return;
         } else {
-            HttpSession session = request.getSession(true);
-            CustomerBean cb = new CustomerBean(db.getLargestCustId() + 1, name, username, pw, gender, address, dob, tel, email);
             db.addRecord(cb);
-            session.setAttribute("customerBean", cb);
-            request.setAttribute("username", username);
-            request.setAttribute("pw", pw);
+            request.getSession().setAttribute("customerBean", cb);
             request.getRequestDispatcher("/registerSuccess.jsp").forward(request, response);
         }
     }
