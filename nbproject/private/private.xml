@@ -2,16 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/Users/Tong/Desktop/新增資料夾%20(2)/ITP4511_Assignment/src/java/ict/java/AppInitListener.java</file>
-            <file>file:/C:/Users/Tong/Desktop/新增資料夾%20(2)/ITP4511_Assignment/src/java/ict/test/TestisValidUser.java</file>
-            <file>file:/C:/Users/Tong/Desktop/新增資料夾%20(2)/ITP4511_Assignment/web/registerSuccess.jsp</file>
-            <file>file:/C:/Users/Tong/Desktop/新增資料夾%20(2)/ITP4511_Assignment/web/loginError.jsp</file>
-            <file>file:/C:/Users/Tong/Desktop/新增資料夾%20(2)/ITP4511_Assignment/src/java/ict/servlet/loginController.java</file>
-            <file>file:/C:/Users/Tong/Desktop/新增資料夾%20(2)/ITP4511_Assignment/src/java/ict/servlet/registerController.java</file>
-            <file>file:/C:/Users/Tong/Desktop/新增資料夾%20(2)/ITP4511_Assignment/src/java/ict/servlet/CheckUsernameServlet.java</file>
-            <file>file:/C:/Users/Tong/Desktop/新增資料夾%20(2)/ITP4511_Assignment/src/java/ict/db/CustomerDB.java</file>
-            <file>file:/C:/Users/Tong/Desktop/新增資料夾%20(2)/ITP4511_Assignment/web/index.jsp</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

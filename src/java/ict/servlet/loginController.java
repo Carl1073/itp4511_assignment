@@ -22,12 +22,12 @@ import javax.servlet.http.*;
 public class loginController extends HttpServlet {
 
     private CustomerDB db;
-    
+
     @Override
-    public void init () {
-        String dbUser = this.getServletContext().getInitParameter("dbUser"); 
-        String dbPassword = this.getServletContext().getInitParameter("dbPassword"); 
-        String dbUrl = this.getServletContext().getInitParameter("dbUrl"); 
+    public void init() {
+        String dbUser = this.getServletContext().getInitParameter("dbUser");
+        String dbPassword = this.getServletContext().getInitParameter("dbPassword");
+        String dbUrl = this.getServletContext().getInitParameter("dbUrl");
         db = new CustomerDB(dbUrl, dbUser, dbPassword);
     }
 
@@ -36,19 +36,22 @@ public class loginController extends HttpServlet {
             throws ServletException, IOException {
         doPost(request, response);
     }
-    
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
-        if (!isAuthenticated(request) && !("authenticate".equals(action))) {
+        System.out.println(action);
+        if (!isAuthenticated(request) && !("authenticate".equalsIgnoreCase(action))) {
+                        System.out.println("test");
+
             doLogin(request, response);
             return;
         }
-        if ("authenticate".equals(action)) {
+        if ("authenticate".equalsIgnoreCase(action)) {
             doAuthenticate(request, response);
-        } else if ("logout".equals(action)) {
+        } else if ("logout".equalsIgnoreCase(action)) {
+            System.out.println("test2");
             doLogout(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
@@ -61,15 +64,14 @@ public class loginController extends HttpServlet {
         String password = request.getParameter("password");
         String targetURL;
         LoginResult validUser = db.isValidUser(username, password);
-        if (validUser.status == 0)  {
+        if (validUser.status == 0) {
             HttpSession session = request.getSession(true);
             CustomerBean bean = validUser.customer;
-
             session.setAttribute("customerBean", bean);
             targetURL = "client/clientHome.jsp";
-        } else{
+        } else {
             String errorMsg = "";
-            switch (validUser.status){
+            switch (validUser.status) {
                 case 1:
                     errorMsg = "Username not register. Please register.";
                     break;
@@ -90,7 +92,7 @@ public class loginController extends HttpServlet {
         boolean result = false;
         HttpSession session = request.getSession();
 
-        if (session.getAttribute("userInfo") != null) {
+        if (session.getAttribute("customerBean") != null) {
             result = true;
         }
         return result;
@@ -103,12 +105,12 @@ public class loginController extends HttpServlet {
         rd = getServletContext().getRequestDispatcher("/" + targetURL);
         rd.forward(request, response);
     }
-    
+
     private void doLogout(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        if (session != null){
-            session.removeAttribute("userInfo");
+        if (session != null) {
+            session.removeAttribute("customerBean");
             session.invalidate();
         }
         doLogin(request, response);

@@ -9,11 +9,17 @@ import java.io.Serializable;
 
 /**
  *
- * @author Tong
+ * @author 240708635
  */
-public class StaffBean implements Serializable{
-    private String custId;
+public class StaffBean implements Serializable, People {
+
+    private String stafffId;
     private String name;
     private String password;
     private String role;
+
+    @Override
+    public String getRole() {
+        return role;
+    }
 }

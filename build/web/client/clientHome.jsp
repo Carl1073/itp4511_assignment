@@ -15,5 +15,9 @@
         <jsp:useBean id="customerBean" class="ict.bean.CustomerBean" scope="session"/>
         <b> Hello, <jsp:getProperty name="customerBean" property="name"/></b>
         <h1>Hello World!</h1>
+        <form method="post" action="loginController">
+            <input type="hidden" name="action" value="logout"/>
+            <input type="submit" name="logoutButton" value="Logout"/>
+        </form>
     </body>
 </html>

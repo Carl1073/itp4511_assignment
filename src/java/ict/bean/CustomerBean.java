@@ -12,7 +12,8 @@ import java.sql.Date;
  *
  * @author 240708635
  */
-public class CustomerBean implements Serializable{
+public class CustomerBean implements Serializable, People {
+
     private int custId;
     private String name;
     private String username;
@@ -22,8 +23,10 @@ public class CustomerBean implements Serializable{
     private Date dob;
     private String tel;
     private String email;
+    private String role;
 
     public CustomerBean() {
+        setRole();
     }
 
     public CustomerBean(int custId, String name, String username, String password, String gender, String address, Date dob,
@@ -37,6 +40,7 @@ public class CustomerBean implements Serializable{
         this.dob = dob;
         this.tel = tel;
         this.email = email;
+        setRole();
     }
 
     public String getAddress() {
@@ -110,8 +114,17 @@ public class CustomerBean implements Serializable{
     public void setUsername(String username) {
         this.username = username;
     }
-    
-    public String toString(){
+
+    public String toString() {
         return username;
+    }
+
+    public void setRole() {
+        this.role = "customer";
+    }
+
+    @Override
+    public String getRole() {
+        return role;
     }
 }

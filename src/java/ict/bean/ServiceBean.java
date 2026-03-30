@@ -13,7 +13,7 @@ import java.sql.Time;
 
 /**
  *
- * @author Tong
+ * @author 240708635
  */
 public class ServiceBean implements Serializable{
     private String serviceId;

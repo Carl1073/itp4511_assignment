@@ -10,6 +10,10 @@
         <title>Login Page</title>
     </head>
 
+    <jsp:useBean id="customerBean" class="ict.bean.CustomerBean" scope="session"/>
+    <%if(customerBean.getRole().equalsIgnoreCase("customer")){ %>
+        <jsp:forward page="client/clientHome.jsp" />
+    <%}%>
     <body>
         <h1>Community Care Health Consortium </h1>
         <h2>Login Page</h2>
