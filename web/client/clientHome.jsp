@@ -12,8 +12,8 @@
         <title>Home page</title>
     </head>
     <body>
-        <%@ include file="client_heading.jsp" %>
-        <jsp:useBean id="customerBean" class="ict.bean.CustomerBean" scope="session"/>
+        <%@ include file="component/patient/heading.jsp" %>
+        <jsp:useBean id="customerBean" class="ict.bean.PatientBean" scope="session"/>
         <b> Hello, <jsp:getProperty name="customerBean" property="name"/></b>
     </body>
 </html>
