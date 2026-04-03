@@ -1,7 +1,7 @@
 <%-- 
-    Document   : index
-    Created on : Mar 19, 2026, 9:42:32 AM
-    Author     : 240708635
+    Document   : index.jsp
+    Created on : 2026/4/3, 上午 02:33:30
+    Author     : slt8ky
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -12,6 +12,6 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <jsp:forward page="login.jsp" />
+        <jsp:forward page="login.jsp"/>
     </body>
 </html>

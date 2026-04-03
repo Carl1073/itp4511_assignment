@@ -1,9 +1,16 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package ict.bean;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
+/**
+ *
+ * @author slt8ky
+ */
 public class UserBean implements Serializable {
     private int user_id;
     private String username;
@@ -14,32 +21,38 @@ public class UserBean implements Serializable {
     private Gender gender;
     private int role_id;
 
-    public enum Gender {
-        MALE('m'),
-        FEMALE('f');
+    public static enum Gender {
+        MALE("male"),
+        FEMALE("female");
 
-        public final char code;
-        private static final Map<Character, Gender> genderMap = new HashMap<>();
-        static {
-            genderMap.put('m', MALE);
-            genderMap.put('f', FEMALE);
+        private final String value;
+
+        Gender(String value) {
+            this.value = value;
         }
 
-        private Gender(char code) {
-            this.code = code;
+        public String getValue() {
+            return value;
         }
 
-        public static Gender fromChar(char c) {
-            return genderMap.get(Character.toLowerCase(c));
+        public static Gender fromValue(String value) {
+            if (value == null)
+                return null;
+
+            for (Gender g : Gender.values()) {
+                if (g.value.equals(value)) {
+                    return g;
+                }
+            }
+            return null;
         }
     }
 
     public UserBean() {
     }
 
-    public UserBean(int user_id, String username, String password, String first_name, String last_name, String email,
+    public UserBean(String username, String password, String first_name, String last_name, String email,
             Gender gender, int role_id) {
-        this.user_id = user_id;
         this.username = username;
         this.password = password;
         this.first_name = first_name;
@@ -49,8 +62,9 @@ public class UserBean implements Serializable {
         this.role_id = role_id;
     }
 
-    public UserBean(String username, String password, String first_name, String last_name, String email,
+    public UserBean(int user_id, String username, String password, String first_name, String last_name, String email,
             Gender gender, int role_id) {
+        this.user_id = user_id;
         this.username = username;
         this.password = password;
         this.first_name = first_name;

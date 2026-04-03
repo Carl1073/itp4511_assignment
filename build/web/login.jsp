@@ -1,43 +1,30 @@
-<%-- Document : index Created on : Mar 16, 2026, 3:29:02 PM Author : 240708635 --%>
+<%-- Document : login Created on : 2026/4/3, 上午 02:29:24 Author : slt8ky --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="stylesheet" href="CSS/styles.css">
-        <title>Login Page</title>
+        <title>JSP Page</title>
     </head>
 
-    <jsp:useBean id="customerBean" class="ict.bean.PatientBean" scope="session"/>
-
     <body>
-        <h1>Community Care Health Consortium </h1>
-        <h2>Login Page</h2>
-        <% if (request.getAttribute("errorMsg") != null) {%>
-        <p class="error"><%= request.getAttribute("errorMsg")%></p>
-        <% }%>
-        <form action="loginController" method="post">
-            Login as:
-            <div class="segmented-control">
-                <input type="radio" name="role" id="customer" value="user" checked />
-                <label for="user">customer</label>
-
-                <input type="radio" name="role" id="staff" value="staff" />
-                <label for="staff">staff</label>
-
-                <input type="radio" name="role" id="admin" value="admin" />
-                <label for="admin">admin</label>
+        <form action="main" method="post">
+            <input type="hidden" name="action" value="login" required>
+            <div>
+                <div>Username</div>
+                <input type="text" name="username" value="<%= (request.getParameter("username") != null ? request.getParameter("username") : "") %>" required>
             </div>
-            <input type="hidden" name="action" value="authenticate" />
-            <label>Name: <input name="username" type="text" required="required" /></label><br />
-            <label>Password <input name="password" type="text" required="required" /></label><br />
-
-            <br />
-            <input type="submit" value="Login" id="login">
-            <a href="register.jsp">No account? Register now!</a>
+            <div>
+                <div>Password</div>
+                <input type="password" name="password" value="<%= (request.getParameter("password") != null ? request.getParameter("password") : "") %>" required>
+            </div>
+            <div style="color:red;">
+                <%= (request.getAttribute("msg") != null ? request.getAttribute("msg") : "")%>
+            </div>
+            <input type="submit" value="login">
+            <a href="register.jsp">create account<a/>
         </form>
     </body>
 
