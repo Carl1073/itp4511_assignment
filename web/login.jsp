@@ -22,8 +22,8 @@
         <form action="loginController" method="post">
             Login as:
             <div class="segmented-control">
-                <input type="radio" name="role" id="customer" value="user" checked />
-                <label for="user">customer</label>
+                <input type="radio" name="role" id="patient" value="patient" checked />
+                <label for="user">patient</label>
 
                 <input type="radio" name="role" id="staff" value="staff" />
                 <label for="staff">staff</label>

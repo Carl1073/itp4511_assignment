@@ -42,16 +42,17 @@ public class loginController extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
         String role = request.getParameter("role");
-        System.out.println(action);
+        System.out.println(action + ", " + role);
+
         if (!isAuthenticated(request) && !("authenticate".equalsIgnoreCase(action))) {
             System.out.println("test");
             doLogin(request, response);
             return;
         }
         if ("authenticate".equalsIgnoreCase(action)) {
+            System.out.println("is doing authenticate");
             doAuthenticate(request, response);
         } else if ("logout".equalsIgnoreCase(action)) {
-            System.out.println("test2");
             doLogout(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
@@ -64,6 +65,8 @@ public class loginController extends HttpServlet {
         String password = request.getParameter("password");
         String role = request.getParameter("role");
         String targetURL = "";
+        System.out.println(role);
+
         LoginResult validUser;
         if (role.equalsIgnoreCase("patient")) {
             validUser = cdb.isValidUser(username, password);
@@ -88,6 +91,7 @@ public class loginController extends HttpServlet {
         } else {
             validUser = new LoginResult();
         }
+        System.out.println(targetURL);
 
         RequestDispatcher rd;
         rd = getServletContext().getRequestDispatcher("/" + targetURL);
