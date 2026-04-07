@@ -74,7 +74,7 @@ public class loginController extends HttpServlet {
                 HttpSession session = request.getSession(true);
                 PatientBean bean = validUser.patient;
                 session.setAttribute("patientBean", bean);
-                targetURL = "client/clientHome.jsp";
+                targetURL = "patient/patientHome.jsp";
             } else {
                 String errorMsg = "";
                 switch (validUser.status) {
