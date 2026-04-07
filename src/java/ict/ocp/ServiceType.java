@@ -10,5 +10,6 @@ package ict.ocp;
  * @author Tong
  */
 public interface ServiceType {
-    
+
+    public String toString();
 }

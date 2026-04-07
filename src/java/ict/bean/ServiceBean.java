@@ -103,5 +103,4 @@ public class ServiceBean implements Serializable {
     public void set_custId(String _custId) {
         this._custId = _custId;
     }
-
 }

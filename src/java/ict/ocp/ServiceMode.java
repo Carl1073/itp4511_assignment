@@ -10,5 +10,7 @@ package ict.ocp;
  * @author Tong
  */
 public interface ServiceMode {
-    
+
+    public String toString();
+
 }

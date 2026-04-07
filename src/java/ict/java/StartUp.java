@@ -5,17 +5,19 @@
  */
 package ict.java;
 
-import ict.db.PatientDB;
-
+import ict.db.*;
 
 /**
  *
  * @author 240708635
  */
 public class StartUp {
+
     // Change the method to accept parameters
     public static void startUp(String url, String username, String password) {
-        PatientDB custDb = new PatientDB(url, username, password);
-        custDb.createCustTable();
+        PatientDB patientDb = new PatientDB(url, username, password);
+        patientDb.createCustTable();
+        ServiceDB serviceDb = new ServiceDB(url, username, password);
+        serviceDb.createServiceTable();
     }
 }
