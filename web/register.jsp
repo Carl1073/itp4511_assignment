@@ -30,16 +30,55 @@
             <% }%>
 
             <input type="hidden" name="action" value="register"/>
-            Name: <input type="text" name="name" value="<%= request.getAttribute("name") != null ? request.getAttribute("name") : ""%>"  required /><br/>
-            Username: <input id="username" type="text" name="username" value="<%= request.getAttribute("username") != null ? request.getAttribute("username") : ""%>"  required/> <span id="username-feedback" style="margin-left: 10px;"></span><br/>
-            Password: <input type="password" name="pw" value="<%= request.getAttribute("pw") != null ? request.getAttribute("pw") : ""%>" required /><br/>
-            Confirm Password: <input type="password" name="cpw" value="<%= request.getAttribute("cpw") != null ? request.getAttribute("cpw") : ""%>" required /><span id="pw-feedback" style="margin-left: 10px;"></span><br/><br/>
-            Gender: <label><input type="radio" name="gender" value="M" <c:if test="${gender == 'M'}">checked="checked"</c:if>  required/>Male </label> 
-            <label><input type="radio" name="gender" value="F" <c:if test="${gender == 'F'}">checked="checked"</c:if>  required/>Female </label><br/>
-            Address: <input type="text" name="address" size="100" value="<%= request.getAttribute("address") != null ? request.getAttribute("address") : ""%>" required/><br/>
-            Date of Birth: <input type="date" name="dob" value="<%= formattedDate %>"  required/><br/>
-            Contact number: <input type="text" name="tel" value="<%= request.getAttribute("tel") != null ? request.getAttribute("tel") : ""%>" required/><br/>
-            Email: <input type="email" name="email" value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : ""%>" required/><br/>
+            <div class="form-row">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" value="<%= request.getAttribute("name") != null ? request.getAttribute("name") : ""%>" required />
+            </div>
+
+            <div class="form-row">
+                <label for="username">Username:</label>
+                <input id="username" type="text" name="username" value="<%= request.getAttribute("username") != null ? request.getAttribute("username") : ""%>" required/>
+                <span id="username-feedback" style="margin-left: 10px;"></span>
+            </div>
+
+            <div class="form-row">
+                <label for="pw">Password:</label>
+                <input type="password" id="pw" name="pw" value="<%= request.getAttribute("pw") != null ? request.getAttribute("pw") : ""%>" required />
+            </div>
+
+            <div class="form-row">
+                <label for="cpw">Confirm Password:</label>
+                <input type="password" id="cpw" name="cpw" value="<%= request.getAttribute("cpw") != null ? request.getAttribute("cpw") : ""%>" required />
+                <span id="pw-feedback" style="margin-left: 10px;"></span>
+            </div>
+
+            <div class="form-row">
+                <label>Gender:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="gender" value="M" <c:if test="${gender == 'M'}">checked="checked"</c:if> required/> Male</label> 
+                    <label><input type="radio" name="gender" value="F" <c:if test="${gender == 'F'}">checked="checked"</c:if> required/> Female</label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" name="address" style="flex-grow: 1; max-width: 500px;" value="<%= request.getAttribute("address") != null ? request.getAttribute("address") : ""%>" required/>
+            </div>
+
+            <div class="form-row">
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" name="dob" value="<%= formattedDate%>" required/>
+            </div>
+
+            <div class="form-row">
+                <label for="tel">Contact number:</label>
+                <input type="text" id="tel" name="tel" value="<%= request.getAttribute("tel") != null ? request.getAttribute("tel") : ""%>" required/>
+            </div>
+
+            <div class="form-row">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : ""%>" required/>
+            </div>
             <input type="submit" value="Register"/>
         </form>
         <a href="login.jsp">Return</a>

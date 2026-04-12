@@ -8,7 +8,7 @@
 }
 
 .segmented-control input[type="radio"] {
-    display: none; /* 隱藏原本的小圓圈 */
+    display: none; /* hidden the small circile */
 }
 
 .segmented-control label {
@@ -30,3 +30,36 @@
 }
 
 .error { color: red; }
+/* Container for each form row */
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px; /* Consistent spacing between rows */
+}
+
+/* Force all labels to have the same width */
+.form-row label {
+    width: 150px;       /* Adjust this based on your longest label */
+    font-weight: bold;
+}
+
+/* Ensure inputs and feedback spans behave nicely */
+.form-row input[type="text"],
+.form-row input[type="password"],
+.form-row input[type="email"],
+.form-row input[type="date"] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Specific fix for the radio button alignment */
+.radio-group {
+    display: flex;
+    gap: 15px;
+}
+
+.radio-group label {
+    width: auto; /* Radio labels shouldn't be 150px wide */
+    font-weight: normal;
+}

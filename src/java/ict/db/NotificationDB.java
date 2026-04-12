@@ -14,13 +14,13 @@ import ict.bean.PatientBean;
  *
  * @author 240708635
  */
-public class ServiceDB {
+public class NotificationDB {
 
     private String url = "";
     private String username = "";
     private String password = "";
 
-    public ServiceDB(String url, String username, String password) {
+    public NotificationDB(String url, String username, String password) {
         this.url = url;
         this.username = username;
         this.password = password;
@@ -65,11 +65,14 @@ public class ServiceDB {
         try {
             cnnct = getConnection();
             stmnt = cnnct.createStatement();
-            String sql = "CREATE TABLE IF NOT EXISTS service ("
-                    + "serviceId INT AUTO_INCREMENT,"
-                    + "serviceName VARCHAR(100) NOT NULL,"
-                    + "description TEXT,"
-                    + "PRIMARY KEY (serviceId)"
+            String sql = "CREATE TABLE IF NOT EXISTS notification ("
+                    + "notifId INT AUTO_INCREMENT,"
+                    + "userId INT NOT NULL,"
+                    + "message TEXT NOT NULL,"
+                    + "isRead BOOLEAN DEFAULT FALSE,"
+                    + "createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                    + "PRIMARY KEY (notifId),"
+                    + "FOREIGN KEY (userId) REFERENCES users(userId)"
                     + ")";
             stmnt.execute(sql);
             stmnt.close();

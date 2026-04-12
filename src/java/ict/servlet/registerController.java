@@ -83,7 +83,7 @@ public class registerController extends HttpServlet {
             request.getRequestDispatcher("/register.jsp").forward(request, response);
         } else {
             db.addRecord(cb);
-            request.getSession().setAttribute("customerBean", cb);
+            request.getSession().setAttribute("patientBean", cb);
             request.getRequestDispatcher("/registerSuccess.jsp").forward(request, response);
         }
     }

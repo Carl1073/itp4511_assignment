@@ -14,13 +14,13 @@ import ict.bean.PatientBean;
  *
  * @author 240708635
  */
-public class ServiceDB {
+public class AppointmentDB {
 
     private String url = "";
     private String username = "";
     private String password = "";
 
-    public ServiceDB(String url, String username, String password) {
+    public AppointmentDB(String url, String username, String password) {
         this.url = url;
         this.username = username;
         this.password = password;
@@ -65,11 +65,19 @@ public class ServiceDB {
         try {
             cnnct = getConnection();
             stmnt = cnnct.createStatement();
-            String sql = "CREATE TABLE IF NOT EXISTS service ("
-                    + "serviceId INT AUTO_INCREMENT,"
-                    + "serviceName VARCHAR(100) NOT NULL,"
-                    + "description TEXT,"
-                    + "PRIMARY KEY (serviceId)"
+            String sql = "CREATE TABLE IF NOT EXISTS appointment ("
+                    + "appId INT AUTO_INCREMENT,"
+                    + "patientId INT NOT NULL,"
+                    + "clinicId INT NOT NULL,"
+                    + "serviceId INT NOT NULL,"
+                    + "appDate DATE NOT NULL,"
+                    + "timeslot TIME NOT NULL,"
+                    + "status ENUM('Confirmed', 'Arrived', 'No-show', 'Completed', 'Cancelled') DEFAULT 'Confirmed',"
+                    + "cancelReason VARCHAR(255)," 
+                    + "PRIMARY KEY (appId),"
+                    + "FOREIGN KEY (patientId) REFERENCES users(userId),"
+                    + "FOREIGN KEY (clinicId) REFERENCES clinics(clinicId),"
+                    + "FOREIGN KEY (serviceId) REFERENCES services(serviceId)"
                     + ")";
             stmnt.execute(sql);
             stmnt.close();

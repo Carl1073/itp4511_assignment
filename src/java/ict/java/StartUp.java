@@ -17,7 +17,5 @@ public class StartUp {
     public static void startUp(String url, String username, String password) {
         PatientDB patientDb = new PatientDB(url, username, password);
         patientDb.createCustTable();
-        ServiceDB serviceDb = new ServiceDB(url, username, password);
-        serviceDb.createServiceTable();
     }
 }

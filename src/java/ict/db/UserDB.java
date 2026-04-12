@@ -14,13 +14,13 @@ import ict.bean.PatientBean;
  *
  * @author 240708635
  */
-public class ServiceDB {
+public class UserDB {
 
     private String url = "";
     private String username = "";
     private String password = "";
 
-    public ServiceDB(String url, String username, String password) {
+    public UserDB(String url, String username, String password) {
         this.url = url;
         this.username = username;
         this.password = password;
@@ -58,6 +58,56 @@ public class ServiceDB {
         }
     }
 
+    // -1 is error, 0 is success, 1 is no user, 2 is incorrect password
+    public LoginResult isValidUser(String user, String pwd) {
+        String sql = "SELECT * FROM patient WHERE username = ?";
+
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+
+            pStmnt.setString(1, user);
+
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                if (rs.next()) {
+                    // User exists, check password
+                    if (rs.getString("password").equals(pwd)) {
+                        // Success! Convert the current row to a bean
+                        PatientBean bean = reseltSetToBean(rs);
+                        return new LoginResult(0, bean);
+                    } else {
+                        return new LoginResult(2, null); // Wrong password
+                    }
+                } else {
+                    return new LoginResult(1, null); // User not found
+                }
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+            return new LoginResult(-1, null); // System error
+        }
+    }
+
+    public int getLargestCustId() {
+        Connection cnnct = null;
+        PreparedStatement pStmnt = null;
+        int largestCustId = 0;
+        try {
+            cnnct = getConnection();
+            String preQueryStatement = "SELECT MAX(column_name) AS largest_value FROM users;";
+            pStmnt = cnnct.prepareStatement(preQueryStatement);
+            ResultSet rs = null;
+            rs = pStmnt.executeQuery();
+            if (rs.next()) {
+                largestCustId = rs.getInt("largest_value");
+            }
+            pStmnt.close();
+            cnnct.close();
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return largestCustId;
+    }
+
     public void createTable() {
         Statement stmnt = null;
         Connection cnnct = null;
@@ -65,11 +115,17 @@ public class ServiceDB {
         try {
             cnnct = getConnection();
             stmnt = cnnct.createStatement();
-            String sql = "CREATE TABLE IF NOT EXISTS service ("
-                    + "serviceId INT AUTO_INCREMENT,"
-                    + "serviceName VARCHAR(100) NOT NULL,"
-                    + "description TEXT,"
-                    + "PRIMARY KEY (serviceId)"
+            String sql = "CREATE TABLE IF NOT EXISTS user ("
+                    + "userId INT AUTO_INCREMENT,"
+                    + "username VARCHAR(50) NOT NULL UNIQUE,"
+                    + "password VARCHAR(255) NOT NULL,"
+                    + "fullName VARCHAR(100) NOT NULL,"
+                    + "email VARCHAR(100),"
+                    + "phone VARCHAR(10),"
+                    + "gender ENUM('M', 'F', 'O'),"
+                    + "role ENUM('Patient', 'Staff', 'Admin') NOT NULL,"
+                    + "clinicId INT,"
+                    + "PRIMARY KEY (userId)"
                     + ")";
             stmnt.execute(sql);
             stmnt.close();

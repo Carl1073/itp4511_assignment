@@ -22,8 +22,8 @@
         <form action="loginController" method="post">
             Login as:
             <div class="segmented-control">
-                <input type="radio" name="role" id="patient" value="patient" checked />
-                <label for="user">patient</label>
+                <input type="radio" name="role" id="patient" value="patient" checked/>
+                <label for="patient">patient</label>
 
                 <input type="radio" name="role" id="staff" value="staff" />
                 <label for="staff">staff</label>
@@ -32,8 +32,15 @@
                 <label for="admin">admin</label>
             </div>
             <input type="hidden" name="action" value="authenticate" />
-            <label>Name: <input name="username" type="text" required="required" /></label><br />
-            <label>Password <input name="password" type="text" required="required" /></label><br />
+            <div class="form-row">
+                <label for="username">Name:</label>
+                <input id="username" name="username" type="text" required>
+            </div>
+
+            <div class="form-row">
+                <label for="password">Password:</label>
+                <input id="password" name="password" type="password" required>
+            </div>
 
             <br />
             <input type="submit" value="Login" id="login">

@@ -1,71 +1,44 @@
-package ict.bean;
-
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
+/**
+ * Supports Patients, Staff, and Administrators.
+ */
 public class UserBean implements Serializable {
-    private int user_id;
+    private static final long serialVersionUID = 1L;
+
+    private int userId;
     private String username;
     private String password;
-    private String first_name;
-    private String last_name;
+    private String fullName;
     private String email;
-    private Gender gender;
-    private int role_id;
+    private String phone;
+    private String gender; // M, F, or O
+    private String role;   // Patient, Staff, or Admin
+    private int clinicId = 0;  // for Staff and Admin
 
-    public enum Gender {
-        MALE('m'),
-        FEMALE('f');
-
-        public final char code;
-        private static final Map<Character, Gender> genderMap = new HashMap<>();
-        static {
-            genderMap.put('m', MALE);
-            genderMap.put('f', FEMALE);
-        }
-
-        private Gender(char code) {
-            this.code = code;
-        }
-
-        public static Gender fromChar(char c) {
-            return genderMap.get(Character.toLowerCase(c));
-        }
-    }
-
+    // Default No-argument Constructor
     public UserBean() {
     }
 
-    public UserBean(int user_id, String username, String password, String first_name, String last_name, String email,
-            Gender gender, int role_id) {
-        this.user_id = user_id;
+    public UserBean(int userId, String username, String password, String fullName, String email, String phone, String gender, String role, int clinicId) {
+        this.userId = userId;
         this.username = username;
         this.password = password;
-        this.first_name = first_name;
-        this.last_name = last_name;
+        this.fullName = fullName;
         this.email = email;
+        this.phone = phone;
         this.gender = gender;
-        this.role_id = role_id;
+        this.role = role;
+        this.clinicId = clinicId;
     }
 
-    public UserBean(String username, String password, String first_name, String last_name, String email,
-            Gender gender, int role_id) {
-        this.username = username;
-        this.password = password;
-        this.first_name = first_name;
-        this.last_name = last_name;
-        this.email = email;
-        this.gender = gender;
-        this.role_id = role_id;
+    // Getters and Setters
+    public int getUserId() {
+        return userId;
     }
 
-    public int getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {
@@ -84,20 +57,12 @@ public class UserBean implements Serializable {
         this.password = password;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
-    }
-
-    public String getLast_name() {
-        return last_name;
-    }
-
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getEmail() {
@@ -108,19 +73,35 @@ public class UserBean implements Serializable {
         this.email = email;
     }
 
-    public Gender getGender() {
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
-    public int getRole_id() {
-        return role_id;
+    public String getRole() {
+        return role;
     }
 
-    public void setRole_id(int role_id) {
-        this.role_id = role_id;
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public int getClinicId() {
+        return clinicId;
+    }
+
+    public void setClinicId(int clinicId) {
+        this.clinicId = clinicId;
     }
 }
