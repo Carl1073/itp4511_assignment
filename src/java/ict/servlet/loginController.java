@@ -5,8 +5,8 @@
  */
 package ict.servlet;
 
-import ict.bean.PatientBean;
-import ict.db.PatientDB;
+import ict.bean.UserBean;
+import ict.db.UserDB;
 import ict.db.LoginResult;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,14 +21,14 @@ import javax.servlet.http.*;
 @WebServlet(name = "loginController", urlPatterns = {"/loginController"})
 public class loginController extends HttpServlet {
 
-    private PatientDB cdb;
+    private UserDB db;
 
     @Override
     public void init() {
         String dbUser = this.getServletContext().getInitParameter("dbUser");
         String dbPassword = this.getServletContext().getInitParameter("dbPassword");
         String dbUrl = this.getServletContext().getInitParameter("dbUrl");
-        cdb = new PatientDB(dbUrl, dbUser, dbPassword);
+        db = new UserDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override

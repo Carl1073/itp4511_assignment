@@ -5,7 +5,7 @@
  */
 package ict.db;
 
-import ict.bean.PatientBean;
+import ict.bean.*;
 
 /**
  *
@@ -14,12 +14,12 @@ import ict.bean.PatientBean;
 public class LoginResult {
 
     public int status;
-    public PatientBean patient;
+    public UserBean user;
 
     public LoginResult() {}
 
-    public LoginResult(int status, PatientBean patient) {
+    public LoginResult(int status, UserBean user) {
         this.status = status;
-        this.patient = patient;
+        this.user = user;
     }
 }

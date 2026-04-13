@@ -8,7 +8,7 @@ package ict.db;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
-import ict.bean.PatientBean;
+import ict.bean.ClinicBean;
 
 /**
  *
@@ -80,22 +80,17 @@ public class ClinicDB {
         }
     }
 
-    public boolean addRecord(PatientBean cb) {
+    public boolean addRecord(ClinicBean cb) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
         boolean isSuccess = false;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "INSERT INTO patient (name, username, password, gender, address, dob, tel, email) VALUES (?,?,?,?,?,?,?,?)";
+            String preQueryStatement = "INSERT INTO clinic (clinicName, address, isWalkinEnabled) VALUES (?,?,?)";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, cb.getName());
-            pStmnt.setString(2, cb.getUsername());
-            pStmnt.setString(3, cb.getPassword());
-            pStmnt.setString(4, cb.getGender());
-            pStmnt.setString(5, cb.getAddress());
-            pStmnt.setDate(6, cb.getDob());
-            pStmnt.setString(7, cb.getTel());
-            pStmnt.setString(8, cb.getEmail());
+            pStmnt.setString(1, cb.getClinicName());
+            pStmnt.setString(2, cb.getAddress());
+            pStmnt.setBoolean(3, cb.getIsWalkinEnabled());
             int rowCount = pStmnt.executeUpdate();
             if (rowCount >= 1) {
                 isSuccess = true;
@@ -108,41 +103,12 @@ public class ClinicDB {
         return isSuccess;
     }
 
-    public boolean isUsernameTaken(String username) {
+    public ArrayList<ClinicBean> queryCust() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
-        boolean isRepeated = false;
+        ArrayList<ClinicBean> cbs = new ArrayList<>();
 
-        PatientBean cb = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM patient WHERE username = ?";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, username);
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            if (rs.next()) {
-                isRepeated = true;
-            }
-            pStmnt.close();
-            cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return isRepeated;
-    }
-
-    public ArrayList<PatientBean> queryCust() {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
-        ArrayList<PatientBean> cbs = new ArrayList<>();
-
-        PatientBean cb = null;
+        ClinicBean cb = null;
         try {
             cnnct = getConnection();
             String preQueryStatement = "SELECT * FROM patient";
@@ -362,17 +328,12 @@ public class ClinicDB {
         }
     }
 
-    public PatientBean reseltSetToBean(ResultSet rs) throws SQLException {
-        PatientBean cb = new PatientBean();
-        cb.setPatId(rs.getInt(1));
-        cb.setName(rs.getString(2));
-        cb.setUsername(rs.getString(3));
-        cb.setPassword(rs.getString(4));
-        cb.setGender(rs.getString(5));
-        cb.setAddress(rs.getString(6));
-        cb.setDob(rs.getDate(7));
-        cb.setTel(rs.getString(8));
-        cb.setEmail(rs.getString(9));
+    public ClinicBean reseltSetToBean(ResultSet rs) throws SQLException {
+        ClinicBean cb = new ClinicBean();
+        cb.setClinicId(rs.getInt(1));
+        cb.setClinicName(rs.getString(2));
+        cb.setAddress(rs.getString(3));
+        cb.setIsWalkinEnabled(rs.getBoolean(4));
         return cb;
     }
 }

@@ -8,7 +8,7 @@ package ict.db;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
-import ict.bean.PatientBean;
+import ict.bean.IncidentLogBean;
 
 /**
  *
@@ -82,22 +82,17 @@ public class IncidentLogDB {
         }
     }
 
-    public boolean addRecord(PatientBean cb) {
+    public boolean addRecord(IncidentLogBean ib) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
         boolean isSuccess = false;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "INSERT INTO patient (name, username, password, gender, address, dob, tel, email) VALUES (?,?,?,?,?,?,?,?)";
+            String preQueryStatement = "INSERT INTO incident_log (userId, eventType, description) VALUES (?,?,?)";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, cb.getName());
-            pStmnt.setString(2, cb.getUsername());
-            pStmnt.setString(3, cb.getPassword());
-            pStmnt.setString(4, cb.getGender());
-            pStmnt.setString(5, cb.getAddress());
-            pStmnt.setDate(6, cb.getDob());
-            pStmnt.setString(7, cb.getTel());
-            pStmnt.setString(8, cb.getEmail());
+            pStmnt.setInt(1, ib.getUserId());
+            pStmnt.setString(2, ib.getEventType());
+            pStmnt.setString(3, ib.getDescription());
             int rowCount = pStmnt.executeUpdate();
             if (rowCount >= 1) {
                 isSuccess = true;
@@ -110,41 +105,12 @@ public class IncidentLogDB {
         return isSuccess;
     }
 
-    public boolean isUsernameTaken(String username) {
+    public ArrayList<IncidentLogBean> queryCust() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
-        boolean isRepeated = false;
+        ArrayList<IncidentLogBean> ibs = new ArrayList<>();
 
-        PatientBean cb = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM patient WHERE username = ?";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, username);
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            if (rs.next()) {
-                isRepeated = true;
-            }
-            pStmnt.close();
-            cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return isRepeated;
-    }
-
-    public ArrayList<PatientBean> queryCust() {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
-        ArrayList<PatientBean> cbs = new ArrayList<>();
-
-        PatientBean cb = null;
+        IncidentLogBean ib = null;
         try {
             cnnct = getConnection();
             String preQueryStatement = "SELECT * FROM patient";
@@ -152,22 +118,22 @@ public class IncidentLogDB {
             ResultSet rs = null;
             rs = pStmnt.executeQuery();
             while (rs.next()) {
-                cb = this.reseltSetToBean(rs);
-                cbs.add(cb);
+                ib = this.reseltSetToBean(rs);
+                ibs.add(ib);
             }
             pStmnt.close();
             cnnct.close();
         } catch (SQLException | IOException ex) {
             ex.printStackTrace();
         }
-        return cbs;
+        return ibs;
     }
 
     // public PatientBean queryCustByID(String id) {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
-    // PatientBean cb = null;
+    // PatientBean ib = null;
     // try {
     // cnnct = getConnection();
     // String preQueryStatement = "SELECT * FROM patient WHERE CUSTID = ?";
@@ -176,7 +142,7 @@ public class IncidentLogDB {
     // ResultSet rs = null;
     // rs = pStmnt.executeQuery();
     // if (rs.next()) {
-    // cb = reseltSetToBean(rs);
+    // ib = reseltSetToBean(rs);
     // }
     // pStmnt.close();
     // cnnct.close();
@@ -188,14 +154,14 @@ public class IncidentLogDB {
     // } catch (IOException ex) {
     // ex.printStackTrace();
     // }
-    // return cb;
+    // return ib;
     // }
     // public ArrayList<PatientBean> queryCustByName(String name) {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
-    // ArrayList<PatientBean> cbs = new ArrayList<>();
-    // PatientBean cb = null;
+    // ArrayList<PatientBean> ibs = new ArrayList<>();
+    // PatientBean ib = null;
     // try {
     // cnnct = getConnection();
     // String preQueryStatement = "SELECT * FROM patient WHERE NAME LIKE ?";
@@ -204,12 +170,12 @@ public class IncidentLogDB {
     // ResultSet rs = null;
     // rs = pStmnt.executeQuery();
     // while (rs.next()) {
-    // cb = new PatientBean();
-    // cb.setCustId(rs.getString(1));
-    // cb.setName(rs.getString(2));
-    // cb.setTel(rs.getString(3));
-    // cb.setAge(rs.getInt(4));
-    // cbs.add(cb);
+    // ib = new PatientBean();
+    // ib.setCustId(rs.getString(1));
+    // ib.setName(rs.getString(2));
+    // ib.setTel(rs.getString(3));
+    // ib.setAge(rs.getInt(4));
+    // ibs.add(ib);
     // }
     // pStmnt.close();
     // cnnct.close();
@@ -221,14 +187,14 @@ public class IncidentLogDB {
     // } catch (IOException ex) {
     // ex.printStackTrace();
     // }
-    // return cbs;
+    // return ibs;
     // }
     // public ArrayList<PatientBean> queryCustByTel(String tel) {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
-    // ArrayList<PatientBean> cbs = new ArrayList<PatientBean>();
-    // PatientBean cb = null;
+    // ArrayList<PatientBean> ibs = new ArrayList<PatientBean>();
+    // PatientBean ib = null;
     // try {
     // cnnct = getConnection();
     // String preQueryStatement = "SELECT * FROM patient WHERE TEL LIKE ?";
@@ -237,12 +203,12 @@ public class IncidentLogDB {
     // ResultSet rs = null;
     // rs = pStmnt.executeQuery();
     // while (rs.next()) {
-    // cb = new PatientBean();
-    // cb.setCustId(rs.getString(1));
-    // cb.setName(rs.getString(2));
-    // cb.setTel(rs.getString(3));
-    // cb.setAge(rs.getInt(4));
-    // cbs.add(cb);
+    // ib = new PatientBean();
+    // ib.setCustId(rs.getString(1));
+    // ib.setName(rs.getString(2));
+    // ib.setTel(rs.getString(3));
+    // ib.setAge(rs.getInt(4));
+    // ibs.add(ib);
     // }
     // pStmnt.close();
     // cnnct.close();
@@ -254,14 +220,14 @@ public class IncidentLogDB {
     // } catch (IOException ex) {
     // ex.printStackTrace();
     // }
-    // return cbs;
+    // return ibs;
     // }
     // public ArrayList<PatientBean> queryCust() {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
-    // ArrayList<PatientBean> cbs = new ArrayList<PatientBean>();
-    // PatientBean cb = null;
+    // ArrayList<PatientBean> ibs = new ArrayList<PatientBean>();
+    // PatientBean ib = null;
     // try {
     // cnnct = getConnection();
     // String preQueryStatement = "SELECT * FROM patient";
@@ -269,9 +235,9 @@ public class IncidentLogDB {
     // ResultSet rs = null;
     // rs = pStmnt.executeQuery();
     // while (rs.next()) {
-    // cb = new PatientBean(rs.getString(1), rs.getString(2), rs.getString(3),
+    // ib = new PatientBean(rs.getString(1), rs.getString(2), rs.getString(3),
     // rs.getInt(4));
-    // cbs.add(cb);
+    // ibs.add(ib);
     // }
     // pStmnt.close();
     // cnnct.close();
@@ -283,7 +249,7 @@ public class IncidentLogDB {
     // } catch (IOException ex) {
     // ex.printStackTrace();
     // }
-    // return cbs;
+    // return ibs;
     // }
     public boolean delRecord(String custId) {
         Connection cnnct = null;
@@ -314,7 +280,7 @@ public class IncidentLogDB {
         return isSuccess;
     }
 
-    // public int editRecord(PatientBean cb) {
+    // public int editRecord(PatientBean ib) {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
@@ -323,10 +289,10 @@ public class IncidentLogDB {
     // String preQueryStatement = "UPDATE patient SET NAME = ?, TEL = ?, AGE = ?
     // WHERE CUSTID = ?";
     // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, cb.getName());
-    // pStmnt.setString(2, cb.getTel());
-    // pStmnt.setInt(3, cb.getAge());
-    // pStmnt.setString(4, cb.getCustId());
+    // pStmnt.setString(1, ib.getName());
+    // pStmnt.setString(2, ib.getTel());
+    // pStmnt.setInt(3, ib.getAge());
+    // pStmnt.setString(4, ib.getCustId());
     //
     // int rs = pStmnt.executeUpdate();
     // pStmnt.close();
@@ -364,17 +330,13 @@ public class IncidentLogDB {
         }
     }
 
-    public PatientBean reseltSetToBean(ResultSet rs) throws SQLException {
-        PatientBean cb = new PatientBean();
-        cb.setPatId(rs.getInt(1));
-        cb.setName(rs.getString(2));
-        cb.setUsername(rs.getString(3));
-        cb.setPassword(rs.getString(4));
-        cb.setGender(rs.getString(5));
-        cb.setAddress(rs.getString(6));
-        cb.setDob(rs.getDate(7));
-        cb.setTel(rs.getString(8));
-        cb.setEmail(rs.getString(9));
-        return cb;
+    public IncidentLogBean reseltSetToBean(ResultSet rs) throws SQLException {
+        IncidentLogBean ib = new IncidentLogBean();
+        ib.setLogId(rs.getInt(1));
+        ib.setUserId(rs.getInt(2));
+        ib.setEventType(rs.getString(3));
+        ib.setDescription(rs.getString(4));
+        ib.setCreatedAt(rs.getTimestamp(5));
+        return ib;
     }
 }

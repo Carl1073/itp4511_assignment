@@ -6,7 +6,7 @@
 package ict.test.paul;
 
 
-import ict.db.PatientDB;
+import ict.db.*;
 
 /**
  *

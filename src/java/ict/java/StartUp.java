@@ -15,7 +15,6 @@ public class StartUp {
 
     // Change the method to accept parameters
     public static void startUp(String url, String username, String password) {
-        PatientDB patientDb = new PatientDB(url, username, password);
-        patientDb.createCustTable();
+
     }
 }

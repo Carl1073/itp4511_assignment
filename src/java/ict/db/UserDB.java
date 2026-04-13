@@ -8,7 +8,7 @@ package ict.db;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
-import ict.bean.PatientBean;
+import ict.bean.UserBean;
 
 /**
  *
@@ -60,7 +60,7 @@ public class UserDB {
 
     // -1 is error, 0 is success, 1 is no user, 2 is incorrect password
     public LoginResult isValidUser(String user, String pwd) {
-        String sql = "SELECT * FROM patient WHERE username = ?";
+        String sql = "SELECT * FROM users WHERE username = ?";
 
         try (Connection cnnct = getConnection();
                 PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
@@ -72,7 +72,7 @@ public class UserDB {
                     // User exists, check password
                     if (rs.getString("password").equals(pwd)) {
                         // Success! Convert the current row to a bean
-                        PatientBean bean = reseltSetToBean(rs);
+                        UserBean bean = reseltSetToBean(rs);
                         return new LoginResult(0, bean);
                     } else {
                         return new LoginResult(2, null); // Wrong password
@@ -115,7 +115,7 @@ public class UserDB {
         try {
             cnnct = getConnection();
             stmnt = cnnct.createStatement();
-            String sql = "CREATE TABLE IF NOT EXISTS user ("
+            String sql = "CREATE TABLE IF NOT EXISTS users ("
                     + "userId INT AUTO_INCREMENT,"
                     + "username VARCHAR(50) NOT NULL UNIQUE,"
                     + "password VARCHAR(255) NOT NULL,"
@@ -135,22 +135,22 @@ public class UserDB {
         }
     }
 
-    public boolean addRecord(PatientBean cb) {
+    public boolean addRecord(UserBean ub) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
         boolean isSuccess = false;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "INSERT INTO patient (name, username, password, gender, address, dob, tel, email) VALUES (?,?,?,?,?,?,?,?)";
+            String preQueryStatement = "INSERT INTO users (username, password, fullName, email, phone, gender, role, clinicId) VALUES (?,?,?,?,?,?,?,?)";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, cb.getName());
-            pStmnt.setString(2, cb.getUsername());
-            pStmnt.setString(3, cb.getPassword());
-            pStmnt.setString(4, cb.getGender());
-            pStmnt.setString(5, cb.getAddress());
-            pStmnt.setDate(6, cb.getDob());
-            pStmnt.setString(7, cb.getTel());
-            pStmnt.setString(8, cb.getEmail());
+            pStmnt.setString(1, ub.getUsername());
+            pStmnt.setString(2, ub.getPassword());
+            pStmnt.setString(3, ub.getFullName());
+            pStmnt.setString(4, ub.getEmail());
+            pStmnt.setString(5, ub.getPhone());
+            pStmnt.setString(6, ub.getGender());
+            pStmnt.setString(7, ub.getRole());
+            pStmnt.setInt(8, ub.getClinicId());
             int rowCount = pStmnt.executeUpdate();
             if (rowCount >= 1) {
                 isSuccess = true;
@@ -168,10 +168,10 @@ public class UserDB {
         PreparedStatement pStmnt = null;
         boolean isRepeated = false;
 
-        PatientBean cb = null;
+        UserBean ub = null;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM patient WHERE username = ?";
+            String preQueryStatement = "SELECT * FROM users WHERE username = ?";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setString(1, username);
             ResultSet rs = null;
@@ -192,35 +192,35 @@ public class UserDB {
         return isRepeated;
     }
 
-    public ArrayList<PatientBean> queryCust() {
+    public ArrayList<UserBean> queryCust() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
-        ArrayList<PatientBean> cbs = new ArrayList<>();
+        ArrayList<UserBean> ubs = new ArrayList<>();
 
-        PatientBean cb = null;
+        UserBean ub = null;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM patient";
+            String preQueryStatement = "SELECT * FROM users";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             ResultSet rs = null;
             rs = pStmnt.executeQuery();
             while (rs.next()) {
-                cb = this.reseltSetToBean(rs);
-                cbs.add(cb);
+                ub = this.reseltSetToBean(rs);
+                ubs.add(ub);
             }
             pStmnt.close();
             cnnct.close();
         } catch (SQLException | IOException ex) {
             ex.printStackTrace();
         }
-        return cbs;
+        return ubs;
     }
 
     // public PatientBean queryCustByID(String id) {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
-    // PatientBean cb = null;
+    // PatientBean ub = null;
     // try {
     // cnnct = getConnection();
     // String preQueryStatement = "SELECT * FROM patient WHERE CUSTID = ?";
@@ -229,7 +229,7 @@ public class UserDB {
     // ResultSet rs = null;
     // rs = pStmnt.executeQuery();
     // if (rs.next()) {
-    // cb = reseltSetToBean(rs);
+    // ub = reseltSetToBean(rs);
     // }
     // pStmnt.close();
     // cnnct.close();
@@ -241,14 +241,14 @@ public class UserDB {
     // } catch (IOException ex) {
     // ex.printStackTrace();
     // }
-    // return cb;
+    // return ub;
     // }
     // public ArrayList<PatientBean> queryCustByName(String name) {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
-    // ArrayList<PatientBean> cbs = new ArrayList<>();
-    // PatientBean cb = null;
+    // ArrayList<PatientBean> ubs = new ArrayList<>();
+    // PatientBean ub = null;
     // try {
     // cnnct = getConnection();
     // String preQueryStatement = "SELECT * FROM patient WHERE NAME LIKE ?";
@@ -257,12 +257,12 @@ public class UserDB {
     // ResultSet rs = null;
     // rs = pStmnt.executeQuery();
     // while (rs.next()) {
-    // cb = new PatientBean();
-    // cb.setCustId(rs.getString(1));
-    // cb.setName(rs.getString(2));
-    // cb.setTel(rs.getString(3));
-    // cb.setAge(rs.getInt(4));
-    // cbs.add(cb);
+    // ub = new PatientBean();
+    // ub.setCustId(rs.getString(1));
+    // ub.setName(rs.getString(2));
+    // ub.setTel(rs.getString(3));
+    // ub.setAge(rs.getInt(4));
+    // ubs.add(ub);
     // }
     // pStmnt.close();
     // cnnct.close();
@@ -274,14 +274,14 @@ public class UserDB {
     // } catch (IOException ex) {
     // ex.printStackTrace();
     // }
-    // return cbs;
+    // return ubs;
     // }
     // public ArrayList<PatientBean> queryCustByTel(String tel) {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
-    // ArrayList<PatientBean> cbs = new ArrayList<PatientBean>();
-    // PatientBean cb = null;
+    // ArrayList<PatientBean> ubs = new ArrayList<PatientBean>();
+    // PatientBean ub = null;
     // try {
     // cnnct = getConnection();
     // String preQueryStatement = "SELECT * FROM patient WHERE TEL LIKE ?";
@@ -290,12 +290,12 @@ public class UserDB {
     // ResultSet rs = null;
     // rs = pStmnt.executeQuery();
     // while (rs.next()) {
-    // cb = new PatientBean();
-    // cb.setCustId(rs.getString(1));
-    // cb.setName(rs.getString(2));
-    // cb.setTel(rs.getString(3));
-    // cb.setAge(rs.getInt(4));
-    // cbs.add(cb);
+    // ub = new PatientBean();
+    // ub.setCustId(rs.getString(1));
+    // ub.setName(rs.getString(2));
+    // ub.setTel(rs.getString(3));
+    // ub.setAge(rs.getInt(4));
+    // ubs.add(ub);
     // }
     // pStmnt.close();
     // cnnct.close();
@@ -307,14 +307,14 @@ public class UserDB {
     // } catch (IOException ex) {
     // ex.printStackTrace();
     // }
-    // return cbs;
+    // return ubs;
     // }
     // public ArrayList<PatientBean> queryCust() {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
-    // ArrayList<PatientBean> cbs = new ArrayList<PatientBean>();
-    // PatientBean cb = null;
+    // ArrayList<PatientBean> ubs = new ArrayList<PatientBean>();
+    // PatientBean ub = null;
     // try {
     // cnnct = getConnection();
     // String preQueryStatement = "SELECT * FROM patient";
@@ -322,9 +322,9 @@ public class UserDB {
     // ResultSet rs = null;
     // rs = pStmnt.executeQuery();
     // while (rs.next()) {
-    // cb = new PatientBean(rs.getString(1), rs.getString(2), rs.getString(3),
+    // ub = new PatientBean(rs.getString(1), rs.getString(2), rs.getString(3),
     // rs.getInt(4));
-    // cbs.add(cb);
+    // ubs.add(ub);
     // }
     // pStmnt.close();
     // cnnct.close();
@@ -336,7 +336,7 @@ public class UserDB {
     // } catch (IOException ex) {
     // ex.printStackTrace();
     // }
-    // return cbs;
+    // return ubs;
     // }
     public boolean delRecord(String custId) {
         Connection cnnct = null;
@@ -367,7 +367,7 @@ public class UserDB {
         return isSuccess;
     }
 
-    // public int editRecord(PatientBean cb) {
+    // public int editRecord(PatientBean ub) {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
@@ -376,10 +376,10 @@ public class UserDB {
     // String preQueryStatement = "UPDATE patient SET NAME = ?, TEL = ?, AGE = ?
     // WHERE CUSTID = ?";
     // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, cb.getName());
-    // pStmnt.setString(2, cb.getTel());
-    // pStmnt.setInt(3, cb.getAge());
-    // pStmnt.setString(4, cb.getCustId());
+    // pStmnt.setString(1, ub.getName());
+    // pStmnt.setString(2, ub.getTel());
+    // pStmnt.setInt(3, ub.getAge());
+    // pStmnt.setString(4, ub.getCustId());
     //
     // int rs = pStmnt.executeUpdate();
     // pStmnt.close();
@@ -417,17 +417,17 @@ public class UserDB {
         }
     }
 
-    public PatientBean reseltSetToBean(ResultSet rs) throws SQLException {
-        PatientBean cb = new PatientBean();
-        cb.setPatId(rs.getInt(1));
-        cb.setName(rs.getString(2));
-        cb.setUsername(rs.getString(3));
-        cb.setPassword(rs.getString(4));
-        cb.setGender(rs.getString(5));
-        cb.setAddress(rs.getString(6));
-        cb.setDob(rs.getDate(7));
-        cb.setTel(rs.getString(8));
-        cb.setEmail(rs.getString(9));
-        return cb;
+    public UserBean reseltSetToBean(ResultSet rs) throws SQLException {
+        UserBean ub = new UserBean();
+        ub.setUserId(rs.getInt(1));
+        ub.setUsername(rs.getString(2));
+        ub.setPassword(rs.getString(3));
+        ub.setFullName(rs.getString(4));
+        ub.setEmail(rs.getString(5));
+        ub.setPhone(rs.getString(6));
+        ub.setGender(rs.getString(7));
+        ub.setRole(rs.getString(8));
+        ub.setClinicId(rs.getInt(9));
+        return ub;
     }
 }

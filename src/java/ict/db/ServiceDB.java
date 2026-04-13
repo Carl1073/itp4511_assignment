@@ -8,7 +8,7 @@ package ict.db;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
-import ict.bean.PatientBean;
+import ict.bean.ServiceBean;
 
 /**
  *
@@ -79,22 +79,16 @@ public class ServiceDB {
         }
     }
 
-    public boolean addRecord(PatientBean cb) {
+    public boolean addRecord(ServiceBean sb) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
         boolean isSuccess = false;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "INSERT INTO patient (name, username, password, gender, address, dob, tel, email) VALUES (?,?,?,?,?,?,?,?)";
+            String preQueryStatement = "INSERT INTO service (serviceName, description) VALUES (?,?)";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, cb.getName());
-            pStmnt.setString(2, cb.getUsername());
-            pStmnt.setString(3, cb.getPassword());
-            pStmnt.setString(4, cb.getGender());
-            pStmnt.setString(5, cb.getAddress());
-            pStmnt.setDate(6, cb.getDob());
-            pStmnt.setString(7, cb.getTel());
-            pStmnt.setString(8, cb.getEmail());
+            pStmnt.setString(1, sb.getServiceName());
+            pStmnt.setString(2, sb.getDescription());
             int rowCount = pStmnt.executeUpdate();
             if (rowCount >= 1) {
                 isSuccess = true;
@@ -107,41 +101,12 @@ public class ServiceDB {
         return isSuccess;
     }
 
-    public boolean isUsernameTaken(String username) {
+    public ArrayList<ServiceBean> queryCust() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
-        boolean isRepeated = false;
+        ArrayList<ServiceBean> sbs = new ArrayList<>();
 
-        PatientBean cb = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM patient WHERE username = ?";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, username);
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            if (rs.next()) {
-                isRepeated = true;
-            }
-            pStmnt.close();
-            cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return isRepeated;
-    }
-
-    public ArrayList<PatientBean> queryCust() {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
-        ArrayList<PatientBean> cbs = new ArrayList<>();
-
-        PatientBean cb = null;
+        ServiceBean sb = null;
         try {
             cnnct = getConnection();
             String preQueryStatement = "SELECT * FROM patient";
@@ -149,22 +114,22 @@ public class ServiceDB {
             ResultSet rs = null;
             rs = pStmnt.executeQuery();
             while (rs.next()) {
-                cb = this.reseltSetToBean(rs);
-                cbs.add(cb);
+                sb = this.reseltSetToBean(rs);
+                sbs.add(sb);
             }
             pStmnt.close();
             cnnct.close();
         } catch (SQLException | IOException ex) {
             ex.printStackTrace();
         }
-        return cbs;
+        return sbs;
     }
 
     // public PatientBean queryCustByID(String id) {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
-    // PatientBean cb = null;
+    // PatientBean sb = null;
     // try {
     // cnnct = getConnection();
     // String preQueryStatement = "SELECT * FROM patient WHERE CUSTID = ?";
@@ -173,7 +138,7 @@ public class ServiceDB {
     // ResultSet rs = null;
     // rs = pStmnt.executeQuery();
     // if (rs.next()) {
-    // cb = reseltSetToBean(rs);
+    // sb = reseltSetToBean(rs);
     // }
     // pStmnt.close();
     // cnnct.close();
@@ -185,14 +150,14 @@ public class ServiceDB {
     // } catch (IOException ex) {
     // ex.printStackTrace();
     // }
-    // return cb;
+    // return sb;
     // }
     // public ArrayList<PatientBean> queryCustByName(String name) {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
-    // ArrayList<PatientBean> cbs = new ArrayList<>();
-    // PatientBean cb = null;
+    // ArrayList<PatientBean> sbs = new ArrayList<>();
+    // PatientBean sb = null;
     // try {
     // cnnct = getConnection();
     // String preQueryStatement = "SELECT * FROM patient WHERE NAME LIKE ?";
@@ -201,12 +166,12 @@ public class ServiceDB {
     // ResultSet rs = null;
     // rs = pStmnt.executeQuery();
     // while (rs.next()) {
-    // cb = new PatientBean();
-    // cb.setCustId(rs.getString(1));
-    // cb.setName(rs.getString(2));
-    // cb.setTel(rs.getString(3));
-    // cb.setAge(rs.getInt(4));
-    // cbs.add(cb);
+    // sb = new PatientBean();
+    // sb.setCustId(rs.getString(1));
+    // sb.setName(rs.getString(2));
+    // sb.setTel(rs.getString(3));
+    // sb.setAge(rs.getInt(4));
+    // sbs.add(sb);
     // }
     // pStmnt.close();
     // cnnct.close();
@@ -218,14 +183,14 @@ public class ServiceDB {
     // } catch (IOException ex) {
     // ex.printStackTrace();
     // }
-    // return cbs;
+    // return sbs;
     // }
     // public ArrayList<PatientBean> queryCustByTel(String tel) {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
-    // ArrayList<PatientBean> cbs = new ArrayList<PatientBean>();
-    // PatientBean cb = null;
+    // ArrayList<PatientBean> sbs = new ArrayList<PatientBean>();
+    // PatientBean sb = null;
     // try {
     // cnnct = getConnection();
     // String preQueryStatement = "SELECT * FROM patient WHERE TEL LIKE ?";
@@ -234,12 +199,12 @@ public class ServiceDB {
     // ResultSet rs = null;
     // rs = pStmnt.executeQuery();
     // while (rs.next()) {
-    // cb = new PatientBean();
-    // cb.setCustId(rs.getString(1));
-    // cb.setName(rs.getString(2));
-    // cb.setTel(rs.getString(3));
-    // cb.setAge(rs.getInt(4));
-    // cbs.add(cb);
+    // sb = new PatientBean();
+    // sb.setCustId(rs.getString(1));
+    // sb.setName(rs.getString(2));
+    // sb.setTel(rs.getString(3));
+    // sb.setAge(rs.getInt(4));
+    // sbs.add(sb);
     // }
     // pStmnt.close();
     // cnnct.close();
@@ -251,14 +216,14 @@ public class ServiceDB {
     // } catch (IOException ex) {
     // ex.printStackTrace();
     // }
-    // return cbs;
+    // return sbs;
     // }
     // public ArrayList<PatientBean> queryCust() {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
-    // ArrayList<PatientBean> cbs = new ArrayList<PatientBean>();
-    // PatientBean cb = null;
+    // ArrayList<PatientBean> sbs = new ArrayList<PatientBean>();
+    // PatientBean sb = null;
     // try {
     // cnnct = getConnection();
     // String preQueryStatement = "SELECT * FROM patient";
@@ -266,9 +231,9 @@ public class ServiceDB {
     // ResultSet rs = null;
     // rs = pStmnt.executeQuery();
     // while (rs.next()) {
-    // cb = new PatientBean(rs.getString(1), rs.getString(2), rs.getString(3),
+    // sb = new PatientBean(rs.getString(1), rs.getString(2), rs.getString(3),
     // rs.getInt(4));
-    // cbs.add(cb);
+    // sbs.add(sb);
     // }
     // pStmnt.close();
     // cnnct.close();
@@ -280,7 +245,7 @@ public class ServiceDB {
     // } catch (IOException ex) {
     // ex.printStackTrace();
     // }
-    // return cbs;
+    // return sbs;
     // }
     public boolean delRecord(String custId) {
         Connection cnnct = null;
@@ -311,7 +276,7 @@ public class ServiceDB {
         return isSuccess;
     }
 
-    // public int editRecord(PatientBean cb) {
+    // public int editRecord(PatientBean sb) {
     // Connection cnnct = null;
     // PreparedStatement pStmnt = null;
     //
@@ -320,10 +285,10 @@ public class ServiceDB {
     // String preQueryStatement = "UPDATE patient SET NAME = ?, TEL = ?, AGE = ?
     // WHERE CUSTID = ?";
     // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, cb.getName());
-    // pStmnt.setString(2, cb.getTel());
-    // pStmnt.setInt(3, cb.getAge());
-    // pStmnt.setString(4, cb.getCustId());
+    // pStmnt.setString(1, sb.getName());
+    // pStmnt.setString(2, sb.getTel());
+    // pStmnt.setInt(3, sb.getAge());
+    // pStmnt.setString(4, sb.getCustId());
     //
     // int rs = pStmnt.executeUpdate();
     // pStmnt.close();
@@ -361,17 +326,11 @@ public class ServiceDB {
         }
     }
 
-    public PatientBean reseltSetToBean(ResultSet rs) throws SQLException {
-        PatientBean cb = new PatientBean();
-        cb.setPatId(rs.getInt(1));
-        cb.setName(rs.getString(2));
-        cb.setUsername(rs.getString(3));
-        cb.setPassword(rs.getString(4));
-        cb.setGender(rs.getString(5));
-        cb.setAddress(rs.getString(6));
-        cb.setDob(rs.getDate(7));
-        cb.setTel(rs.getString(8));
-        cb.setEmail(rs.getString(9));
-        return cb;
+    public ServiceBean reseltSetToBean(ResultSet rs) throws SQLException {
+        ServiceBean sb = new ServiceBean();
+        sb.setServiceId(Integer.parseInt(rs.getString(1)));
+        sb.setServiceName(rs.getString(2));
+        sb.setDescription(rs.getString(3));
+        return sb;
     }
 }
