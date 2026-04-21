@@ -22,7 +22,7 @@
     </head>
 
     <body>
-        <jsp:useBean id="userInfo" class="ict.bean.PatientBean" scope="session"/>
+        <jsp:useBean id="userInfo" class="ict.bean.UserBean" scope="session"/>
         <h1>Client Register</h1>
         <form action="registerController" method="post">
             <% if (request.getAttribute("errorMsg") != null) {%>
