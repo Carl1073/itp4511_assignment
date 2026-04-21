@@ -11,7 +11,7 @@
         <title>Login Page</title>
     </head>
 
-    <jsp:useBean id="customerBean" class="ict.bean.PatientBean" scope="session"/>
+    <jsp:useBean id="customerBean" class="ict.bean.UserBean" scope="session"/>
 
     <body>
         <h1>Community Care Health Consortium </h1>

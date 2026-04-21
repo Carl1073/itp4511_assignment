@@ -14,11 +14,11 @@ import ict.bean.ClinicServiceBean;
  *
  * @author 240708635
  */
-public class ClinicServiceDB extends Database{
+public class ClinicServiceDB {
 
-    private String url;
-    private String username;
-    private String password;
+    private String url = "";
+    private String username = "";
+    private String password = "";
 
     public ClinicServiceDB(String url, String username, String password) {
         this.url = url;

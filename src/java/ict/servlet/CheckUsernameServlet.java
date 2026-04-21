@@ -41,11 +41,11 @@ public class CheckUsernameServlet extends HttpServlet {
         username = username.trim();
 
         // Optional: enforce minimum length
-        if (username.length() < 4) {
-            out.print("{\"available\":false, \"message\":\"Username must be at least 4 characters.\"}");
-            out.flush();
-            return;
-        }
+//        if (username.length() < 4) {
+//            out.print("{\"available\":false, \"message\":\"Username must be at least 4 characters.\"}");
+//            out.flush();
+//            return;
+//        }
 
         boolean isTaken = db.isUsernameTaken(username);
 

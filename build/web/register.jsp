@@ -30,55 +30,55 @@
             <% }%>
 
             <input type="hidden" name="action" value="register"/>
+
             <div class="form-row">
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" value="<%= request.getAttribute("name") != null ? request.getAttribute("name") : ""%>" required />
+                <label for="fullName">Full Name:</label>
+                <input type="text" id="fullName" name="fullName" 
+                       value="<%= request.getAttribute("fullName") != null ? request.getAttribute("fullName") : ""%>" required />
             </div>
 
             <div class="form-row">
                 <label for="username">Username:</label>
-                <input id="username" type="text" name="username" value="<%= request.getAttribute("username") != null ? request.getAttribute("username") : ""%>" required/>
+                <input id="username" type="text" name="username" 
+                       value="<%= request.getAttribute("username") != null ? request.getAttribute("username") : ""%>" required/>
                 <span id="username-feedback" style="margin-left: 10px;"></span>
             </div>
 
             <div class="form-row">
-                <label for="pw">Password:</label>
-                <input type="password" id="pw" name="pw" value="<%= request.getAttribute("pw") != null ? request.getAttribute("pw") : ""%>" required />
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required />
             </div>
 
             <div class="form-row">
                 <label for="cpw">Confirm Password:</label>
-                <input type="password" id="cpw" name="cpw" value="<%= request.getAttribute("cpw") != null ? request.getAttribute("cpw") : ""%>" required />
+                <input type="password" id="cpw" name="cpw" required />
                 <span id="pw-feedback" style="margin-left: 10px;"></span>
             </div>
 
             <div class="form-row">
                 <label>Gender:</label>
                 <div class="radio-group">
-                    <label><input type="radio" name="gender" value="M" <c:if test="${gender == 'M'}">checked="checked"</c:if> required/> Male</label> 
-                    <label><input type="radio" name="gender" value="F" <c:if test="${gender == 'F'}">checked="checked"</c:if> required/> Female</label>
-                    </div>
+                    <% String gender = (String) request.getAttribute("gender");%>
+                    <label><input type="radio" name="gender" value="M" <%= "M".equals(gender) ? "checked" : ""%> required/> Male</label> 
+                    <label><input type="radio" name="gender" value="F" <%= "F".equals(gender) ? "checked" : ""%> required/> Female</label>
+                    <label><input type="radio" name="gender" value="O" <%= "O".equals(gender) ? "checked" : ""%> required/> Other</label>
                 </div>
-
-                <div class="form-row">
-                    <label for="address">Address:</label>
-                    <input type="text" id="address" name="address" style="flex-grow: 1; max-width: 500px;" value="<%= request.getAttribute("address") != null ? request.getAttribute("address") : ""%>" required/>
-            </div>
-
-            <div class="form-row">
-                <label for="dob">Date of Birth:</label>
-                <input type="date" id="dob" name="dob" value="<%= formattedDate%>" required/>
-            </div>
-
-            <div class="form-row">
-                <label for="tel">Contact number:</label>
-                <input type="text" id="tel" name="tel" value="<%= request.getAttribute("tel") != null ? request.getAttribute("tel") : ""%>" required/>
             </div>
 
             <div class="form-row">
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : ""%>" required/>
+                <input type="email" id="email" name="email" 
+                       value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : ""%>" required/>
             </div>
+
+            <div class="form-row">
+                <label for="phone">Phone/Contact:</label>
+                <input type="text" id="phone" name="phone" 
+                       value="<%= request.getAttribute("phone") != null ? request.getAttribute("phone") : ""%>" required/>
+            </div>
+
+            <input type="hidden" name="clinicId" value="0" />
+
             <input type="submit" value="Register"/>
         </form>
         <a href="login.jsp">Return</a>
@@ -88,7 +88,7 @@
         let timeout;
         function checkPwMatch() {
             clearTimeout(timeout);
-            const pw = $('input[name="pw"]').val();
+            const pw = $('input[name="password"]').val();
             const cpw = $('input[name="cpw"]').val();
 
             timeout = setTimeout(function () {
@@ -103,14 +103,10 @@
             }, 500);
         }
         $(document).ready(function () {
+            // check whether Username is repeated
             $('input[name="username"]').on('input', function () {
                 clearTimeout(timeout);
                 const username = $(this).val().trim();
-
-                if (username.length < 4) {
-                    $('#username-feedback').text('').css('color', '');
-                    return;
-                }
 
                 timeout = setTimeout(function () {
                     $.ajax({
@@ -131,7 +127,7 @@
                     });
                 }, 500);
             });
-            $('input[name="pw"]').on('input', checkPwMatch);
+            $('input[name="password"]').on('input', checkPwMatch);
             $('input[name="cpw"]').on('input', checkPwMatch);
         });
     </script>
