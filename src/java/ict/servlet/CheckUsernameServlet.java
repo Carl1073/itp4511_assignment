@@ -1,4 +1,6 @@
+package ict.servlet;
 
+import ict.bean.UserBean;
 import ict.db.UserDB;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -47,7 +49,8 @@ public class CheckUsernameServlet extends HttpServlet {
 //            return;
 //        }
 
-        boolean isTaken = db.isUsernameTaken(username);
+        UserBean ub = db.queryCustByUsername(username);
+        boolean isTaken = (ub == null)? false: true ;
 
         System.out.println(username);
         System.out.println(isTaken);
