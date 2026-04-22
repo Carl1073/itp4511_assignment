@@ -215,8 +215,8 @@ public class UserDB {
         }
         return ubs;
     }
-    
-        public UserBean queryCustByUsername(String username) {
+
+    public UserBean queryCustByUsername(String username) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
 
@@ -244,7 +244,7 @@ public class UserDB {
         return ub;
     }
 
-    public ArrayList<UserBean> queryCustByTel(String tel) {
+    public ArrayList<UserBean> queryCustByPhone(String phone) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
 
@@ -254,7 +254,7 @@ public class UserDB {
             cnnct = getConnection();
             String preQueryStatement = "SELECT * FROM user WHERE phone LIKE ?";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, "%" + tel + "%");
+            pStmnt.setString(1, "%" + phone + "%");
             ResultSet rs = null;
             rs = pStmnt.executeQuery();
             while (rs.next()) {
@@ -303,33 +303,38 @@ public class UserDB {
         return isSuccess;
     }
 
-//    public int editRecord(UserBean ub) {
-//        Connection cnnct = null;
-//        PreparedStatement pStmnt = null;
-//
-//        try {
-//            cnnct = getConnection();
-//            String preQueryStatement = "UPDATE patient SET NAME = ?, TEL = ?, AGE = ? WHERE CUSTID =  ?";
-//     pStmnt = cnnct.prepareStatement(preQueryStatement);
-//            pStmnt.setString(1, ub.getName());
-//            pStmnt.setString(2, ub.getTel());
-//            pStmnt.setInt(3, ub.getAge());
-//            pStmnt.setString(4, ub.getCustId());
-//
-//            int rs = pStmnt.executeUpdate();
-//            pStmnt.close();
-//            cnnct.close();
-//            return rs;
-//        } catch (SQLException ex) {
-//            while (ex != null) {
-//                ex.printStackTrace();
-//                ex = ex.getNextException();
-//            }
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
-//        return 0;
-//    }
+    public int editRecord(UserBean ub) {
+        Connection cnnct = null;
+        PreparedStatement pStmnt = null;
+
+        try {
+            cnnct = getConnection();
+            String preQueryStatement = "UPDATE user SET username = ?, password = ?, fullName = ?, email = ?, phone = ?, gender = ?, role = ?, clinicId = ? WHERE userid =  ?";
+            pStmnt = cnnct.prepareStatement(preQueryStatement);
+            pStmnt.setString(1, ub.getUsername());
+            pStmnt.setString(2, ub.getPassword());
+            pStmnt.setString(3, ub.getFullName());
+            pStmnt.setString(4, ub.getEmail());
+            pStmnt.setString(5, ub.getPhone());
+            pStmnt.setString(6, ub.getGender());
+            pStmnt.setString(7, ub.getRole());
+            pStmnt.setInt(8, ub.getClinicId());
+            pStmnt.setInt(9, ub.getUserId());
+
+            int rs = pStmnt.executeUpdate();
+            pStmnt.close();
+            cnnct.close();
+            return rs;
+        } catch (SQLException ex) {
+            while (ex != null) {
+                ex.printStackTrace();
+                ex = ex.getNextException();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
 
     public void dropCustTable() {
         Connection cnnct = null;
