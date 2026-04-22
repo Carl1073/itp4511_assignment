@@ -5,8 +5,8 @@
  */
 package ict.servlet;
 
-import ict.bean.PatientBean;
-import ict.db.PatientDB;
+import ict.bean.*;
+import ict.db.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
@@ -22,14 +22,14 @@ import javax.servlet.http.*;
 @WebServlet(name = "registerController", urlPatterns = {"/registerController"})
 public class registerController extends HttpServlet {
 
-    private PatientDB db;
+    private UserDB db;
 
     @Override
     public void init() {
         String dbUser = "root";
         String dbPassword = "";
         String dbUrl = "jdbc:mysql://localhost:3306/ITP4511_Assignment_DB";
-        db = new PatientDB(dbUrl, dbUser, dbPassword);
+        db = new UserDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -52,38 +52,48 @@ public class registerController extends HttpServlet {
     }
 
     private void doRegister(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. Wrap parameters into a bean immediately
-        PatientBean cb = new PatientBean(
-                db.getLargestCustId() + 1,
-                request.getParameter("name"),
+        // 1. Make a user bean
+        UserBean ub = new UserBean(
+                db.getLargestCustId(),
                 request.getParameter("username"),
-                request.getParameter("pw"),
+                request.getParameter("password"),
+                request.getParameter("fullName"),
+                request.getParameter("email"),
+                request.getParameter("phone"),
                 request.getParameter("gender"),
-                request.getParameter("address"),
-                Date.valueOf(request.getParameter("dob")),
-                request.getParameter("tel"),
-                request.getParameter("email")
+                request.getParameter("role"),
+                0  //default no clinic assign
         );
 
         String cpw = request.getParameter("cpw");
         StringBuilder errorMsg = new StringBuilder();
 
         // 2. Validation
-        if (db.isUsernameTaken(cb.getUsername())) {
+        if (db.queryCustByUsername(ub.getUsername()) != null) {
             errorMsg.append("Username is already taken.<br/>");
         }
-        if (!cb.getPassword().equals(cpw)) {
+        if (!ub.getPassword().equals(cpw)) {
             errorMsg.append("Passwords do not match.<br/>");
+        }
+        if (ub.getPassword().length() < 3) {
+            errorMsg.append("Passwords length is shorter than 3.<br/>");
         }
 
         // 3. Logic Flow
         if (errorMsg.length() > 0) {
             request.setAttribute("errorMsg", errorMsg.toString());
-            request.setAttribute("tempCustomer", cb); // Just send the whole bean back
+            request.setAttribute("username",  ub.getUsername());
+            request.setAttribute("password",  ub.getPassword());
+            request.setAttribute("cpw", cpw);
+            request.setAttribute("fullName",  ub.getFullName());
+            request.setAttribute("email",  ub.getEmail());
+            request.setAttribute("phone",  ub.getPhone());
+            request.setAttribute("gender",  ub.getGender());
+            request.setAttribute("role",  ub.getRole());
             request.getRequestDispatcher("/register.jsp").forward(request, response);
         } else {
-            db.addRecord(cb);
-            request.getSession().setAttribute("patientBean", cb);
+            db.addRecord(ub);
+            request.getSession().setAttribute("userBean", ub);
             request.getRequestDispatcher("/registerSuccess.jsp").forward(request, response);
         }
     }

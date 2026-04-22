@@ -72,7 +72,7 @@ public class IncidentLogDB {
                     + "description TEXT," // Details for Admin review 
                     + "createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                     + "PRIMARY KEY (logId),"
-                    + "FOREIGN KEY (userId) REFERENCES users(userId)"
+                    + "FOREIGN KEY (userId) REFERENCES user(userId)"
                     + ")";
             stmnt.execute(sql);
             stmnt.close();

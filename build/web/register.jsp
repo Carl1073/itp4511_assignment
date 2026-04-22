@@ -6,13 +6,6 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%
-    java.sql.Date sqlDate = (java.sql.Date) request.getAttribute("dob");
-    String formattedDate = "";
-    if (sqlDate != null) {
-        formattedDate = sqlDate.toString();   // java.sql.Date.toString() already returns "yyyy-MM-dd"
-    }
-%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -22,7 +15,7 @@
     </head>
 
     <body>
-        <jsp:useBean id="userInfo" class="ict.bean.UserBean" scope="session"/>
+        <jsp:useBean id="userBean" class="ict.bean.UserBean" scope="session"/>
         <h1>Client Register</h1>
         <form action="registerController" method="post">
             <% if (request.getAttribute("errorMsg") != null) {%>
@@ -46,12 +39,14 @@
 
             <div class="form-row">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required />
+                <input type="password" id="password" name="password"
+                       value="<%= request.getAttribute("password") != null ? request.getAttribute("password") : ""%>" required />
             </div>
 
             <div class="form-row">
                 <label for="cpw">Confirm Password:</label>
-                <input type="password" id="cpw" name="cpw" required />
+                <input type="password" id="cpw" name="cpw" 
+                        value="<%= request.getAttribute("cpw") != null ? request.getAttribute("cpw") : ""%>"required />
                 <span id="pw-feedback" style="margin-left: 10px;"></span>
             </div>
 
@@ -76,8 +71,8 @@
                 <input type="text" id="phone" name="phone" 
                        value="<%= request.getAttribute("phone") != null ? request.getAttribute("phone") : ""%>" required/>
             </div>
-
-            <input type="hidden" name="clinicId" value="0" />
+            
+            <input type ="hidden" name="role" value="patient">
 
             <input type="submit" value="Register"/>
         </form>
@@ -94,17 +89,21 @@
             timeout = setTimeout(function () {
                 console.log(pw);
                 console.log(cpw);
+                if (pw.length < 3){
+                    $('#pw-feedback').text('✗ Password Length at least 3').css('color', 'red');
+                }else{
                 if (pw === cpw) {
                     $('#pw-feedback').text('✓ Password Match').css('color', 'green');
                     console.log();
                 } else {
                     $('#pw-feedback').text('✗ Password Not Match').css('color', 'red');
                 }
+                }
             }, 500);
         }
         $(document).ready(function () {
             // check whether Username is repeated
-            $('input[name="username"]').on('input', function () {
+            $('input[name="fullName"]').on('input', function () {
                 clearTimeout(timeout);
                 const username = $(this).val().trim();
 

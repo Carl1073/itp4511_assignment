@@ -74,9 +74,9 @@ public class QueueDB {
                     + "entryTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                     + "status ENUM('Waiting', 'Called', 'Skipped', 'Served') DEFAULT 'Waiting',"
                     + "PRIMARY KEY (queueId),"
-                    + "FOREIGN KEY (patientId) REFERENCES users(userId),"
-                    + "FOREIGN KEY (clinicId) REFERENCES clinics(clinicId)"
-                    + "FOREIGN KEY (serviceId) REFERENCES services(serviceId)"
+                    + "FOREIGN KEY (patientId) REFERENCES user(userId),"
+                    + "FOREIGN KEY (clinicId) REFERENCES clinic(clinicId),"
+                    + "FOREIGN KEY (serviceId) REFERENCES service(serviceId)"
                     + ")";
             stmnt.execute(sql);
             stmnt.close();

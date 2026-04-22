@@ -5,18 +5,31 @@
  */
 package ict.test.paul;
 
+import ict.bean.*;
 import ict.db.*;
 
 /**
  *
  * @author Tong
  */
-public class TestCreateCustTable {
+public class TestUBAddRecord {
+
     public static void main(String[] arg) {
         String url = "jdbc:mysql://localhost:3306/ITP4511_Assignment_DB";
         String username = "root";
         String password = "";
-        PatientDB custDb = new PatientDB(url, username, password);
-        custDb.createCustTable();
+        UserDB userDB = new UserDB(url, username, password);
+        UserBean ub = new UserBean(
+                0,
+                "test3",
+                "test",
+                "Test",
+                "Test",
+                "Test",
+                "M",
+                "patient",
+                0 //default no clinic assign
+        );
+        userDB.addRecord(ub);
     }
 }

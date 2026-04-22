@@ -72,7 +72,7 @@ public class NotificationDB {
                     + "isRead BOOLEAN DEFAULT FALSE,"
                     + "createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                     + "PRIMARY KEY (notifId),"
-                    + "FOREIGN KEY (userId) REFERENCES users(userId)"
+                    + "FOREIGN KEY (userId) REFERENCES user(userId)"
                     + ")";
             stmnt.execute(sql);
             stmnt.close();

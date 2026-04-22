@@ -75,9 +75,9 @@ public class AppointmentDB {
                     + "status ENUM('Confirmed', 'Arrived', 'No-show', 'Completed', 'Cancelled') DEFAULT 'Confirmed',"
                     + "cancelReason VARCHAR(255)," 
                     + "PRIMARY KEY (appId),"
-                    + "FOREIGN KEY (patientId) REFERENCES users(userId),"
-                    + "FOREIGN KEY (clinicId) REFERENCES clinics(clinicId),"
-                    + "FOREIGN KEY (serviceId) REFERENCES services(serviceId)"
+                    + "FOREIGN KEY (patientId) REFERENCES user(userId),"
+                    + "FOREIGN KEY (clinicId) REFERENCES clinic(clinicId),"
+                    + "FOREIGN KEY (serviceId) REFERENCES service(serviceId)"
                     + ")";
             stmnt.execute(sql);
             stmnt.close();

@@ -64,7 +64,7 @@ public class UserDB {
         int largestCustId = 0;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "SELECT MAX(userId) AS largest_value FROM users;";
+            String preQueryStatement = "SELECT MAX(userId) AS largest_value FROM user;";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             ResultSet rs = null;
             rs = pStmnt.executeQuery();
@@ -86,7 +86,7 @@ public class UserDB {
         try {
             cnnct = getConnection();
             stmnt = cnnct.createStatement();
-            String sql = "CREATE TABLE IF NOT EXISTS users ("
+            String sql = "CREATE TABLE IF NOT EXISTS user ("
                     + "userId INT AUTO_INCREMENT,"
                     + "username VARCHAR(50) NOT NULL UNIQUE,"
                     + "password VARCHAR(255) NOT NULL,"
@@ -112,7 +112,7 @@ public class UserDB {
         boolean isSuccess = false;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "INSERT INTO users (username, password, fullName, email, phone, gender, role, clinicId) VALUES (?,?,?,?,?,?,?,?)";
+            String preQueryStatement = "INSERT INTO user (username, password, fullName, email, phone, gender, role, clinicId) VALUES (?,?,?,?,?,?,?,?)";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setString(1, ub.getUsername());
             pStmnt.setString(2, ub.getPassword());
@@ -282,7 +282,7 @@ public class UserDB {
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "DELETE FROM patient WHERE CUSTID = ?";
+            String preQueryStatement = "DELETE FROM user WHERE userid = ?";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setString(1, custId);
 

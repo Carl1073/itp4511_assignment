@@ -71,8 +71,8 @@ public class ClinicServiceDB {
                     + "quotaPerSlot INT NOT NULL DEFAULT 1," // Max capacity for booking
                     + "duration INT NOT NULL DEFAULT 30," // Minutes per appointment
                     + "PRIMARY KEY (clinicId, serviceId),"
-                    + "FOREIGN KEY (clinicId) REFERENCES clinics(clinicId),"
-                    + "FOREIGN KEY (serviceId) REFERENCES services(serviceId)"
+                    + "FOREIGN KEY (clinicId) REFERENCES clinic(clinicId),"
+                    + "FOREIGN KEY (serviceId) REFERENCES service(serviceId)"
                     + ")";
             stmnt.execute(sql);
             stmnt.close();

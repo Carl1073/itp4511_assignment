@@ -13,8 +13,8 @@
     </head>
     <body>
         <%@ include file="component/patient/heading.jsp" %>
-        <jsp:useBean id="patientBean" class="ict.bean.PatientBean" scope="session"/>
-        <b> Hello, <jsp:getProperty name="patientBean" property="name"/></b>
+        <jsp:useBean id="userBean" class="ict.bean.UserBean" scope="session"/>
+        <b> Hello, <jsp:getProperty name="userBean" property="fullName"/></b>
 
         <h1>This is booking page</h1>
     </body>

@@ -7,7 +7,6 @@ package ict.servlet;
 
 import ict.bean.UserBean;
 import ict.db.UserDB;
-import ict.db.LoginResult;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.*;
@@ -65,32 +64,35 @@ public class loginController extends HttpServlet {
         String password = request.getParameter("password");
         String role = request.getParameter("role");
         String targetURL = "";
+        HttpSession session = request.getSession(true);
         System.out.println(role);
 
-        LoginResult validUser;
-        if (role.equalsIgnoreCase("patient")) {
-            validUser = cdb.isValidUser(username, password);
-            if (validUser.status == 0) {
-                HttpSession session = request.getSession(true);
-                PatientBean bean = validUser.patient;
-                session.setAttribute("patientBean", bean);
+        UserBean ub = db.queryCustByUsername(username);
+        String errorMsg = "";
+
+        if (ub == null) {  // incorrect username
+            errorMsg = "Username not register. Please register.";
+        } else {
+            if (!ub.getPassword().equals(password)) {  //incorrect password
+                errorMsg = "Password incorrect. Please check the password.";
+            }
+        }
+
+        if (errorMsg.equals("")) {  // no error message, means correct username and password
+            session.setAttribute("userBean", ub);
+            //check the role
+            if (role.equalsIgnoreCase("patient")) {
                 targetURL = "patient/patientHome.jsp";
-            } else {
-                String errorMsg = "";
-                switch (validUser.status) {
-                    case 1:
-                        errorMsg = "Username not register. Please register.";
-                        break;
-                    case 2:
-                        errorMsg = "Password incorrect. Please check the password.";
-                        break;
-                }
-                request.setAttribute("errorMsg", errorMsg);
-                targetURL = "login.jsp";
+            } else if (role.equalsIgnoreCase("staff")) {
+                targetURL = "staff/staffHome.jsp";
+            } else { //admin
+                targetURL = "admin/adminHome.jsp";
             }
         } else {
-            validUser = new LoginResult();
+            request.setAttribute("errorMsg", errorMsg);
+            targetURL = "login.jsp";
         }
+
         System.out.println(targetURL);
 
         RequestDispatcher rd;
