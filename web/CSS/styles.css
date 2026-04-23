@@ -1,3 +1,4 @@
+
 .segmented-control {
     display: flex;
     background-color: #f1f1f1;
@@ -125,4 +126,29 @@ select:focus {
     border-color: #009879;
     outline: none;
     box-shadow: 0 0 5px rgba(0, 152, 121, 0.5);
+}
+
+body {
+    /* A soft, professional blue-gray gradient */
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background-attachment: fixed; /* Keeps background still while scrolling */
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* A container to wrap your JSP content and give it structure */
+.container {
+    width: 90%;
+    max-width: 1000px;
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    padding: 40px;
+    margin: 50px 0;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }

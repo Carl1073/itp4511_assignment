@@ -1,5 +1,5 @@
 <head>
-    <link rel="stylesheet" type="text/css" href="../CSS/styles.css">
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/CSS/styles.css">
 </head>
 
 <form method="post" action="${pageContext.request.contextPath}/loginController">

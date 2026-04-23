@@ -10,7 +10,7 @@
         <link rel="stylesheet" href="CSS/styles.css">
         <title>Login Page</title>
     </head>
-
+    
     <jsp:useBean id="customerBean" class="ict.bean.UserBean" scope="session"/>
 
     <body>
