@@ -71,6 +71,7 @@ public class ServiceDB {
                     + "serviceName VARCHAR(100) NOT NULL,"
                     + "description TEXT,"
                     + "price DECIMAL(10, 2) NOT NULL,"
+                    + "duration INT NOT NULL DEFAULT 60," // Minutes per slot, default to 60 minutes
                     + "PRIMARY KEY (serviceId)"
                     + ")";
             stmnt.execute(sql);
@@ -87,11 +88,12 @@ public class ServiceDB {
         boolean isSuccess = false;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "INSERT INTO service (serviceName, description, price) VALUES (?,?,?)";
+            String preQueryStatement = "INSERT INTO service (serviceName, description, price, duration) VALUES (?,?,?,?)";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setString(1, sb.getServiceName());
             pStmnt.setString(2, sb.getDescription());
             pStmnt.setDouble(3, sb.getPrice());
+            pStmnt.setInt(4, sb.getDuration());
             int rowCount = pStmnt.executeUpdate();
             if (rowCount >= 1) {
                 isSuccess = true;
@@ -169,13 +171,14 @@ public class ServiceDB {
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "UPDATE patient SET serviceName = ?, description = ?, price = ? "
+            String preQueryStatement = "UPDATE serivce SET serviceName = ?, description = ?, price = ?, duration = ? "
                     + " WHERE serviceId =  ?";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setString(1, sb.getServiceName());
             pStmnt.setString(2, sb.getDescription());
             pStmnt.setDouble(3, sb.getPrice());
-            pStmnt.setInt(4, sb.getServiceId());
+            pStmnt.setInt(4, sb.getDuration());
+            pStmnt.setInt(5, sb.getServiceId());
 
             int rs = pStmnt.executeUpdate();
             pStmnt.close();
@@ -220,6 +223,7 @@ public class ServiceDB {
         sb.setServiceName(rs.getString(2));
         sb.setDescription(rs.getString(3));
         sb.setPrice(rs.getDouble(4));
+        sb.setDuration(rs.getInt(5));
         return sb;
     }
 }

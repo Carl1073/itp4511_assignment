@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Time;
 
-public class ClinicServiceBean implements Serializable {
+public class TimeslotBean implements Serializable {
+
+    private int timeslotId;
     private int clinicId;
     private ClinicBean clinicBean;
     private int serviceId;
@@ -12,23 +14,30 @@ public class ClinicServiceBean implements Serializable {
     private Date date;
     private Time openTime;
     private int quotaPerSlot;
-    private int duration; // in minute
 
     // Default No-argument Constructor
-    public ClinicServiceBean() {
+    public TimeslotBean() {
     }
 
     // Constructor for all input values
-    public ClinicServiceBean(int clinicId, int serviceId, Date date, Time openTime, int quotaPerSlot, int duration) {
+    public TimeslotBean(int timeslotId, int clinicId, int serviceId, Date date, Time openTime, int quotaPerSlot) {
+        this.timeslotId = timeslotId;
         this.clinicId = clinicId;
         this.serviceId = serviceId;
         this.date = date;
         this.openTime = openTime;
         this.quotaPerSlot = quotaPerSlot;
-        this.duration = duration;
     }
 
     // Getters and Setters
+    public int getTimeslotId() {
+        return timeslotId;
+    }
+
+    public void setTimeslotId(int timeslotId) {
+        this.timeslotId = timeslotId;
+    }
+
     public int getClinicId() {
         return clinicId;
     }
@@ -51,14 +60,6 @@ public class ClinicServiceBean implements Serializable {
 
     public void setQuotaPerSlot(int quotaPerSlot) {
         this.quotaPerSlot = quotaPerSlot;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
     }
 
     public ClinicBean getClinicBean() {
@@ -88,6 +89,7 @@ public class ClinicServiceBean implements Serializable {
     public Time getOpenTime() {
         return openTime;
     }
+
     public void setOpenTime(Time openTime) {
         this.openTime = openTime;
     }

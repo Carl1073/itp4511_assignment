@@ -12,9 +12,9 @@
         <title>Booking</title>
     </head>
     <body>
-        <%@ include file="component/patient/heading.jsp" %>
+        <%@ include file="component/heading.jsp" %>
         <jsp:useBean id="userBean" class="ict.bean.UserBean" scope="session"/>
-        <b> Hello, <jsp:getProperty name="userBean" property="fullName"/></b>
+        <ict:hello name="${userBean.fullName}"/>
 
         <h1>This is booking page</h1>
     </body>
