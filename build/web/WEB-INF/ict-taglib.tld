@@ -21,6 +21,25 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
+    
+    <tag>
+        <name>dropdown</name>
+        <tag-class>ict.tag.DropdownTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>items</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>name</name>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>option</name>
+            <required>true</required>
+        </attribute>
+    </tag>
 
  
 <!--    <tag>

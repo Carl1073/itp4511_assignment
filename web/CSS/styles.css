@@ -202,3 +202,9 @@ body {
 .logout-btn:active {
     transform: scale(0.95);
 }
+
+.search{
+    display: flex; 
+    gap: 20px; 
+    align-items: center;
+}

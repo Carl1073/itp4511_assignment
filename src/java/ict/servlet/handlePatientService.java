@@ -18,8 +18,8 @@ import javax.servlet.http.*;
  *
  * @author Tong
  */
-@WebServlet(name = "handlePatient", urlPatterns = {"/handlePatient"})
-public class handlePatient extends HttpServlet {
+@WebServlet(name = "handleService", urlPatterns = {"/handleService"})
+public class handlePatientService extends HttpServlet {
 
     private ServiceDB sdb;
     private ClinicDB cdb;
@@ -44,27 +44,8 @@ public class handlePatient extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
-        if ("service".equalsIgnoreCase(action)) {
-            ArrayList<ServiceBean> services = sdb.queryService();
-            request.setAttribute("services", services);
-            ArrayList<ClinicBean> clinics = cdb.queryClinic();
-            request.setAttribute("clinics", clinics);
-            RequestDispatcher rd;
-            rd = getServletContext().getRequestDispatcher("/patient/service.jsp");
-            rd.forward(request, response);
-        } else if ("booking".equalsIgnoreCase(action)) {
-            RequestDispatcher rd;
-            rd = getServletContext().getRequestDispatcher("/patient/booking.jsp");
-            rd.forward(request, response);
-        } else if ("search".equalsIgnoreCase(action)) {
-            ArrayList<ServiceBean> services = sdb.queryService();
-            request.setAttribute("services", services);
-            ArrayList<ClinicBean> clinics = cdb.queryClinic();
-            request.setAttribute("clinics", clinics);
+        if ("search".equalsIgnoreCase(action)) {
 
-            RequestDispatcher rd;
-            rd = getServletContext().getRequestDispatcher("/patient/service.jsp");
-            rd.forward(request, response);
         } else{
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();
