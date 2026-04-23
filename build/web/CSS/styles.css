@@ -152,3 +152,53 @@ body {
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
+
+/* Navigation Header Container */
+.heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Pushes links to left, logout to right */
+    padding: 15px 25px;
+    background-color: #ffffff;
+    border-bottom: 2px solid #f1f1f1;
+    margin-bottom: 30px;
+}
+
+/* Grouping the links */
+.nav-links {
+    display: flex;
+    gap: 25px; /* Spacing between Home, Booking, etc. */
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #555;
+    font-weight: 600;
+    font-size: 15px;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #009879; /* Matches your table header color */
+}
+
+/* Logout Button Styling */
+.logout-btn {
+    background-color: #ff4757; /* Professional Red */
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.1s ease;
+    margin: 0px 0px 0px 18px;
+}
+
+.logout-btn:hover {
+    background-color: #ff6b81;
+}
+
+.logout-btn:active {
+    transform: scale(0.95);
+}

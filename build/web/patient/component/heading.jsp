@@ -2,12 +2,15 @@
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/CSS/styles.css">
 </head>
 
-<form method="post" action="${pageContext.request.contextPath}/loginController">
+<form class="heading" method="post" action="${pageContext.request.contextPath}/loginController">
     <input type="hidden" name="action" value="logout"/>
 
-    <a href="${pageContext.request.contextPath}/patient/patientHome.jsp">Home</a>
-    <a href="${pageContext.request.contextPath}/patient/booking.jsp">Booking</a>
+    <div class="nav-links">
+        <a href="${pageContext.request.contextPath}/patient/patientHome.jsp">Home</a>
+        <a href="${pageContext.request.contextPath}/handlePatient?action=booking">Booking</a>
+        <a href="${pageContext.request.contextPath}/handlePatient?action=service">Service</a>
+    </div>
 
-    <input type="submit" name="logoutButton" value="Logout"/>
+    <input type="submit" class="logout-btn" name="logoutButton" value="Logout"/>
 </form>
 <%@ taglib uri="/WEB-INF/tlds/ict-taglib.tld" prefix="ict" %>

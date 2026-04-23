@@ -1,6 +1,6 @@
 <%-- 
-    Document   : clientBooking
-    Created on : 2026年4月7日, 上午11:56:23
+    Document   : clientHome
+    Created on : 2026年3月24日, 下午08:54:57
     Author     : Tong
 --%>
 
@@ -9,13 +9,13 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Booking</title>
+        <title>Home page</title>
 
     </head>
     <body>
         <%@ include file="component/heading.jsp" %>
         <jsp:useBean id="userBean" class="ict.bean.UserBean" scope="session"/>
-
-        <h1>This is booking page</h1>
+        <ict:hello name="${userBean.fullName}"/>
+        <h1>This is home page.</h1>
     </body>
 </html>

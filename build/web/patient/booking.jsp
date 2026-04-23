@@ -10,11 +10,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Booking</title>
+
     </head>
     <body>
         <%@ include file="component/heading.jsp" %>
         <jsp:useBean id="userBean" class="ict.bean.UserBean" scope="session"/>
-        <ict:hello name="${userBean.fullName}"/>
 
         <h1>This is booking page</h1>
     </body>
