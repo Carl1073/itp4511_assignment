@@ -6,8 +6,11 @@ import java.sql.Timestamp;
 public class QueueBean implements Serializable {
     private int queueId;
     private int patientId;
+    private UserBean userBean;
     private int clinicId;
+    private ClinicBean clinicBean;
     private int serviceId;
+    private ServiceBean serviceBean;
     private int queueNumber;
     private Timestamp entryTime;
     private String status;
@@ -83,5 +86,29 @@ public class QueueBean implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    
+    public ClinicBean getClinicBean() {
+        return clinicBean;
+    }
+
+    public ServiceBean getServiceBean() {
+        return serviceBean;
+    }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setClinicBean(ClinicBean clinicBean) {
+        this.clinicBean = clinicBean;
+    }
+
+    public void setServiceBean(ServiceBean serviceBean) {
+        this.serviceBean = serviceBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
     }
 }

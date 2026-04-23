@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 public class IncidentLogBean implements Serializable {
     private int logId;
     private int userId;
+    private UserBean userBean;
     private String eventType;
     private String description;
     private Timestamp createdAt;
@@ -38,6 +39,14 @@ public class IncidentLogBean implements Serializable {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
     }
 
     public String getEventType() {

@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 public class ClinicServiceBean implements Serializable {
     private int clinicId;
+    private ClinicBean clinicBean;
     private int serviceId;
+    private ServiceBean serviceBean;
     private int quotaPerSlot;
     private int duration; // in minute
 
@@ -51,5 +53,21 @@ public class ClinicServiceBean implements Serializable {
 
     public void setDuration(int duration) {
         this.duration = duration;
+    }
+
+    public ClinicBean getClinicBean() {
+        return clinicBean;
+    }
+
+    public void setClinicBean(ClinicBean clinicBean) {
+        this.clinicBean = clinicBean;
+    }
+
+    public ServiceBean getServiceBean() {
+        return serviceBean;
+    }
+
+    public void setServiceBean(ServiceBean serviceBean) {
+        this.serviceBean = serviceBean;
     }
 }

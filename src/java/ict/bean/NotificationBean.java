@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 public class NotificationBean implements Serializable {
     private int notifId;
     private int userId;
+    private UserBean userBean;
     private String message;
     private boolean isRead;
     private Timestamp createdAt;
@@ -38,6 +39,14 @@ public class NotificationBean implements Serializable {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
     }
 
     public String getMessage() {

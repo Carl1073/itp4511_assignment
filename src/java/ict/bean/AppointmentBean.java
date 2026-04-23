@@ -7,8 +7,11 @@ import java.sql.Time;
 public class AppointmentBean implements Serializable {
     private int appId;
     private int patientId;
+    private UserBean userBean;
     private int clinicId;
+    private ClinicBean clinicBean;
     private int serviceId;
+    private ServiceBean serviceBean;
     private Date appDate;
     private Time timeslot;
     private String status;
@@ -19,8 +22,8 @@ public class AppointmentBean implements Serializable {
     }
 
     // Constructor for all input values
-    public AppointmentBean(int appId, int patientId, int clinicId, int serviceId, 
-                           Date appDate, Time timeslot, String status, String cancelReason) {
+    public AppointmentBean(int appId, int patientId, int clinicId, int serviceId,
+            Date appDate, Time timeslot, String status, String cancelReason) {
         this.appId = appId;
         this.patientId = patientId;
         this.clinicId = clinicId;
@@ -94,5 +97,29 @@ public class AppointmentBean implements Serializable {
 
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
+    }
+
+    public ClinicBean getClinicBean() {
+        return clinicBean;
+    }
+
+    public ServiceBean getServiceBean() {
+        return serviceBean;
+    }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setClinicBean(ClinicBean clinicBean) {
+        this.clinicBean = clinicBean;
+    }
+
+    public void setServiceBean(ServiceBean serviceBean) {
+        this.serviceBean = serviceBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
     }
 }
