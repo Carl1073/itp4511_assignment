@@ -20,8 +20,8 @@ public class IncidentLogDB {
     private String username = "";
     private String password = "";
     private String query = "SELECT l.*, u.fullName, u.email, u.phone "
-                + "FROM incident_log l "
-                + "INNER JOIN user u ON l.userId = u.userId ";
+            + "FROM incident_log l "
+            + "LEFT JOIN user u ON l.userId = u.userId ";
 
     public IncidentLogDB(String url, String username, String password) {
         this.url = url;
@@ -133,7 +133,7 @@ public class IncidentLogDB {
         String sql = query;
         return executeGenericQuery(sql);
     }
-    
+
     public ArrayList<IncidentLogBean> queryIncidentLogByUserId(int userId) {
         String sql = query + " where l.userid = ?";
         return executeGenericQuery(sql, userId);
@@ -147,7 +147,7 @@ public class IncidentLogDB {
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "DELETE FROM patient WHERE CUSTID = ?";
+            String preQueryStatement = "DELETE FROM incident_log WHERE logid = ?";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setString(1, custId);
 
@@ -168,41 +168,41 @@ public class IncidentLogDB {
         return isSuccess;
     }
 
-    // public int editRecord(PatientBean ib) {
-    // Connection cnnct = null;
-    // PreparedStatement pStmnt = null;
-    //
-    // try {
-    // cnnct = getConnection();
-    // String preQueryStatement = "UPDATE patient SET NAME = ?, TEL = ?, AGE = ?
-    // WHERE CUSTID = ?";
-    // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, ib.getName());
-    // pStmnt.setString(2, ib.getTel());
-    // pStmnt.setInt(3, ib.getAge());
-    // pStmnt.setString(4, ib.getCustId());
-    //
-    // int rs = pStmnt.executeUpdate();
-    // pStmnt.close();
-    // cnnct.close();
-    // return rs;
-    // } catch (SQLException ex) {
-    // while (ex != null) {
-    // ex.printStackTrace();
-    // ex = ex.getNextException();
-    // }
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // }
-    // return 0;
-    // }
+    public int editRecord(IncidentLogBean ib) {
+        Connection cnnct = null;
+        PreparedStatement pStmnt = null;
+
+        try {
+            cnnct = getConnection();
+            String preQueryStatement = "UPDATE incident_log SET userId = ?, eventType = ?, description = ? WHERE logid = ?";
+            pStmnt = cnnct.prepareStatement(preQueryStatement);
+            pStmnt.setInt(1, ib.getUserId());
+            pStmnt.setString(2, ib.getEventType());
+            pStmnt.setString(3, ib.getDescription());
+            pStmnt.setInt(4, ib.getLogId());
+
+            int rs = pStmnt.executeUpdate();
+            pStmnt.close();
+            cnnct.close();
+            return rs;
+        } catch (SQLException ex) {
+            while (ex != null) {
+                ex.printStackTrace();
+                ex = ex.getNextException();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
     public void dropCustTable() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "DROP TABLE patient";
+            String preQueryStatement = "DROP TABLE incident_log";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
 
             pStmnt.execute();
@@ -224,12 +224,12 @@ public class IncidentLogDB {
         ib.setUserId(rs.getInt(2));
         ib.setEventType(rs.getString(3));
         ib.setDescription(rs.getString(4));
-        ib.setCreatedAt(rs.getTime(5));
+        ib.setCreatedAt(rs.getTimestamp(5));
 
         UserBean ub = new UserBean();
-        ub.setUserId(rs.getInt("userId")); // From user table
+        // ub.setUserId(rs.getInt("userId")); // From user table
         ub.setFullName(rs.getString("fullName"));
-        ub.setEmail(rs.getString("email"));
+        // ub.setEmail(rs.getString("email"));
         ib.setUserBean(ub);
         return ib;
     }

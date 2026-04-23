@@ -19,6 +19,7 @@ public class ClinicDB {
     private String url = "";
     private String username = "";
     private String password = "";
+    private String query = "SELECT * FROM clinic ";
 
     public ClinicDB(String url, String username, String password) {
         this.url = url;
@@ -107,92 +108,29 @@ public class ClinicDB {
         return isSuccess;
     }
 
-    public ArrayList<ClinicBean> queryClinic() {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
+    private ArrayList<ClinicBean> executeGenericQuery(String sql, Object... params) {
         ArrayList<ClinicBean> cbs = new ArrayList<>();
+        // Try-with-resources automatically closes Connection, Statement, and ResultSet
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(query + sql)) {
 
-        ClinicBean cb = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM clinic";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            while (rs.next()) {
-                cb = this.resultSetToBean(rs);
-                cbs.add(cb);
+            for (int i = 0; i < params.length; i++) {
+                pStmnt.setObject(i + 1, params[i]);
             }
-            pStmnt.close();
-            cnnct.close();
+
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                while (rs.next()) {
+                    cbs.add(this.resultSetToBean(rs));
+                }
+            }
         } catch (SQLException | IOException ex) {
             ex.printStackTrace();
         }
         return cbs;
     }
 
-    public ClinicBean queryCustByID(String id) {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
-
-        ClinicBean cb = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM clinic WHERE CLINICID = ?";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, id);
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            if (rs.next()) {
-                cb = resultSetToBean(rs);
-            }
-            pStmnt.close();
-            cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return cb;
-    }
-
-    public ArrayList<ClinicBean> queryClinicByName(String name) {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
-
-        ArrayList<ClinicBean> cbs = new ArrayList<>();
-        ClinicBean cb = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM clinic WHERE CLINICNAME LIKE ?";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, "%" + name + "%");
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            while (rs.next()) {
-                cb = new ClinicBean();
-                cb.setClinicId(rs.getInt(1));
-                cb.setClinicName(rs.getString(2));
-                cb.setAddress(rs.getString(3));
-                cb.setOpenTime(rs.getTime(4));
-                cb.setCloseTime(rs.getTime(5));
-                cb.setIsWalkinEnabled(rs.getBoolean(6));
-                cbs.add(cb);
-            }
-            pStmnt.close();
-            cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return cbs;
+    public ArrayList<ClinicBean> queryClinic() {
+        return executeGenericQuery("");
     }
 
     public boolean delRecord(String custId) {
@@ -225,34 +163,35 @@ public class ClinicDB {
     }
 
     public int editRecord(ClinicBean cb) {
-    Connection cnnct = null;
-    PreparedStatement pStmnt = null;
-    
-    try {
-    cnnct = getConnection();
-    String preQueryStatement = "UPDATE clinic SET CLINICNAME = ?, ADDRESS = ?, OPENTIME = ?, CLOSETIME = ?, ISWALKINENABLED = ? WHERE CLINICID = ?";
-    pStmnt = cnnct.prepareStatement(preQueryStatement);
-    pStmnt.setString(1, cb.getClinicName());
-    pStmnt.setString(2, cb.getAddress());
-    pStmnt.setTime(3, cb.getOpenTime());
-    pStmnt.setTime(4, cb.getCloseTime());
-    pStmnt.setBoolean(5, cb.getIsWalkinEnabled());
-    pStmnt.setInt(6, cb.getClinicId());
-    
-    int rs = pStmnt.executeUpdate();
-    pStmnt.close();
-    cnnct.close();
-    return rs;
-    } catch (SQLException ex) {
-    while (ex != null) {
-    ex.printStackTrace();
-    ex = ex.getNextException();
+        Connection cnnct = null;
+        PreparedStatement pStmnt = null;
+
+        try {
+            cnnct = getConnection();
+            String preQueryStatement = "UPDATE clinic SET CLINICNAME = ?, ADDRESS = ?, OPENTIME = ?, CLOSETIME = ?, ISWALKINENABLED = ? WHERE CLINICID = ?";
+            pStmnt = cnnct.prepareStatement(preQueryStatement);
+            pStmnt.setString(1, cb.getClinicName());
+            pStmnt.setString(2, cb.getAddress());
+            pStmnt.setTime(3, cb.getOpenTime());
+            pStmnt.setTime(4, cb.getCloseTime());
+            pStmnt.setBoolean(5, cb.getIsWalkinEnabled());
+            pStmnt.setInt(6, cb.getClinicId());
+
+            int rs = pStmnt.executeUpdate();
+            pStmnt.close();
+            cnnct.close();
+            return rs;
+        } catch (SQLException ex) {
+            while (ex != null) {
+                ex.printStackTrace();
+                ex = ex.getNextException();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return 0;
     }
-    } catch (IOException ex) {
-    ex.printStackTrace();
-    }
-    return 0;
-    }
+
     public void dropClinicTable() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;

@@ -103,9 +103,7 @@ public class UserBean implements Serializable {
 
     public void setClinicId(int clinicId) {
         this.clinicId = clinicId;
-    }
-    
-    
+    }    
     
     public String toString(){
         return "UserBean id" + userId;

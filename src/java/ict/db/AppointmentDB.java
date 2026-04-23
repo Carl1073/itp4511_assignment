@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import ict.bean.AppointmentBean;
+import ict.bean.ClinicBean;
+import ict.bean.ServiceBean;
+import ict.bean.UserBean;
 
 /**
  *
@@ -19,6 +22,11 @@ public class AppointmentDB {
     private String url = "";
     private String username = "";
     private String password = "";
+    private String query = "SELECT a.* , u.fullName , c.clinicName , s.serviceName "
+            + "FROM appointment a "
+            + "LEFT JOIN user u ON a.patientId = u.userid "
+            + "LEFT JOIN clinic c ON a.clinicId = c.clinicId "
+            + "LEFT JOIN service s ON a.serviceId = s.serviceId ";
 
     public AppointmentDB(String url, String username, String password) {
         this.url = url;
@@ -73,7 +81,7 @@ public class AppointmentDB {
                     + "appDate DATE NOT NULL,"
                     + "timeslot TIME NOT NULL,"
                     + "status ENUM('Confirmed', 'Arrived', 'No-show', 'Completed', 'Cancelled') DEFAULT 'Confirmed',"
-                    + "cancelReason VARCHAR(255)," 
+                    + "cancelReason VARCHAR(255),"
                     + "PRIMARY KEY (appId),"
                     + "FOREIGN KEY (patientId) REFERENCES user(userId),"
                     + "FOREIGN KEY (clinicId) REFERENCES clinic(clinicId),"
@@ -114,152 +122,31 @@ public class AppointmentDB {
         return isSuccess;
     }
 
-    public ArrayList<AppointmentBean> queryCust() {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
-        ArrayList<AppointmentBean> cbs = new ArrayList<>();
+    private ArrayList<AppointmentBean> executeGenericQuery(String sql, Object... params) {
+        ArrayList<AppointmentBean> abs = new ArrayList<>();
+        // Try-with-resources automatically closes Connection, Statement, and ResultSet
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(query + sql)) {
 
-        AppointmentBean cb = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM patient";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            while (rs.next()) {
-                cb = this.resultSetToBean(rs);
-                cbs.add(cb);
+            for (int i = 0; i < params.length; i++) {
+                pStmnt.setObject(i + 1, params[i]);
             }
-            pStmnt.close();
-            cnnct.close();
+
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                while (rs.next()) {
+                    abs.add(this.resultSetToBean(rs));
+                }
+            }
         } catch (SQLException | IOException ex) {
             ex.printStackTrace();
         }
-        return cbs;
+        return abs;
     }
 
-    // public PatientBean queryCustByID(String id) {
-    // Connection cnnct = null;
-    // PreparedStatement pStmnt = null;
-    //
-    // PatientBean cb = null;
-    // try {
-    // cnnct = getConnection();
-    // String preQueryStatement = "SELECT * FROM patient WHERE CUSTID = ?";
-    // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, id);
-    // ResultSet rs = null;
-    // rs = pStmnt.executeQuery();
-    // if (rs.next()) {
-    // cb = reseltSetToBean(rs);
-    // }
-    // pStmnt.close();
-    // cnnct.close();
-    // } catch (SQLException ex) {
-    // while (ex != null) {
-    // ex.printStackTrace();
-    // ex = ex.getNextException();
-    // }
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // }
-    // return cb;
-    // }
-    // public ArrayList<PatientBean> queryCustByName(String name) {
-    // Connection cnnct = null;
-    // PreparedStatement pStmnt = null;
-    //
-    // ArrayList<PatientBean> cbs = new ArrayList<>();
-    // PatientBean cb = null;
-    // try {
-    // cnnct = getConnection();
-    // String preQueryStatement = "SELECT * FROM patient WHERE NAME LIKE ?";
-    // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, "%" + name + "%");
-    // ResultSet rs = null;
-    // rs = pStmnt.executeQuery();
-    // while (rs.next()) {
-    // cb = new PatientBean();
-    // cb.setCustId(rs.getString(1));
-    // cb.setName(rs.getString(2));
-    // cb.setTel(rs.getString(3));
-    // cb.setAge(rs.getInt(4));
-    // cbs.add(cb);
-    // }
-    // pStmnt.close();
-    // cnnct.close();
-    // } catch (SQLException ex) {
-    // while (ex != null) {
-    // ex.printStackTrace();
-    // ex = ex.getNextException();
-    // }
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // }
-    // return cbs;
-    // }
-    // public ArrayList<PatientBean> queryCustByTel(String tel) {
-    // Connection cnnct = null;
-    // PreparedStatement pStmnt = null;
-    //
-    // ArrayList<PatientBean> cbs = new ArrayList<PatientBean>();
-    // PatientBean cb = null;
-    // try {
-    // cnnct = getConnection();
-    // String preQueryStatement = "SELECT * FROM patient WHERE TEL LIKE ?";
-    // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, "%" + tel + "%");
-    // ResultSet rs = null;
-    // rs = pStmnt.executeQuery();
-    // while (rs.next()) {
-    // cb = new PatientBean();
-    // cb.setCustId(rs.getString(1));
-    // cb.setName(rs.getString(2));
-    // cb.setTel(rs.getString(3));
-    // cb.setAge(rs.getInt(4));
-    // cbs.add(cb);
-    // }
-    // pStmnt.close();
-    // cnnct.close();
-    // } catch (SQLException ex) {
-    // while (ex != null) {
-    // ex.printStackTrace();
-    // ex = ex.getNextException();
-    // }
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // }
-    // return cbs;
-    // }
-    // public ArrayList<PatientBean> queryCust() {
-    // Connection cnnct = null;
-    // PreparedStatement pStmnt = null;
-    //
-    // ArrayList<PatientBean> cbs = new ArrayList<PatientBean>();
-    // PatientBean cb = null;
-    // try {
-    // cnnct = getConnection();
-    // String preQueryStatement = "SELECT * FROM patient";
-    // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // ResultSet rs = null;
-    // rs = pStmnt.executeQuery();
-    // while (rs.next()) {
-    // cb = new PatientBean(rs.getString(1), rs.getString(2), rs.getString(3),
-    // rs.getInt(4));
-    // cbs.add(cb);
-    // }
-    // pStmnt.close();
-    // cnnct.close();
-    // } catch (SQLException ex) {
-    // while (ex != null) {
-    // ex.printStackTrace();
-    // ex = ex.getNextException();
-    // }
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // }
-    // return cbs;
-    // }
+    public ArrayList<AppointmentBean> queryApp() {
+        return executeGenericQuery("");
+    }
+
     public boolean delRecord(String custId) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
@@ -268,7 +155,7 @@ public class AppointmentDB {
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "DELETE FROM patient WHERE CUSTID = ?";
+            String preQueryStatement = "DELETE FROM Appointment WHERE appid = ?";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setString(1, custId);
 
@@ -289,41 +176,45 @@ public class AppointmentDB {
         return isSuccess;
     }
 
-    // public int editRecord(PatientBean cb) {
-    // Connection cnnct = null;
-    // PreparedStatement pStmnt = null;
-    //
-    // try {
-    // cnnct = getConnection();
-    // String preQueryStatement = "UPDATE patient SET NAME = ?, TEL = ?, AGE = ?
-    // WHERE CUSTID = ?";
-    // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, cb.getName());
-    // pStmnt.setString(2, cb.getTel());
-    // pStmnt.setInt(3, cb.getAge());
-    // pStmnt.setString(4, cb.getCustId());
-    //
-    // int rs = pStmnt.executeUpdate();
-    // pStmnt.close();
-    // cnnct.close();
-    // return rs;
-    // } catch (SQLException ex) {
-    // while (ex != null) {
-    // ex.printStackTrace();
-    // ex = ex.getNextException();
-    // }
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // }
-    // return 0;
-    // }
+    public int editRecord(AppointmentBean cb) {
+        Connection cnnct = null;
+        PreparedStatement pStmnt = null;
+
+        try {
+            cnnct = getConnection();
+            String preQueryStatement = "UPDATE appointment SET patientId = ?, clinicId = ?, serviceId = ?, appDate = ?, timeslot = ?, status = ?, cancelReason = ? WHERE appid = ?";
+            pStmnt = cnnct.prepareStatement(preQueryStatement);
+            pStmnt.setInt(1, cb.getPatientId());
+            pStmnt.setInt(2, cb.getClinicId());
+            pStmnt.setInt(3, cb.getServiceId());
+            pStmnt.setDate(4, cb.getAppDate());
+            pStmnt.setTime(5, cb.getTimeslot());
+            pStmnt.setString(6, cb.getStatus());
+            pStmnt.setString(7, cb.getCancelReason());
+            pStmnt.setInt(8, cb.getAppId());
+
+            int rs = pStmnt.executeUpdate();
+            pStmnt.close();
+            cnnct.close();
+            return rs;
+        } catch (SQLException ex) {
+            while (ex != null) {
+                ex.printStackTrace();
+                ex = ex.getNextException();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
     public void dropCustTable() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "DROP TABLE patient";
+            String preQueryStatement = "DROP TABLE Appointment";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
 
             pStmnt.execute();
@@ -340,15 +231,40 @@ public class AppointmentDB {
     }
 
     public AppointmentBean resultSetToBean(ResultSet rs) throws SQLException {
-        AppointmentBean cb = new AppointmentBean();
-        cb.setAppId(rs.getInt(1));
-        cb.setPatientId(rs.getInt(2));
-        cb.setClinicId(rs.getInt(3));
-        cb.setServiceId(rs.getInt(4));
-        cb.setAppDate(rs.getDate(5));
-        cb.setTimeslot(rs.getTime(6));
-        cb.setStatus(rs.getString(7));
-        cb.setCancelReason(rs.getString(8));
-        return cb;
+        AppointmentBean ab = new AppointmentBean();
+        ab.setAppId(rs.getInt(1));
+        ab.setPatientId(rs.getInt(2));
+        ab.setClinicId(rs.getInt(3));
+        ab.setServiceId(rs.getInt(4));
+        ab.setAppDate(rs.getDate(5));
+        ab.setTimeslot(rs.getTime(6));
+        ab.setStatus(rs.getString(7));
+        ab.setCancelReason(rs.getString(8));
+
+        UserBean ub = new UserBean();
+        // ub.setUsername(rs.getString("username"));
+        // ub.setPassword(rs.getString("password"));
+        ub.setFullName(rs.getString("fullName"));
+        // ub.setEmail(rs.getString("email"));
+        // ub.setPhone(rs.getString("phone"));
+        // ub.setGender(rs.getString("gender"));
+        // ub.setRole(rs.getString("role"));
+        // ub.setClinicId(rs.getInt("clinicId"));
+        ab.setUserBean(ub);
+
+        ClinicBean cb = new ClinicBean();
+        cb.setClinicName(rs.getString("clinicName"));
+        // cb.setAddress(rs.getString("address"));
+        // cb.setOpenTime(rs.getTime("openTime"));
+        // cb.setCloseTime(rs.getTime("closeTime"));
+        // cb.setIsWalkinEnabled(rs.getBoolean("isWalkinEnabled"));
+        ab.setClinicBean(cb);
+
+        ServiceBean sb = new ServiceBean();
+        sb.setServiceName(rs.getString("serviceName"));
+        // sb.setDescription(rs.getString("description"));
+        // sb.setPrice(rs.getDouble("price"));
+        ab.setServiceBean(sb);
+        return ab;
     }
 }

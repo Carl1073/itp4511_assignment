@@ -8,17 +8,21 @@ package ict.db;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
-import ict.bean.QueueBean;
+import ict.bean.*;
 
 /**
  *
  * @author 240708635
  */
 public class QueueDB {
-
     private String url = "";
     private String username = "";
     private String password = "";
+    private String query = "SELECT q.* , u.fullName , c.clinicName , s.serviceName "
+            + "FROM queue q "
+            + "LEFT JOIN user u ON q.patientId = u.userid "
+            + "LEFT JOIN clinic c ON q.clinicId = c.clinicId "
+            + "LEFT JOIN service s ON q.serviceId = s.serviceId ";
 
     public QueueDB(String url, String username, String password) {
         this.url = url;
@@ -71,7 +75,7 @@ public class QueueDB {
                     + "clinicId INT NOT NULL,"
                     + "serviceId INT NOT NULL,"
                     + "queueNumber INT NOT NULL,"
-                    + "entryTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                    + "entryTime TIME DEFAULT CURRENT_TIMESTAMP,"
                     + "status ENUM('Waiting', 'Called', 'Skipped', 'Served') DEFAULT 'Waiting',"
                     + "PRIMARY KEY (queueId),"
                     + "FOREIGN KEY (patientId) REFERENCES user(userId),"
@@ -111,30 +115,35 @@ public class QueueDB {
         return isSuccess;
     }
 
-    public ArrayList<QueueBean> queryCust() {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
+    private ArrayList<QueueBean> executeGenericQuery(String sql, Object... params) {
         ArrayList<QueueBean> qbs = new ArrayList<>();
+        // Try-with-resources automatically closes Connection, Statement, and ResultSet
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(query + sql)) {
 
-        QueueBean qb = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM patient";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            while (rs.next()) {
-                qb = this.resultSetToBean(rs);
-                qbs.add(qb);
+            for (int i = 0; i < params.length; i++) {
+                pStmnt.setObject(i + 1, params[i]);
             }
-            pStmnt.close();
-            cnnct.close();
+
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                while (rs.next()) {
+                    qbs.add(this.resultSetToBean(rs));
+                }
+            }
         } catch (SQLException | IOException ex) {
             ex.printStackTrace();
         }
         return qbs;
     }
 
+    public ArrayList<QueueBean> queryQueue() {
+        return executeGenericQuery("");
+    }
+
+    public QueueBean queryQueueById(int queueId) {
+        ArrayList<QueueBean> qbs = executeGenericQuery("WHERE q.queueId = ?", queueId);
+        return qbs.isEmpty() ? null : qbs.get(0);
+    }
 
     public boolean delRecord(String custId) {
         Connection cnnct = null;
@@ -144,7 +153,7 @@ public class QueueDB {
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "DELETE FROM patient WHERE CUSTID = ?";
+            String preQueryStatement = "DELETE FROM queue WHERE queueId = ?";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setString(1, custId);
 
@@ -165,41 +174,43 @@ public class QueueDB {
         return isSuccess;
     }
 
-    // public int editRecord(PatientBean qb) {
-    // Connection cnnct = null;
-    // PreparedStatement pStmnt = null;
-    //
-    // try {
-    // cnnct = getConnection();
-    // String preQueryStatement = "UPDATE patient SET NAME = ?, TEL = ?, AGE = ?
-    // WHERE CUSTID = ?";
-    // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, qb.getName());
-    // pStmnt.setString(2, qb.getTel());
-    // pStmnt.setInt(3, qb.getAge());
-    // pStmnt.setString(4, qb.getCustId());
-    //
-    // int rs = pStmnt.executeUpdate();
-    // pStmnt.close();
-    // cnnct.close();
-    // return rs;
-    // } catch (SQLException ex) {
-    // while (ex != null) {
-    // ex.printStackTrace();
-    // ex = ex.getNextException();
-    // }
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // }
-    // return 0;
-    // }
+    public int editRecord(QueueBean qb) {
+        Connection cnnct = null;
+        PreparedStatement pStmnt = null;
+
+        try {
+            cnnct = getConnection();
+            String preQueryStatement = "UPDATE queue SET patientId = ?, clinicId = ?, serviceId = ?, queueNumber = ?, status = ? WHERE queueId = ?";
+            pStmnt = cnnct.prepareStatement(preQueryStatement);
+            pStmnt.setInt(1, qb.getPatientId());
+            pStmnt.setInt(2, qb.getClinicId());
+            pStmnt.setInt(3, qb.getServiceId());
+            pStmnt.setInt(4, qb.getQueueNumber());
+            pStmnt.setString(5, qb.getStatus());
+            pStmnt.setInt(6, qb.getQueueId());
+
+            int rs = pStmnt.executeUpdate();
+            pStmnt.close();
+            cnnct.close();
+            return rs;
+        } catch (SQLException ex) {
+            while (ex != null) {
+                ex.printStackTrace();
+                ex = ex.getNextException();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
     public void dropCustTable() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "DROP TABLE patient";
+            String preQueryStatement = "DROP TABLE queue";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
 
             pStmnt.execute();
@@ -224,6 +235,32 @@ public class QueueDB {
         qb.setQueueNumber(rs.getInt(5));
         qb.setEntryTime(rs.getTimestamp(6));
         qb.setStatus(rs.getString(7));
+
+        UserBean ub = new UserBean();
+//        ub.setUsername(rs.getString("username"));
+//        ub.setPassword(rs.getString("password"));
+        ub.setFullName(rs.getString("fullName"));
+//        ub.setEmail(rs.getString("email"));
+//        ub.setPhone(rs.getString("phone"));
+//        ub.setGender(rs.getString("gender"));
+//        ub.setRole(rs.getString("role"));
+//        ub.setClinicId(rs.getInt("clinicId"));
+        qb.setUserBean(ub);
+
+        ClinicBean cb = new ClinicBean();
+        cb.setClinicName(rs.getString("clinicName"));
+//        cb.setAddress(rs.getString("address"));
+//        cb.setOpenTime(rs.getTime("openTime"));
+//        cb.setCloseTime(rs.getTime("closeTime"));
+//        cb.setIsWalkinEnabled(rs.getBoolean("isWalkinEnabled"));
+        qb.setClinicBean(cb);
+
+        ServiceBean sb = new ServiceBean();
+        sb.setServiceName(rs.getString("serviceName"));
+//        sb.setDescription(rs.getString("description"));
+//        sb.setPrice(rs.getDouble("price"));
+        qb.setServiceBean(sb);
+
         return qb;
     }
 }

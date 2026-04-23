@@ -9,6 +9,8 @@ import ict.bean.*;
 import ict.db.*;
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
@@ -29,7 +31,7 @@ public class TestIncidentAddRecord {
                 userid,
                 "abc",
                 "abc",
-                java.sql.Time.valueOf(LocalTime.now())
+                Timestamp.valueOf( LocalDateTime.now())
         );
         incidentLogDB.addRecord(ilb);
         ArrayList<IncidentLogBean> ilbChecking = incidentLogDB.queryIncidentLogByUserId(userid);

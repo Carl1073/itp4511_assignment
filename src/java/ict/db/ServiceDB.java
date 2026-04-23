@@ -108,7 +108,7 @@ public class ServiceDB {
         ArrayList<ServiceBean> ubs = new ArrayList<>();
         // Try-with-resources automatically closes Connection, Statement, and ResultSet
         try (Connection cnnct = getConnection();
-                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+                PreparedStatement pStmnt = cnnct.prepareStatement(query + sql)) {
 
             for (int i = 0; i < params.length; i++) {
                 pStmnt.setObject(i + 1, params[i]);
@@ -126,11 +126,11 @@ public class ServiceDB {
     }
 
     public ArrayList<ServiceBean> queryService() {
-        return executeGenericQuery(query);
+        return executeGenericQuery("");
     }
 
     public ServiceBean queryServiceId(int serviceId) {
-        ArrayList<ServiceBean> results = executeGenericQuery(query + " WHERE serviceId = ?", serviceId);
+        ArrayList<ServiceBean> results = executeGenericQuery(" WHERE serviceId = ?", serviceId);
         return results.isEmpty() ? null : results.get(0);
     }
 

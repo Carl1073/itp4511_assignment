@@ -139,7 +139,7 @@ private ArrayList<UserBean> executeGenericQuery(String sql, Object... params) {
         ArrayList<UserBean> ubs = new ArrayList<>();
         // Try-with-resources automatically closes Connection, Statement, and ResultSet
         try (Connection cnnct = getConnection();
-             PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+             PreparedStatement pStmnt = cnnct.prepareStatement(query + sql)) {
             
             for (int i = 0; i < params.length; i++) {
                 pStmnt.setObject(i + 1, params[i]);
@@ -157,25 +157,25 @@ private ArrayList<UserBean> executeGenericQuery(String sql, Object... params) {
     }
 
     public ArrayList<UserBean> queryCust() {
-        return executeGenericQuery(query);
+        return executeGenericQuery("");
     }
 
     public UserBean queryCustByID(String id) {
-        ArrayList<UserBean> results = executeGenericQuery(query + " WHERE userid = ?", id);
+        ArrayList<UserBean> results = executeGenericQuery(" WHERE userid = ?", id);
         return results.isEmpty() ? null : results.get(0);
     }
 
     public ArrayList<UserBean> queryCustByName(String name) {
-        return executeGenericQuery(query + " WHERE fullName LIKE ?", "%" + name + "%");
+        return executeGenericQuery(" WHERE fullName LIKE ?", "%" + name + "%");
     }
 
     public UserBean queryCustByUsername(String username) {
-        ArrayList<UserBean> results = executeGenericQuery(query + " WHERE username LIKE ?", "%" + username + "%");
+        ArrayList<UserBean> results = executeGenericQuery(" WHERE username LIKE ?", "%" + username + "%");
         return results.isEmpty() ? null : results.get(0);
     }
 
     public ArrayList<UserBean> queryCustByPhone(String phone) {
-        return executeGenericQuery(query + " WHERE phone LIKE ?", "%" + phone + "%");
+        return executeGenericQuery(" WHERE phone LIKE ?", "%" + phone + "%");
     }
 
     public boolean delRecord(int custId) {
