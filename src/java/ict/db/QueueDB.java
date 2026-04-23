@@ -124,7 +124,7 @@ public class QueueDB {
             ResultSet rs = null;
             rs = pStmnt.executeQuery();
             while (rs.next()) {
-                qb = this.reseltSetToBean(rs);
+                qb = this.resultSetToBean(rs);
                 qbs.add(qb);
             }
             pStmnt.close();
@@ -135,128 +135,7 @@ public class QueueDB {
         return qbs;
     }
 
-    // public PatientBean queryCustByID(String id) {
-    // Connection cnnct = null;
-    // PreparedStatement pStmnt = null;
-    //
-    // PatientBean qb = null;
-    // try {
-    // cnnct = getConnection();
-    // String preQueryStatement = "SELECT * FROM patient WHERE CUSTID = ?";
-    // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, id);
-    // ResultSet rs = null;
-    // rs = pStmnt.executeQuery();
-    // if (rs.next()) {
-    // qb = reseltSetToBean(rs);
-    // }
-    // pStmnt.close();
-    // cnnct.close();
-    // } catch (SQLException ex) {
-    // while (ex != null) {
-    // ex.printStackTrace();
-    // ex = ex.getNextException();
-    // }
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // }
-    // return qb;
-    // }
-    // public ArrayList<PatientBean> queryCustByName(String name) {
-    // Connection cnnct = null;
-    // PreparedStatement pStmnt = null;
-    //
-    // ArrayList<PatientBean> qbs = new ArrayList<>();
-    // PatientBean qb = null;
-    // try {
-    // cnnct = getConnection();
-    // String preQueryStatement = "SELECT * FROM patient WHERE NAME LIKE ?";
-    // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, "%" + name + "%");
-    // ResultSet rs = null;
-    // rs = pStmnt.executeQuery();
-    // while (rs.next()) {
-    // qb = new PatientBean();
-    // qb.setCustId(rs.getString(1));
-    // qb.setName(rs.getString(2));
-    // qb.setTel(rs.getString(3));
-    // qb.setAge(rs.getInt(4));
-    // qbs.add(qb);
-    // }
-    // pStmnt.close();
-    // cnnct.close();
-    // } catch (SQLException ex) {
-    // while (ex != null) {
-    // ex.printStackTrace();
-    // ex = ex.getNextException();
-    // }
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // }
-    // return qbs;
-    // }
-    // public ArrayList<PatientBean> queryCustByTel(String tel) {
-    // Connection cnnct = null;
-    // PreparedStatement pStmnt = null;
-    //
-    // ArrayList<PatientBean> qbs = new ArrayList<PatientBean>();
-    // PatientBean qb = null;
-    // try {
-    // cnnct = getConnection();
-    // String preQueryStatement = "SELECT * FROM patient WHERE TEL LIKE ?";
-    // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, "%" + tel + "%");
-    // ResultSet rs = null;
-    // rs = pStmnt.executeQuery();
-    // while (rs.next()) {
-    // qb = new PatientBean();
-    // qb.setCustId(rs.getString(1));
-    // qb.setName(rs.getString(2));
-    // qb.setTel(rs.getString(3));
-    // qb.setAge(rs.getInt(4));
-    // qbs.add(qb);
-    // }
-    // pStmnt.close();
-    // cnnct.close();
-    // } catch (SQLException ex) {
-    // while (ex != null) {
-    // ex.printStackTrace();
-    // ex = ex.getNextException();
-    // }
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // }
-    // return qbs;
-    // }
-    // public ArrayList<PatientBean> queryCust() {
-    // Connection cnnct = null;
-    // PreparedStatement pStmnt = null;
-    //
-    // ArrayList<PatientBean> qbs = new ArrayList<PatientBean>();
-    // PatientBean qb = null;
-    // try {
-    // cnnct = getConnection();
-    // String preQueryStatement = "SELECT * FROM patient";
-    // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // ResultSet rs = null;
-    // rs = pStmnt.executeQuery();
-    // while (rs.next()) {
-    // qb = new PatientBean(rs.getString(1), rs.getString(2), rs.getString(3),
-    // rs.getInt(4));
-    // qbs.add(qb);
-    // }
-    // pStmnt.close();
-    // cnnct.close();
-    // } catch (SQLException ex) {
-    // while (ex != null) {
-    // ex.printStackTrace();
-    // ex = ex.getNextException();
-    // }
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // }
-    // return qbs;
-    // }
+
     public boolean delRecord(String custId) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
@@ -336,7 +215,7 @@ public class QueueDB {
         }
     }
 
-    public QueueBean reseltSetToBean(ResultSet rs) throws SQLException {
+    public QueueBean resultSetToBean(ResultSet rs) throws SQLException {
         QueueBean qb = new QueueBean();
         qb.setQueueId(rs.getInt(1));
         qb.setPatientId(rs.getInt(2));

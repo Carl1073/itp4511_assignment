@@ -118,7 +118,7 @@ public class NotificationDB {
             ResultSet rs = null;
             rs = pStmnt.executeQuery();
             while (rs.next()) {
-                nb = this.reseltSetToBean(rs);
+                nb = this.resultSetToBean(rs);
                 nbs.add(nb);
             }
             pStmnt.close();
@@ -330,7 +330,7 @@ public class NotificationDB {
         }
     }
 
-    public NotificationBean reseltSetToBean(ResultSet rs) throws SQLException {
+    public NotificationBean resultSetToBean(ResultSet rs) throws SQLException {
         NotificationBean nb = new NotificationBean();
         nb.setNotifId(rs.getInt(1));
         nb.setUserId(rs.getInt(2));

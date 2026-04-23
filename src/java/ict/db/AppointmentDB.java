@@ -127,7 +127,7 @@ public class AppointmentDB {
             ResultSet rs = null;
             rs = pStmnt.executeQuery();
             while (rs.next()) {
-                cb = this.reseltSetToBean(rs);
+                cb = this.resultSetToBean(rs);
                 cbs.add(cb);
             }
             pStmnt.close();
@@ -339,7 +339,7 @@ public class AppointmentDB {
         }
     }
 
-    public AppointmentBean reseltSetToBean(ResultSet rs) throws SQLException {
+    public AppointmentBean resultSetToBean(ResultSet rs) throws SQLException {
         AppointmentBean cb = new AppointmentBean();
         cb.setAppId(rs.getInt(1));
         cb.setPatientId(rs.getInt(2));

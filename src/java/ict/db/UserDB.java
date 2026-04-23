@@ -134,144 +134,47 @@ public class UserDB {
         return isSuccess;
     }
 
-    public ArrayList<UserBean> queryCust() {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
+private ArrayList<UserBean> executeGenericQuery(String sql, Object... params) {
         ArrayList<UserBean> ubs = new ArrayList<>();
-
-        UserBean ub = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM user";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            while (rs.next()) {
-                ub = this.reseltSetToBean(rs);
-                ubs.add(ub);
+        // Try-with-resources automatically closes Connection, Statement, and ResultSet
+        try (Connection cnnct = getConnection();
+             PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+            
+            for (int i = 0; i < params.length; i++) {
+                pStmnt.setObject(i + 1, params[i]);
             }
-            pStmnt.close();
-            cnnct.close();
+
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                while (rs.next()) {
+                    ubs.add(this.resultSetToBean(rs));
+                }
+            }
         } catch (SQLException | IOException ex) {
             ex.printStackTrace();
         }
         return ubs;
     }
 
-    public UserBean queryCustByID(String id) {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
+    public ArrayList<UserBean> queryCust() {
+        return executeGenericQuery("SELECT * FROM user");
+    }
 
-        UserBean ub = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM user WHERE userid = ?";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, id);
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            if (rs.next()) {
-                ub = reseltSetToBean(rs);
-            }
-            pStmnt.close();
-            cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return ub;
+    public UserBean queryCustByID(String id) {
+        ArrayList<UserBean> results = executeGenericQuery("SELECT * FROM user WHERE userid = ?", id);
+        return results.isEmpty() ? null : results.get(0);
     }
 
     public ArrayList<UserBean> queryCustByName(String name) {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
-
-        ArrayList<UserBean> ubs = new ArrayList<>();
-        UserBean ub = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM user WHERE fullName LIKE ?";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, "%" + name + "%");
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            while (rs.next()) {
-                ub = this.reseltSetToBean(rs);
-                ubs.add(ub);
-            }
-            pStmnt.close();
-            cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return ubs;
+        return executeGenericQuery("SELECT * FROM user WHERE fullName LIKE ?", "%" + name + "%");
     }
 
     public UserBean queryCustByUsername(String username) {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
-
-        UserBean ub = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM user WHERE username LIKE ?";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, "%" + username + "%");
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            while (rs.next()) {
-                ub = this.reseltSetToBean(rs);
-            }
-            pStmnt.close();
-            cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return ub;
+        ArrayList<UserBean> results = executeGenericQuery("SELECT * FROM user WHERE username LIKE ?", "%" + username + "%");
+        return results.isEmpty() ? null : results.get(0);
     }
 
     public ArrayList<UserBean> queryCustByPhone(String phone) {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
-
-        ArrayList<UserBean> ubs = new ArrayList<UserBean>();
-        UserBean ub = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM user WHERE phone LIKE ?";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, "%" + phone + "%");
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            while (rs.next()) {
-                ub = this.reseltSetToBean(rs);
-                ubs.add(ub);
-            }
-            pStmnt.close();
-            cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return ubs;
+        return executeGenericQuery("SELECT * FROM user WHERE phone LIKE ?", "%" + phone + "%");
     }
 
     public boolean delRecord(String custId) {
@@ -342,7 +245,7 @@ public class UserDB {
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "DROP TABLE patient";
+            String preQueryStatement = "DROP TABLE user";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
 
             pStmnt.execute();
@@ -358,7 +261,7 @@ public class UserDB {
         }
     }
 
-    public UserBean reseltSetToBean(ResultSet rs) throws SQLException {
+    public UserBean resultSetToBean(ResultSet rs) throws SQLException {
         UserBean ub = new UserBean();
         ub.setUserId(rs.getInt(1));
         ub.setUsername(rs.getString(2));

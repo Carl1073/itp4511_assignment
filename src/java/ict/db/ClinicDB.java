@@ -120,7 +120,7 @@ public class ClinicDB {
             ResultSet rs = null;
             rs = pStmnt.executeQuery();
             while (rs.next()) {
-                cb = this.reseltSetToBean(rs);
+                cb = this.resultSetToBean(rs);
                 cbs.add(cb);
             }
             pStmnt.close();
@@ -144,7 +144,7 @@ public class ClinicDB {
             ResultSet rs = null;
             rs = pStmnt.executeQuery();
             if (rs.next()) {
-                cb = reseltSetToBean(rs);
+                cb = resultSetToBean(rs);
             }
             pStmnt.close();
             cnnct.close();
@@ -275,7 +275,7 @@ public class ClinicDB {
         }
     }
 
-    public ClinicBean reseltSetToBean(ResultSet rs) throws SQLException {
+    public ClinicBean resultSetToBean(ResultSet rs) throws SQLException {
         ClinicBean cb = new ClinicBean();
         cb.setClinicId(rs.getInt(1));
         cb.setClinicName(rs.getString(2));
