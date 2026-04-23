@@ -1,22 +1,23 @@
 package ict.bean;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.sql.Time;
 
 public class IncidentLogBean implements Serializable {
+
     private int logId;
     private int userId;
     private UserBean userBean;
     private String eventType;
     private String description;
-    private Timestamp createdAt;
+    private Time createdAt;
 
     // Default No-argument Constructor
     public IncidentLogBean() {
     }
 
     // Constructor for all input values
-    public IncidentLogBean(int logId, int userId, String eventType, String description, Timestamp createdAt) {
+    public IncidentLogBean(int logId, int userId, String eventType, String description, Time createdAt) {
         this.logId = logId;
         this.userId = userId;
         this.eventType = eventType;
@@ -65,11 +66,23 @@ public class IncidentLogBean implements Serializable {
         this.description = description;
     }
 
-    public Timestamp getCreatedAt() {
+    public Time getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(Time createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("logId: ").append(logId);
+        sb.append(" userId: ").append(userBean);
+        sb.append(" eventType: ").append(eventType);
+        sb.append(" description: ").append(description);
+        sb.append(" createdAt: ").append(createdAt);
+
+        return sb.toString();
+
     }
 }

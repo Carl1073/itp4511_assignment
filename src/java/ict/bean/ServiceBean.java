@@ -6,16 +6,18 @@ public class ServiceBean implements Serializable {
     private int serviceId;
     private String serviceName;
     private String description;
+    private double price;
 
     // Default No-argument Constructor
     public ServiceBean() {
     }
 
     // Constructor for all input values
-    public ServiceBean(int serviceId, String serviceName, String description) {
+    public ServiceBean(int serviceId, String serviceName, String description, double price) {
         this.serviceId = serviceId;
         this.serviceName = serviceName;
         this.description = description;
+        this.price = price;
     }
 
     // Getters and Setters
@@ -41,5 +43,13 @@ public class ServiceBean implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 }

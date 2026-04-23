@@ -8,7 +8,7 @@ package ict.db;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
-import ict.bean.IncidentLogBean;
+import ict.bean.*;
 
 /**
  *
@@ -19,6 +19,9 @@ public class IncidentLogDB {
     private String url = "";
     private String username = "";
     private String password = "";
+    private String query = "SELECT l.*, u.fullName, u.email, u.phone "
+                + "FROM incident_log l "
+                + "INNER JOIN user u ON l.userId = u.userId ";
 
     public IncidentLogDB(String url, String username, String password) {
         this.url = url;
@@ -67,9 +70,9 @@ public class IncidentLogDB {
             stmnt = cnnct.createStatement();
             String sql = "CREATE TABLE IF NOT EXISTS incident_log ("
                     + "logId INT AUTO_INCREMENT,"
-                    + "userId INT NOT NULL," // Target patient or staff 
+                    + "userId INT NOT NULL," // Target patient or staff
                     + "eventType VARCHAR(50) NOT NULL," // e.g., "Repeated No-show" or "Service Suspension"
-                    + "description TEXT," // Details for Admin review 
+                    + "description TEXT," // Details for Admin review
                     + "createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                     + "PRIMARY KEY (logId),"
                     + "FOREIGN KEY (userId) REFERENCES user(userId)"
@@ -105,10 +108,10 @@ public class IncidentLogDB {
         return isSuccess;
     }
 
-private ArrayList<IncidentLogBean> executeGenericQuery(String sql, Object... params) {
+    private ArrayList<IncidentLogBean> executeGenericQuery(String sql, Object... params) {
         ArrayList<IncidentLogBean> list = new ArrayList<>();
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             // Set parameters dynamically
             for (int i = 0; i < params.length; i++) {
@@ -124,6 +127,16 @@ private ArrayList<IncidentLogBean> executeGenericQuery(String sql, Object... par
             ex.printStackTrace();
         }
         return list;
+    }
+
+    public ArrayList<IncidentLogBean> queryIncidentLog() {
+        String sql = query;
+        return executeGenericQuery(sql);
+    }
+    
+    public ArrayList<IncidentLogBean> queryIncidentLogByUserId(int userId) {
+        String sql = query + " where l.userid = ?";
+        return executeGenericQuery(sql, userId);
     }
 
     public boolean delRecord(String custId) {
@@ -183,7 +196,6 @@ private ArrayList<IncidentLogBean> executeGenericQuery(String sql, Object... par
     // }
     // return 0;
     // }
-    
     public void dropCustTable() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
@@ -212,7 +224,13 @@ private ArrayList<IncidentLogBean> executeGenericQuery(String sql, Object... par
         ib.setUserId(rs.getInt(2));
         ib.setEventType(rs.getString(3));
         ib.setDescription(rs.getString(4));
-        ib.setCreatedAt(rs.getTimestamp(5));
+        ib.setCreatedAt(rs.getTime(5));
+
+        UserBean ub = new UserBean();
+        ub.setUserId(rs.getInt("userId")); // From user table
+        ub.setFullName(rs.getString("fullName"));
+        ub.setEmail(rs.getString("email"));
+        ib.setUserBean(ub);
         return ib;
     }
 }

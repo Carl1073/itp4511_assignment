@@ -68,8 +68,10 @@ public class ClinicServiceDB {
             String sql = "CREATE TABLE IF NOT EXISTS clinic_service ("
                     + "clinicId INT NOT NULL,"
                     + "serviceId INT NOT NULL,"
-                    + "quotaPerSlot INT NOT NULL DEFAULT 1," // Max capacity for booking
-                    + "duration INT NOT NULL DEFAULT 30," // Minutes per appointment
+                    + "quotaPerSlot INT NOT NULL DEFAULT 2," // Max capacity for booking
+                    + "date DATE default today()," // Date of the service, default to current date
+                    + "openTime TIME,"
+                    + "duration INT NOT NULL DEFAULT 60," // Minutes per slot, default to 60 minutes
                     + "PRIMARY KEY (clinicId, serviceId),"
                     + "FOREIGN KEY (clinicId) REFERENCES clinic(clinicId),"
                     + "FOREIGN KEY (serviceId) REFERENCES service(serviceId)"

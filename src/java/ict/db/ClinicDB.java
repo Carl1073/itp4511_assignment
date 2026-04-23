@@ -67,7 +67,7 @@ public class ClinicDB {
             stmnt = cnnct.createStatement();
             String sql = "CREATE TABLE IF NOT EXISTS clinic ("
                     + "clinicId INT AUTO_INCREMENT,"
-                    + "clinicName VARCHAR(50) NOT NULL,"
+                    + "clinicName VARCHAR(50) NOT NULL UNIQUE,"
                     + "address VARCHAR(255),"
                     + "openTime TIME DEFAULT '09:00:00',"
                     + "closeTime TIME DEFAULT '18:00:00',"

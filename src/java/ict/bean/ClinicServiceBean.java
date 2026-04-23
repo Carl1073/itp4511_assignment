@@ -1,12 +1,16 @@
 package ict.bean;
 
 import java.io.Serializable;
+import java.sql.Date;
+import java.sql.Time;
 
 public class ClinicServiceBean implements Serializable {
     private int clinicId;
     private ClinicBean clinicBean;
     private int serviceId;
     private ServiceBean serviceBean;
+    private Date date;
+    private Time openTime;
     private int quotaPerSlot;
     private int duration; // in minute
 
@@ -15,9 +19,11 @@ public class ClinicServiceBean implements Serializable {
     }
 
     // Constructor for all input values
-    public ClinicServiceBean(int clinicId, int serviceId, int quotaPerSlot, int duration) {
+    public ClinicServiceBean(int clinicId, int serviceId, Date date, Time openTime, int quotaPerSlot, int duration) {
         this.clinicId = clinicId;
         this.serviceId = serviceId;
+        this.date = date;
+        this.openTime = openTime;
         this.quotaPerSlot = quotaPerSlot;
         this.duration = duration;
     }
@@ -69,5 +75,20 @@ public class ClinicServiceBean implements Serializable {
 
     public void setServiceBean(ServiceBean serviceBean) {
         this.serviceBean = serviceBean;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Time getOpenTime() {
+        return openTime;
+    }
+    public void setOpenTime(Time openTime) {
+        this.openTime = openTime;
     }
 }

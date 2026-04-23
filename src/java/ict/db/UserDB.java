@@ -19,6 +19,7 @@ public class UserDB {
     private String url = "";
     private String username = "";
     private String password = "";
+    private String query = "SELECT * FROM user ";
 
     public UserDB(String url, String username, String password) {
         this.url = url;
@@ -156,28 +157,28 @@ private ArrayList<UserBean> executeGenericQuery(String sql, Object... params) {
     }
 
     public ArrayList<UserBean> queryCust() {
-        return executeGenericQuery("SELECT * FROM user");
+        return executeGenericQuery(query);
     }
 
     public UserBean queryCustByID(String id) {
-        ArrayList<UserBean> results = executeGenericQuery("SELECT * FROM user WHERE userid = ?", id);
+        ArrayList<UserBean> results = executeGenericQuery(query + " WHERE userid = ?", id);
         return results.isEmpty() ? null : results.get(0);
     }
 
     public ArrayList<UserBean> queryCustByName(String name) {
-        return executeGenericQuery("SELECT * FROM user WHERE fullName LIKE ?", "%" + name + "%");
+        return executeGenericQuery(query + " WHERE fullName LIKE ?", "%" + name + "%");
     }
 
     public UserBean queryCustByUsername(String username) {
-        ArrayList<UserBean> results = executeGenericQuery("SELECT * FROM user WHERE username LIKE ?", "%" + username + "%");
+        ArrayList<UserBean> results = executeGenericQuery(query + " WHERE username LIKE ?", "%" + username + "%");
         return results.isEmpty() ? null : results.get(0);
     }
 
     public ArrayList<UserBean> queryCustByPhone(String phone) {
-        return executeGenericQuery("SELECT * FROM user WHERE phone LIKE ?", "%" + phone + "%");
+        return executeGenericQuery(query + " WHERE phone LIKE ?", "%" + phone + "%");
     }
 
-    public boolean delRecord(String custId) {
+    public boolean delRecord(int custId) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
 
@@ -187,7 +188,7 @@ private ArrayList<UserBean> executeGenericQuery(String sql, Object... params) {
             cnnct = getConnection();
             String preQueryStatement = "DELETE FROM user WHERE userid = ?";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, custId);
+            pStmnt.setInt(1, custId);
 
             int rowCount = pStmnt.executeUpdate();
             if (rowCount >= 1) {

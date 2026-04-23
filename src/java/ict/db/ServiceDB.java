@@ -19,6 +19,7 @@ public class ServiceDB {
     private String url = "";
     private String username = "";
     private String password = "";
+    private String query = "SELECT * FROM service";
 
     public ServiceDB(String url, String username, String password) {
         this.url = url;
@@ -69,6 +70,7 @@ public class ServiceDB {
                     + "serviceId INT AUTO_INCREMENT,"
                     + "serviceName VARCHAR(100) NOT NULL,"
                     + "description TEXT,"
+                    + "price DECIMAL(10, 2) NOT NULL,"
                     + "PRIMARY KEY (serviceId)"
                     + ")";
             stmnt.execute(sql);
@@ -85,10 +87,11 @@ public class ServiceDB {
         boolean isSuccess = false;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "INSERT INTO service (serviceName, description) VALUES (?,?)";
+            String preQueryStatement = "INSERT INTO service (serviceName, description, price) VALUES (?,?,?)";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setString(1, sb.getServiceName());
             pStmnt.setString(2, sb.getDescription());
+            pStmnt.setDouble(3, sb.getPrice());
             int rowCount = pStmnt.executeUpdate();
             if (rowCount >= 1) {
                 isSuccess = true;
@@ -101,32 +104,37 @@ public class ServiceDB {
         return isSuccess;
     }
 
-    public ArrayList<ServiceBean> queryCust() {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
-        ArrayList<ServiceBean> sbs = new ArrayList<>();
+    private ArrayList<ServiceBean> executeGenericQuery(String sql, Object... params) {
+        ArrayList<ServiceBean> ubs = new ArrayList<>();
+        // Try-with-resources automatically closes Connection, Statement, and ResultSet
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
 
-        ServiceBean sb = null;
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "SELECT * FROM patient";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            ResultSet rs = null;
-            rs = pStmnt.executeQuery();
-            while (rs.next()) {
-                sb = this.resultSetToBean(rs);
-                sbs.add(sb);
+            for (int i = 0; i < params.length; i++) {
+                pStmnt.setObject(i + 1, params[i]);
             }
-            pStmnt.close();
-            cnnct.close();
+
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                while (rs.next()) {
+                    ubs.add(this.resultSetToBean(rs));
+                }
+            }
         } catch (SQLException | IOException ex) {
             ex.printStackTrace();
         }
-        return sbs;
+        return ubs;
     }
 
+    public ArrayList<ServiceBean> queryService() {
+        return executeGenericQuery(query);
+    }
 
-    public boolean delRecord(String custId) {
+    public ServiceBean queryServiceId(int serviceId) {
+        ArrayList<ServiceBean> results = executeGenericQuery(query + " WHERE serviceId = ?", serviceId);
+        return results.isEmpty() ? null : results.get(0);
+    }
+
+    public boolean delRecord(int serviceId) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
 
@@ -134,9 +142,9 @@ public class ServiceDB {
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "DELETE FROM patient WHERE CUSTID = ?";
+            String preQueryStatement = "DELETE FROM service WHERE SERVICEID = ?";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, custId);
+            pStmnt.setInt(1, serviceId);
 
             int rowCount = pStmnt.executeUpdate();
             if (rowCount >= 1) {
@@ -155,41 +163,42 @@ public class ServiceDB {
         return isSuccess;
     }
 
-    // public int editRecord(PatientBean sb) {
-    // Connection cnnct = null;
-    // PreparedStatement pStmnt = null;
-    //
-    // try {
-    // cnnct = getConnection();
-    // String preQueryStatement = "UPDATE patient SET NAME = ?, TEL = ?, AGE = ?
-    // WHERE CUSTID = ?";
-    // pStmnt = cnnct.prepareStatement(preQueryStatement);
-    // pStmnt.setString(1, sb.getName());
-    // pStmnt.setString(2, sb.getTel());
-    // pStmnt.setInt(3, sb.getAge());
-    // pStmnt.setString(4, sb.getCustId());
-    //
-    // int rs = pStmnt.executeUpdate();
-    // pStmnt.close();
-    // cnnct.close();
-    // return rs;
-    // } catch (SQLException ex) {
-    // while (ex != null) {
-    // ex.printStackTrace();
-    // ex = ex.getNextException();
-    // }
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // }
-    // return 0;
-    // }
+    public int editRecord(ServiceBean sb) {
+        Connection cnnct = null;
+        PreparedStatement pStmnt = null;
+
+        try {
+            cnnct = getConnection();
+            String preQueryStatement = "UPDATE patient SET serviceName = ?, description = ?, price = ? "
+                    + " WHERE serviceId =  ?";
+            pStmnt = cnnct.prepareStatement(preQueryStatement);
+            pStmnt.setString(1, sb.getServiceName());
+            pStmnt.setString(2, sb.getDescription());
+            pStmnt.setDouble(3, sb.getPrice());
+            pStmnt.setInt(4, sb.getServiceId());
+
+            int rs = pStmnt.executeUpdate();
+            pStmnt.close();
+            cnnct.close();
+            return rs;
+        } catch (SQLException ex) {
+            while (ex != null) {
+                ex.printStackTrace();
+                ex = ex.getNextException();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
     public void dropCustTable() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "DROP TABLE patient";
+            String preQueryStatement = "DROP TABLE service";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
 
             pStmnt.execute();
@@ -210,6 +219,7 @@ public class ServiceDB {
         sb.setServiceId(Integer.parseInt(rs.getString(1)));
         sb.setServiceName(rs.getString(2));
         sb.setDescription(rs.getString(3));
+        sb.setPrice(rs.getDouble(4));
         return sb;
     }
 }
