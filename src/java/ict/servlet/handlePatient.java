@@ -25,6 +25,8 @@ public class handlePatient extends HttpServlet {
     private ServiceDB sdb;
     private ClinicDB cdb;
     private TimeslotDB tdb;
+    private NotificationDB ndb;
+    private AppointmentDB adb;
 
     @Override
     public void init() {
@@ -34,6 +36,8 @@ public class handlePatient extends HttpServlet {
         sdb = new ServiceDB(dbUrl, dbUser, dbPassword);
         cdb = new ClinicDB(dbUrl, dbUser, dbPassword);
         tdb = new TimeslotDB(dbUrl, dbUser, dbPassword);
+        ndb = new NotificationDB(dbUrl, dbUser, dbPassword);
+        adb = new AppointmentDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -46,6 +50,8 @@ public class handlePatient extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
+        HttpSession session = request.getSession(true);
+        UserBean user = (UserBean) session.getAttribute("userBean");
         if ("service".equalsIgnoreCase(action)) {
             ArrayList<ServiceBean> services = sdb.queryService();
             request.setAttribute("services", services);
@@ -55,8 +61,25 @@ public class handlePatient extends HttpServlet {
             rd = getServletContext().getRequestDispatcher("/patient/service.jsp");
             rd.forward(request, response);
         } else if ("booking".equalsIgnoreCase(action)) {
+            ArrayList<AppointmentBean> list = adb.queryAppByUserId(user.getUserId());
+            System.out.println(list);
+            request.setAttribute("allAppointments", list);
             RequestDispatcher rd;
             rd = getServletContext().getRequestDispatcher("/patient/booking.jsp");
+            rd.forward(request, response);
+        } else if ("notification".equalsIgnoreCase(action)) {
+            ArrayList<ServiceBean> services = sdb.queryService();
+            request.setAttribute("services", services);
+            RequestDispatcher rd;
+            rd = getServletContext().getRequestDispatcher("/patient/notification.jsp");
+            rd.forward(request, response);
+        } else if ("profile".equalsIgnoreCase(action)) {
+            RequestDispatcher rd;
+            rd = getServletContext().getRequestDispatcher("/patient/profile.jsp");
+            rd.forward(request, response);
+        } else if ("walkin".equalsIgnoreCase(action)) {
+            RequestDispatcher rd;
+            rd = getServletContext().getRequestDispatcher("/patient/walkin.jsp");
             rd.forward(request, response);
         } else if ("search".equalsIgnoreCase(action)) {
             ArrayList<ServiceBean> services = sdb.queryService();
@@ -80,7 +103,7 @@ public class handlePatient extends HttpServlet {
                     break;
                 }
             }
-            ArrayList<TimeslotBean> timeslots = tdb.queryTimeslotbyDateClinicService(date, clinicId, serviceId);
+            ArrayList<TimeslotBean> timeslots = tdb.queryAvailableTimeslots(date, clinicId, serviceId);
             System.out.println(timeslots.size());
             request.setAttribute("timeslots", timeslots);
             RequestDispatcher rd;
@@ -92,8 +115,6 @@ public class handlePatient extends HttpServlet {
             out.println("No such action!!!");
         }
     }
-
-    
 
     /**
      * Returns a short description of the servlet.

@@ -108,7 +108,7 @@ public class loginController extends HttpServlet {
         boolean result = false;
         HttpSession session = request.getSession();
 
-        if (session.getAttribute("patientBean") != null) {
+        if (session.getAttribute("userBean") != null) {
             result = true;
         }
         return result;

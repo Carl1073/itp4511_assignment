@@ -11,7 +11,7 @@ public class QueueBean implements Serializable {
     private ClinicBean clinicBean;
     private int serviceId;
     private ServiceBean serviceBean;
-    private int queueNumber;
+    private int queueNumber; // patient's "position"
     private Timestamp entryTime;
     private String status;
 

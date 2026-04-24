@@ -176,7 +176,62 @@ public class TimeslotDB {
                 tb.setDate(rs.getDate("date"));
                 tb.setOpenTime(rs.getTime("openTime"));
                 tb.setRemaining(rs.getInt("remaining"));
+                list.add(tb);
+            }
+            return list;
 
+        } catch (SQLException ex) {
+            while (ex != null) {
+                ex.printStackTrace();
+                ex = ex.getNextException();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (pStmnt != null) {
+                try {
+                    pStmnt.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (cnnct != null) {
+                try {
+                    cnnct.close();
+                } catch (SQLException sqlEx) {
+                }
+            }
+        }
+        return null;
+    }
+    
+        public ArrayList<TimeslotBean> queryAllAvailableTimeslots() {
+        Connection cnnct = null;
+        PreparedStatement pStmnt = null;
+        try {
+            cnnct = getConnection();
+            // SQL to select timeslot details and calculate remaining quota by subtracting active appointments
+            String preQueryStatement
+                    = "SELECT t.*, (t.quotaPerSlot - COUNT(a.appId)) AS remaining "
+                    + "FROM timeslot t "
+                    + "LEFT JOIN appointment a ON t.timeslotId = a.timeslotId AND a.status != 'Cancelled' "
+                    + "WHERE t.date >= CURDATE() "
+                    + "GROUP BY t.timeslotId "
+                    + "HavIng remaining > 0";
+
+            pStmnt = cnnct.prepareStatement(preQueryStatement);
+            ResultSet rs = pStmnt.executeQuery();
+            ArrayList<TimeslotBean> list = new ArrayList<TimeslotBean>();
+
+            while (rs.next()) {
+                TimeslotBean tb = new TimeslotBean();
+                tb.setTimeslotId(rs.getInt("timeslotId"));
+                tb.setClinicId(rs.getInt("clinicId"));
+                tb.setServiceId(rs.getInt("serviceId"));
+                tb.setQuotaPerSlot(rs.getInt("quotaPerSlot"));
+                tb.setDate(rs.getDate("date"));
+                tb.setOpenTime(rs.getTime("openTime"));
+                tb.setRemaining(rs.getInt("remaining"));
+                System.out.println(rs.getInt("remaining"));
                 list.add(tb);
             }
             return list;

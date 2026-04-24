@@ -8,9 +8,9 @@ public class TimeslotBean implements Serializable {
 
     private int timeslotId;
     private int clinicId;
-    private ClinicBean clinicBean;
+    private ClinicBean clinicBean = new ClinicBean();
     private int serviceId;
-    private ServiceBean serviceBean;
+    private ServiceBean serviceBean = new ServiceBean();
     private Date date;
     private Time openTime;
     private int quotaPerSlot;
@@ -18,10 +18,12 @@ public class TimeslotBean implements Serializable {
 
     // Default No-argument Constructor
     public TimeslotBean() {
+        
     }
 
     // Constructor for all input values
     public TimeslotBean(int timeslotId, int clinicId, int serviceId, Date date, Time openTime, int quotaPerSlot) {
+
         this.timeslotId = timeslotId;
         this.clinicId = clinicId;
         this.serviceId = serviceId;
@@ -102,5 +104,20 @@ public class TimeslotBean implements Serializable {
     public void setRemaining(int remaining) {
         this.remaining = remaining;
     }
+    
+    public String getClinicName(){
+        return clinicBean.getClinicName();
+    }
+    
+    public void setClinicName(String clinicName){
+        clinicBean.setClinicName(clinicName);
+    }
 
+        public String getServiceName(){
+        return serviceBean.getServiceName();
+    }
+    
+    public void setServiceName(String serviceName){
+        serviceBean.setServiceName(serviceName);
+    }
 }

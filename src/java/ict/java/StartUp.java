@@ -20,7 +20,6 @@ public class StartUp {
 
     // Change the method to accept parameters
     public static void startUp(String url, String username, String password) {
-        Date today = Date.valueOf(LocalDate.now());
 
         UserDB userDB = new UserDB(url, username, password);
         userDB.createTable();
@@ -57,6 +56,7 @@ public class StartUp {
 
         TimeslotDB timeslotDB = new TimeslotDB(url, username, password);
         timeslotDB.createTable();
+        Date today = Date.valueOf(LocalDate.now());
         if (timeslotDB.queryTimeslotbyDate(today).isEmpty()) {
             // for every clinic
             ArrayList<ClinicBean> ClinicBeans = clinicDB.queryClinic();
@@ -69,6 +69,34 @@ public class StartUp {
                     for (LocalTime t = startTime; t.isBefore(endTime); t = t.plusMinutes(duration)) {
                         timeslotDB.addRecord(new TimeslotBean(0, clinicBean.getClinicId(), serviceBean.getServiceId(), today, Time.valueOf(t), 2));
                         System.out.println("Generating slot for: " + t);
+                    }
+                }
+            }
+        }
+
+        // Calculate the date for tomorrow
+        LocalDate tomorrowLocalDate = LocalDate.now().plusDays(1);
+        Date tomorrow = Date.valueOf(tomorrowLocalDate);
+
+        // Check if tomorrow's slots already exist
+        if (timeslotDB.queryTimeslotbyDate(tomorrow).isEmpty()) {
+
+            ArrayList<ClinicBean> clinicBeans = clinicDB.queryClinic();
+            for (ClinicBean clinicBean : clinicBeans) {
+
+                LocalTime startTime = clinicBean.getOpenTime().toLocalTime();
+                LocalTime endTime = clinicBean.getCloseTime().toLocalTime();
+                ArrayList<ServiceBean> serviceBeans = serviceDB.queryService();
+
+                for (ServiceBean serviceBean : serviceBeans) {
+                    int duration = serviceBean.getDuration();
+
+                    for (LocalTime t = startTime; t.isBefore(endTime); t = t.plusMinutes(duration)) {
+                        // Pass 'tomorrow' instead of 'today'
+                        TimeslotBean newSlot = new TimeslotBean(0, clinicBean.getClinicId(), serviceBean.getServiceId(), tomorrow, Time.valueOf(t), 2);
+                        timeslotDB.addRecord(newSlot);
+
+                        System.out.println("Generating slot for tomorrow (" + tomorrow + ") at: " + t);
                     }
                 }
             }

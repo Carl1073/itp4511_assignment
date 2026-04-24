@@ -15,6 +15,7 @@
     </head>
     <body>
         <%@ include file="component/heading.jsp" %>
+        <jsp:useBean id="userBean" class="ict.bean.UserBean" scope="session"/>
         <form action="handlePatient" method="post" id="searchForm">
             <input type="hidden" name="action" value="search">
             <div class="search">
@@ -45,7 +46,7 @@
             <label for="date">Service</label>
             ${service}
         </div>
-                <div class="form-row">
+        <div class="form-row">
             <label for="date">Clinic</label>
             ${clinic}
         </div>
@@ -54,8 +55,9 @@
                             for (int i = 0; i < timeslots.size(); i++) {
                                 TimeslotBean t = timeslots.get(i);
                                 out.println("<tr>");
-                                out.println("<th>" + t.getOpenTime()  +  "</th>");
-                                out.println("<th>" + t.getQuotaPerSlot() +  "</th>");
+                                out.println("<th>" + t.getOpenTime() + "</th>");
+                                out.println("<th>" + t.getRemaining() + "/" + t.getQuotaPerSlot() + "</th>");
+                                out.println("<th><a href='handlePatientService?action=booking&tsId=" + t.getTimeslotId() + "'>Book</th>");
                                 out.println("</tr>");
                             }
                             out.println("</table>");

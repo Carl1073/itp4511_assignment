@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import ict.bean.AppointmentBean;
+import ict.bean.ClinicBean;
+import ict.bean.ServiceBean;
 import ict.bean.TimeslotBean;
 import ict.bean.UserBean;
 
@@ -21,10 +23,12 @@ public class AppointmentDB {
     private String url = "";
     private String username = "";
     private String password = "";
-    private String query = "SELECT a.* , u.fullName , t.clinicId , t.serviceId , t.date , t.openTime "
+    private String query = "SELECT a.*, u.fullName, t.date, t.openTime, c.clinicId , c.clinicName, s.serviceId ,s.serviceName "
             + "FROM appointment a "
-            + "LEFT JOIN user u ON a.patientId = u.userid "
-            + "LEFT JOIN timeslot t ON a.timeslotId = t.timeslotId ";
+            + "JOIN user u ON a.patientId = u.userId "
+            + "JOIN timeslot t ON a.timeslotId = t.timeslotId "
+            + "JOIN clinic c ON t.clinicId = c.clinicId "
+            + "JOIN service s ON t.serviceId = s.serviceId ";
 
     public AppointmentDB(String url, String username, String password) {
         this.url = url;
@@ -137,6 +141,15 @@ public class AppointmentDB {
     public ArrayList<AppointmentBean> queryApp() {
         return executeGenericQuery(query);
     }
+    
+   public AppointmentBean queryAppByAppID(int id) {
+        ArrayList<AppointmentBean> results = executeGenericQuery(query + " WHERE appId = ? ", id);
+        return results.isEmpty() ? null : results.get(0);
+    }
+    
+    public ArrayList<AppointmentBean> queryAppByUserId(int userId) {
+        return executeGenericQuery(query + " Where u.userid = ? ", userId);
+    }
 
     public ArrayList<AppointmentBean> queryAvailableSlot(int clinicId, Date date) {
         return executeGenericQuery("SELECT  t.*, "
@@ -146,7 +159,7 @@ public class AppointmentDB {
                 + "    AND a.status NOT IN ('Cancelled') "
                 + "WHERE t.clinicId = ? AND t.date = ? "
                 + "GROUP BY t.timeslotId "
-                + "HAVING remaining > 0; " , clinicId, date);
+                + "HAVING remaining > 0; ", clinicId, date);
     }
 
     public boolean delRecord(String custId) {
@@ -178,35 +191,67 @@ public class AppointmentDB {
         return isSuccess;
     }
 
-    public int editRecord(AppointmentBean cb) {
-        Connection cnnct = null;
-        PreparedStatement pStmnt = null;
+public int editRecord(AppointmentBean ab) {
+    Connection cnnct = null;
+    PreparedStatement pStmnt = null;
 
-        try {
-            cnnct = getConnection();
-            String preQueryStatement = "UPDATE appointment SET patientId = ?, timeslotId = ?, status = ?, cancelReason = ? WHERE appid = ?";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setInt(1, cb.getPatientId());
-            pStmnt.setInt(2, cb.getTimeslotId());
-            pStmnt.setString(3, cb.getStatus());
-            pStmnt.setString(4, cb.getCancelReason());
-            pStmnt.setInt(5, cb.getAppId());
+    try {
+        cnnct = getConnection();
+        
+        // Start building the query
+        StringBuilder sql = new StringBuilder("UPDATE appointment SET ");
+        ArrayList<Object> params = new ArrayList<>();
 
-            int rs = pStmnt.executeUpdate();
-            pStmnt.close();
-            cnnct.close();
-            return rs;
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        // Check each field and add to SQL if not null/zero
+        if (ab.getPatientId() != 0) {
+            sql.append("patientId = ?, ");
+            params.add(ab.getPatientId());
         }
-        return 0;
-    }
+        if (ab.getTimeslotId() != 0) {
+            sql.append("timeslotId = ?, ");
+            params.add(ab.getTimeslotId());
+        }
+        if (ab.getStatus() != null) {
+            sql.append("status = ?, ");
+            params.add(ab.getStatus());
+        }
+        if (ab.getCancelReason() != null) {
+            sql.append("cancelReason = ?, ");
+            params.add(ab.getCancelReason());
+        }
 
+        // Remove the trailing comma and space
+        if (params.isEmpty()) {
+            return 0; // Nothing to update
+        }
+        sql.setLength(sql.length() - 2);
+
+        // Add the WHERE clause
+        sql.append(" WHERE appId = ?");
+        params.add(ab.getAppId());
+
+        pStmnt = cnnct.prepareStatement(sql.toString());
+
+        // Set parameters dynamically
+        for (int i = 0; i < params.size(); i++) {
+            pStmnt.setObject(i + 1, params.get(i));
+        }
+
+        int rs = pStmnt.executeUpdate();
+        pStmnt.close();
+        cnnct.close();
+        return rs;
+
+    } catch (SQLException ex) {
+        while (ex != null) {
+            ex.printStackTrace();
+            ex = ex.getNextException();
+        }
+    } catch (IOException ex) {
+        ex.printStackTrace();
+    }
+    return 0;
+}
     public void dropCustTable() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
@@ -249,6 +294,8 @@ public class AppointmentDB {
         ab.setUserBean(ub);
 
         TimeslotBean tb = new TimeslotBean();
+        tb.setClinicName(rs.getString("clinicName"));
+        tb.setServiceName(rs.getString("serviceName"));
         tb.setTimeslotId(rs.getInt(3));
         tb.setClinicId(rs.getInt("clinicId"));
         tb.setServiceId(rs.getInt("serviceId"));
