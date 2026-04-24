@@ -142,6 +142,10 @@ public class TimeslotDB {
         return executeGenericQuery("where date = ? ", date);
     }
 
+    public ArrayList<TimeslotBean> queryTimeslotbyDateClinicService(Date date, int clinicId, int serviceId ) {
+        return executeGenericQuery("where date = ? and clinicId = ? and serviceId = ?", date, clinicId, serviceId);
+    }
+
     public boolean delRecord(int timeslotId) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;

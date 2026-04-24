@@ -37,13 +37,43 @@
             </div>
             <input type="submit" value="Search"/>
         </form>
-        <table>
-            
-        </table>
+        <%
+            if (request.getAttribute("timeslots") != null){
+            <tr>
+                <th>CustId</th> <th> name</th><th> tel</th><th> age</th >
+            </tr>
+            <%
+                ArrayList<CustomerBean> customers = (ArrayList<CustomerBean>) request.getAttribute("customers");
+                for (int i = 0; i < customers.size(); i++) {
+                    CustomerBean c = customers.get(i);
+                    out.println("<tr>");
+                    out.println("<td>" + c.getCustid() + "</td>");
+                    out.println("<td>" + c.getName()+ "</td>");
+                    out.println("<td>" + c.getTel()+ "</td>");
+                    out.println("<td>" + c.getAge()+ "</td>");
+                    out.println("</tr>");
+                }            
+            }
+
+            %>
+        %>
 
     </body>
     <script>
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('date').value = today;
+
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const serviceSelect = document.getElementById('serviceId');
+        if (serviceSelect.value === '') {
+            e.preventDefault();
+            alert('Please select a service.');
+        }
+        const clinicSelect = document.getElementById('clinicId');
+        if (clinicSelect.value === '') {
+            e.preventDefault();
+            alert('Please select a clinic.');
+        }
+    });
 </script>
 </html>

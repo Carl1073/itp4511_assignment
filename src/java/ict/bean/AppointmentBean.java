@@ -1,19 +1,13 @@
 package ict.bean;
 
 import java.io.Serializable;
-import java.sql.Date;
-import java.sql.Time;
 
 public class AppointmentBean implements Serializable {
     private int appId;
     private int patientId;
     private UserBean userBean;
-    private int clinicId;
-    private ClinicBean clinicBean;
-    private int serviceId;
-    private ServiceBean serviceBean;
-    private Date appDate;
-    private Time timeslot;
+    private int timeslotId;
+    private TimeslotBean timeslotBean;
     private String status;
     private String cancelReason;
 
@@ -22,14 +16,10 @@ public class AppointmentBean implements Serializable {
     }
 
     // Constructor for all input values
-    public AppointmentBean(int appId, int patientId, int clinicId, int serviceId,
-            Date appDate, Time timeslot, String status, String cancelReason) {
+    public AppointmentBean(int appId, int patientId, int timeslotId, String status, String cancelReason) {
         this.appId = appId;
         this.patientId = patientId;
-        this.clinicId = clinicId;
-        this.serviceId = serviceId;
-        this.appDate = appDate;
-        this.timeslot = timeslot;
+        this.timeslotId = timeslotId;
         this.status = status;
         this.cancelReason = cancelReason;
     }
@@ -51,36 +41,20 @@ public class AppointmentBean implements Serializable {
         this.patientId = patientId;
     }
 
-    public int getClinicId() {
-        return clinicId;
+    public int getTimeslotId() {
+        return timeslotId;
     }
 
-    public void setClinicId(int clinicId) {
-        this.clinicId = clinicId;
+    public void setTimeslotId(int timeslotId) {
+        this.timeslotId = timeslotId;
     }
 
-    public int getServiceId() {
-        return serviceId;
+    public TimeslotBean getTimeslotBean() {
+        return timeslotBean;
     }
 
-    public void setServiceId(int serviceId) {
-        this.serviceId = serviceId;
-    }
-
-    public Date getAppDate() {
-        return appDate;
-    }
-
-    public void setAppDate(Date appDate) {
-        this.appDate = appDate;
-    }
-
-    public Time getTimeslot() {
-        return timeslot;
-    }
-
-    public void setTimeslot(Time timeslot) {
-        this.timeslot = timeslot;
+    public void setTimeslotBean(TimeslotBean timeslotBean) {
+        this.timeslotBean = timeslotBean;
     }
 
     public String getStatus() {
@@ -99,24 +73,9 @@ public class AppointmentBean implements Serializable {
         this.cancelReason = cancelReason;
     }
 
-    public ClinicBean getClinicBean() {
-        return clinicBean;
-    }
-
-    public ServiceBean getServiceBean() {
-        return serviceBean;
-    }
 
     public UserBean getUserBean() {
         return userBean;
-    }
-
-    public void setClinicBean(ClinicBean clinicBean) {
-        this.clinicBean = clinicBean;
-    }
-
-    public void setServiceBean(ServiceBean serviceBean) {
-        this.serviceBean = serviceBean;
     }
 
     public void setUserBean(UserBean userBean) {

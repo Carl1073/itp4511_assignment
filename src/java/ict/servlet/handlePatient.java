@@ -9,6 +9,7 @@ import ict.bean.*;
 import ict.db.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Date;
 import java.util.ArrayList;
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
@@ -23,6 +24,7 @@ public class handlePatient extends HttpServlet {
 
     private ServiceDB sdb;
     private ClinicDB cdb;
+    private TimeslotDB tdb;
 
     @Override
     public void init() {
@@ -31,7 +33,7 @@ public class handlePatient extends HttpServlet {
         String dbUrl = this.getServletContext().getInitParameter("dbUrl");
         sdb = new ServiceDB(dbUrl, dbUser, dbPassword);
         cdb = new ClinicDB(dbUrl, dbUser, dbPassword);
-
+        tdb = new TimeslotDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -45,31 +47,33 @@ public class handlePatient extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
         if ("service".equalsIgnoreCase(action)) {
-            ArrayList<ServiceBean> services = sdb.queryService();
-            request.setAttribute("services", services);
-            ArrayList<ClinicBean> clinics = cdb.queryClinic();
-            request.setAttribute("clinics", clinics);
-            RequestDispatcher rd;
-            rd = getServletContext().getRequestDispatcher("/patient/service.jsp");
-            rd.forward(request, response);
+            doSearch(request, response);
         } else if ("booking".equalsIgnoreCase(action)) {
             RequestDispatcher rd;
             rd = getServletContext().getRequestDispatcher("/patient/booking.jsp");
             rd.forward(request, response);
         } else if ("search".equalsIgnoreCase(action)) {
-            ArrayList<ServiceBean> services = sdb.queryService();
-            request.setAttribute("services", services);
-            ArrayList<ClinicBean> clinics = cdb.queryClinic();
-            request.setAttribute("clinics", clinics);
-
-            RequestDispatcher rd;
-            rd = getServletContext().getRequestDispatcher("/patient/service.jsp");
-            rd.forward(request, response);
-        } else{
+            Date date = Date.valueOf(request.getParameter("date"));
+            int serviceId = Integer.parseInt(request.getParameter("serviceId"));
+            int clinicId = Integer.parseInt(request.getParameter("clinicId"));
+            ArrayList<TimeslotBean> timeslots = tdb.queryTimeslotbyDateClinicService(date, clinicId, serviceId);
+            request.setAttribute("timeslots", timeslots);
+            doSearch(request, response);
+        } else {
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();
             out.println("No such action!!!");
         }
+    }
+
+    protected void doSearch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ArrayList<ServiceBean> services = sdb.queryService();
+        request.setAttribute("services", services);
+        ArrayList<ClinicBean> clinics = cdb.queryClinic();
+        request.setAttribute("clinics", clinics);
+        RequestDispatcher rd;
+        rd = getServletContext().getRequestDispatcher("/patient/service.jsp");
+        rd.forward(request, response);
     }
 
     /**

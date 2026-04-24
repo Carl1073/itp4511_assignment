@@ -21,6 +21,8 @@ public class DropdownTag extends SimpleTagSupport {
         JspWriter out = getJspContext().getOut();
         if (items == null) return;
 
+        out.println("<option value=\"\">--</option>");
+
         try {
             for (Object item : items) {
                 // Construct getter names (e.g., "get" + "ServiceId")

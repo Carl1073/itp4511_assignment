@@ -3,15 +3,25 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/UserDB.java</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/ClinicServiceDB.java</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/ClinicDB.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/patientHome.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handlePatientService.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/register.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/loginController.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/booking.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/WEB-INF/glassfish-web.xml</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/service.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/tag/DropdownTag.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handlePatient.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/staffHome.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/NotificationDB.java</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/Database.java</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/IncidentLogDB.java</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/ServiceDB.java</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/AppointmentDB.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/registerSuccess.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/CSS/styles.css</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/WEB-INF/web.xml</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/tag/HelloTag.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/processBooking.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/WEB-INF/ict-taglib.tld</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/QueueDB.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/component/heading.jsp</file>
         </group>
     </open-files>
 </project-private>

@@ -9,8 +9,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import ict.bean.AppointmentBean;
-import ict.bean.ClinicBean;
-import ict.bean.ServiceBean;
+import ict.bean.TimeslotBean;
 import ict.bean.UserBean;
 
 /**
@@ -22,11 +21,10 @@ public class AppointmentDB {
     private String url = "";
     private String username = "";
     private String password = "";
-    private String query = "SELECT a.* , u.fullName , c.clinicName , s.serviceName "
+    private String query = "SELECT a.* , u.fullName , t.clinicId , t.serviceId , t.date , t.openTime "
             + "FROM appointment a "
             + "LEFT JOIN user u ON a.patientId = u.userid "
-            + "LEFT JOIN clinic c ON a.clinicId = c.clinicId "
-            + "LEFT JOIN service s ON a.serviceId = s.serviceId ";
+            + "LEFT JOIN timeslot t ON a.timeslotId = t.timeslotId ";
 
     public AppointmentDB(String url, String username, String password) {
         this.url = url;
@@ -76,16 +74,12 @@ public class AppointmentDB {
             String sql = "CREATE TABLE IF NOT EXISTS appointment ("
                     + "appId INT AUTO_INCREMENT,"
                     + "patientId INT NOT NULL,"
-                    + "clinicId INT NOT NULL,"
-                    + "serviceId INT NOT NULL,"
-                    + "appDate DATE NOT NULL,"
-                    + "timeslot TIME NOT NULL,"
+                    + "timeslotId INT NOT NULL,"
                     + "status ENUM('Confirmed', 'Arrived', 'No-show', 'Completed', 'Cancelled') DEFAULT 'Confirmed',"
                     + "cancelReason VARCHAR(255),"
                     + "PRIMARY KEY (appId),"
                     + "FOREIGN KEY (patientId) REFERENCES user(userId),"
-                    + "FOREIGN KEY (clinicId) REFERENCES clinic(clinicId),"
-                    + "FOREIGN KEY (serviceId) REFERENCES service(serviceId)"
+                    + "FOREIGN KEY (timeslotId) REFERENCES timeslot(timeslotId)"
                     + ")";
             stmnt.execute(sql);
             stmnt.close();
@@ -101,15 +95,12 @@ public class AppointmentDB {
         boolean isSuccess = false;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "INSERT INTO appointment (patientId, clinicId, serviceId, appDate, timeslot, status, cancelReason) VALUES (?,?,?,?,?,?,?)";
+            String preQueryStatement = "INSERT INTO appointment (patientId, timeslotId, status, cancelReason) VALUES (?,?,?,?)";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setInt(1, cb.getPatientId());
-            pStmnt.setInt(2, cb.getClinicId());
-            pStmnt.setInt(3, cb.getServiceId());
-            pStmnt.setDate(4, cb.getAppDate());
-            pStmnt.setTime(5, cb.getTimeslot());
-            pStmnt.setString(6, cb.getStatus());
-            pStmnt.setString(7, cb.getCancelReason());
+            pStmnt.setInt(2, cb.getTimeslotId());
+            pStmnt.setString(3, cb.getStatus());
+            pStmnt.setString(4, cb.getCancelReason());
             int rowCount = pStmnt.executeUpdate();
             if (rowCount >= 1) {
                 isSuccess = true;
@@ -126,7 +117,7 @@ public class AppointmentDB {
         ArrayList<AppointmentBean> abs = new ArrayList<>();
         // Try-with-resources automatically closes Connection, Statement, and ResultSet
         try (Connection cnnct = getConnection();
-                PreparedStatement pStmnt = cnnct.prepareStatement(query + sql)) {
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
 
             for (int i = 0; i < params.length; i++) {
                 pStmnt.setObject(i + 1, params[i]);
@@ -144,7 +135,18 @@ public class AppointmentDB {
     }
 
     public ArrayList<AppointmentBean> queryApp() {
-        return executeGenericQuery("");
+        return executeGenericQuery(query);
+    }
+
+    public ArrayList<AppointmentBean> queryAvailableSlot(int clinicId, Date date) {
+        return executeGenericQuery("SELECT  t.*, "
+                + "    (t.quotaPerSlot - COUNT(a.appId)) AS remaining "
+                + "FROM timeslot t "
+                + "LEFT JOIN appointment a ON t.timeslotId = a.timeslotId "
+                + "    AND a.status NOT IN ('Cancelled') "
+                + "WHERE t.clinicId = ? AND t.date = ? "
+                + "GROUP BY t.timeslotId "
+                + "HAVING remaining > 0; " , clinicId, date);
     }
 
     public boolean delRecord(String custId) {
@@ -182,16 +184,13 @@ public class AppointmentDB {
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "UPDATE appointment SET patientId = ?, clinicId = ?, serviceId = ?, appDate = ?, timeslot = ?, status = ?, cancelReason = ? WHERE appid = ?";
+            String preQueryStatement = "UPDATE appointment SET patientId = ?, timeslotId = ?, status = ?, cancelReason = ? WHERE appid = ?";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setInt(1, cb.getPatientId());
-            pStmnt.setInt(2, cb.getClinicId());
-            pStmnt.setInt(3, cb.getServiceId());
-            pStmnt.setDate(4, cb.getAppDate());
-            pStmnt.setTime(5, cb.getTimeslot());
-            pStmnt.setString(6, cb.getStatus());
-            pStmnt.setString(7, cb.getCancelReason());
-            pStmnt.setInt(8, cb.getAppId());
+            pStmnt.setInt(2, cb.getTimeslotId());
+            pStmnt.setString(3, cb.getStatus());
+            pStmnt.setString(4, cb.getCancelReason());
+            pStmnt.setInt(5, cb.getAppId());
 
             int rs = pStmnt.executeUpdate();
             pStmnt.close();
@@ -234,12 +233,9 @@ public class AppointmentDB {
         AppointmentBean ab = new AppointmentBean();
         ab.setAppId(rs.getInt(1));
         ab.setPatientId(rs.getInt(2));
-        ab.setClinicId(rs.getInt(3));
-        ab.setServiceId(rs.getInt(4));
-        ab.setAppDate(rs.getDate(5));
-        ab.setTimeslot(rs.getTime(6));
-        ab.setStatus(rs.getString(7));
-        ab.setCancelReason(rs.getString(8));
+        ab.setTimeslotId(rs.getInt(3));
+        ab.setStatus(rs.getString(4));
+        ab.setCancelReason(rs.getString(5));
 
         UserBean ub = new UserBean();
         // ub.setUsername(rs.getString("username"));
@@ -252,19 +248,13 @@ public class AppointmentDB {
         // ub.setClinicId(rs.getInt("clinicId"));
         ab.setUserBean(ub);
 
-        ClinicBean cb = new ClinicBean();
-        cb.setClinicName(rs.getString("clinicName"));
-        // cb.setAddress(rs.getString("address"));
-        // cb.setOpenTime(rs.getTime("openTime"));
-        // cb.setCloseTime(rs.getTime("closeTime"));
-        // cb.setIsWalkinEnabled(rs.getBoolean("isWalkinEnabled"));
-        ab.setClinicBean(cb);
-
-        ServiceBean sb = new ServiceBean();
-        sb.setServiceName(rs.getString("serviceName"));
-        // sb.setDescription(rs.getString("description"));
-        // sb.setPrice(rs.getDouble("price"));
-        ab.setServiceBean(sb);
+        TimeslotBean tb = new TimeslotBean();
+        tb.setTimeslotId(rs.getInt(3));
+        tb.setClinicId(rs.getInt("clinicId"));
+        tb.setServiceId(rs.getInt("serviceId"));
+        tb.setDate(rs.getDate("date"));
+        tb.setOpenTime(rs.getTime("openTime"));
+        ab.setTimeslotBean(tb);
         return ab;
     }
 }
