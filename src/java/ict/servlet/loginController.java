@@ -78,6 +78,10 @@ public class loginController extends HttpServlet {
             }
         }
 
+        if (!ub.getRole().equalsIgnoreCase(role)) {  //incorrect role
+            errorMsg = "Wrong Role. Your role should be " + ub.getRole() + ".";
+        }
+
         if (errorMsg.equals("")) {  // no error message, means correct username and password
             session.setAttribute("userBean", ub);
             //check the role

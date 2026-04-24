@@ -14,6 +14,7 @@ public class TimeslotBean implements Serializable {
     private Date date;
     private Time openTime;
     private int quotaPerSlot;
+    private int remaining;
 
     // Default No-argument Constructor
     public TimeslotBean() {
@@ -93,4 +94,13 @@ public class TimeslotBean implements Serializable {
     public void setOpenTime(Time openTime) {
         this.openTime = openTime;
     }
+    
+    public int getRemaining() {
+        return remaining;
+    }
+
+    public void setRemaining(int remaining) {
+        this.remaining = remaining;
+    }
+
 }

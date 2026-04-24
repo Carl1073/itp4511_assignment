@@ -23,13 +23,13 @@
             Login as:
             <div class="segmented-control">
                 <input type="radio" name="role" id="patient" value="patient" checked/>
-                <label for="patient">patient</label>
+                <label for="patient">Patient</label>
 
                 <input type="radio" name="role" id="staff" value="staff" />
-                <label for="staff">staff</label>
+                <label for="staff">Staff</label>
 
                 <input type="radio" name="role" id="admin" value="admin" />
-                <label for="admin">admin</label>
+                <label for="admin">Admin</label>
             </div>
             <input type="hidden" name="action" value="authenticate" />
             <div class="form-row">

@@ -7,7 +7,9 @@ package ict.test.paul;
 
 import ict.bean.*;
 import ict.db.*;
+import java.sql.Date;
 import java.util.ArrayList;
+import java.time.LocalDate;
 
 /**
  *
@@ -20,8 +22,8 @@ public class TestQueryAvaliableSlot {
         String username = "root";
         String password = "";
         AppointmentDB csdb = new AppointmentDB(url, username, password);
-        java.time.LocalDate today = java.time.LocalDate.now();
-        ArrayList<AppointmentBean> csbs = csdb.queryAvailableSlot(1, today);
+        LocalDate today = LocalDate.now();
+        ArrayList<AppointmentBean> csbs = csdb.queryAvailableSlot(1, Date.valueOf(today));
          for (AppointmentBean bean : csbs) {
             System.out.println(bean);
         }

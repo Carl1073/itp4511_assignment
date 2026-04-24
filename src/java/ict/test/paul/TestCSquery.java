@@ -7,6 +7,7 @@ package ict.test.paul;
 
 import ict.bean.*;
 import ict.db.*;
+import java.sql.Date;
 import java.util.ArrayList;
 
 /**
@@ -19,10 +20,11 @@ public class TestCSquery {
         String url = "jdbc:mysql://localhost:3306/ITP4511_Assignment_DB";
         String username = "root";
         String password = "";
-        TimeslotDB csdb = new TimeslotDB(url, username, password);
+        TimeslotDB tdb = new TimeslotDB(url, username, password);
         java.time.LocalDate today = java.time.LocalDate.now();
-        ArrayList<TimeslotBean> csbs = csdb.queryTimeslotbyDate(java.sql.Date.valueOf(today));
-         for (TimeslotBean bean : csbs) {
+        ArrayList<TimeslotBean> timeslots = tdb.queryTimeslotbyDateClinicService(Date.valueOf(today), 2, 2);
+
+        for (TimeslotBean bean : timeslots) {
             System.out.println(bean.getClinicId());
         }
     }

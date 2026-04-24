@@ -117,7 +117,7 @@ public class TimeslotDB {
         ArrayList<TimeslotBean> tbs = new ArrayList<>();
         // Try-with-resources automatically closes Connection, Statement, and ResultSet
         try (Connection cnnct = getConnection();
-                PreparedStatement pStmnt = cnnct.prepareStatement(query + sql)) {
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
 
             for (int i = 0; i < params.length; i++) {
                 pStmnt.setObject(i + 1, params[i]);
@@ -135,15 +135,15 @@ public class TimeslotDB {
     }
 
     public ArrayList<TimeslotBean> queryTimeslot() {
-        return executeGenericQuery("");
+        return executeGenericQuery(query);
     }
 
     public ArrayList<TimeslotBean> queryTimeslotbyDate(Date date) {
-        return executeGenericQuery("where date = ? ", date);
+        return executeGenericQuery(query + "where date = ? ", date);
     }
 
-    public ArrayList<TimeslotBean> queryTimeslotbyDateClinicService(Date date, int clinicId, int serviceId ) {
-        return executeGenericQuery("where date = ? and clinicId = ? and serviceId = ?", date, clinicId, serviceId);
+    public ArrayList<TimeslotBean> queryTimeslotbyDateClinicService(Date date, int clinicId, int serviceId) {
+        return executeGenericQuery(query + "where date = ? and t.clinicId = ? and t.serviceId = ?", date, clinicId, serviceId);
     }
 
     public boolean delRecord(int timeslotId) {
