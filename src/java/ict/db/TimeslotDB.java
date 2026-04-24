@@ -146,6 +146,65 @@ public class TimeslotDB {
         return executeGenericQuery(query + "where date = ? and t.clinicId = ? and t.serviceId = ?", date, clinicId, serviceId);
     }
 
+    public ArrayList<TimeslotBean> queryAvailableTimeslots(Date date, int clinicId, int serviceId) {
+        Connection cnnct = null;
+        PreparedStatement pStmnt = null;
+        try {
+            cnnct = getConnection();
+            // SQL to select timeslot details and calculate remaining quota by subtracting active appointments
+            String preQueryStatement
+                    = "SELECT t.*, (t.quotaPerSlot - COUNT(a.appId)) AS remaining "
+                    + "FROM timeslot t "
+                    + "LEFT JOIN appointment a ON t.timeslotId = a.timeslotId AND a.status != 'Cancelled' "
+                    + "WHERE t.date = ? AND t.clinicId = ? AND t.serviceId = ? "
+                    + "GROUP BY t.timeslotId";
+
+            pStmnt = cnnct.prepareStatement(preQueryStatement);
+            pStmnt.setDate(1, date);
+            pStmnt.setInt(2, clinicId);
+            pStmnt.setInt(3, serviceId);
+
+            ResultSet rs = pStmnt.executeQuery();
+            ArrayList<TimeslotBean> list = new ArrayList<TimeslotBean>();
+
+            while (rs.next()) {
+                TimeslotBean tb = new TimeslotBean();
+                tb.setTimeslotId(rs.getInt("timeslotId"));
+                tb.setClinicId(rs.getInt("clinicId"));
+                tb.setServiceId(rs.getInt("serviceId"));
+                tb.setQuotaPerSlot(rs.getInt("quotaPerSlot"));
+                tb.setDate(rs.getDate("date"));
+                tb.setOpenTime(rs.getTime("openTime"));
+                tb.setRemaining(rs.getInt("remaining"));
+
+                list.add(tb);
+            }
+            return list;
+
+        } catch (SQLException ex) {
+            while (ex != null) {
+                ex.printStackTrace();
+                ex = ex.getNextException();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (pStmnt != null) {
+                try {
+                    pStmnt.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (cnnct != null) {
+                try {
+                    cnnct.close();
+                } catch (SQLException sqlEx) {
+                }
+            }
+        }
+        return null;
+    }
+
     public boolean delRecord(int timeslotId) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
