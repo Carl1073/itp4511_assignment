@@ -49,20 +49,49 @@ public class handlePatientService extends HttpServlet {
             String tsIdStr = request.getParameter("tsId");
             if (tsIdStr != null) {
                 int timeslotid = Integer.parseInt(tsIdStr);
+                int patientId = user.getUserId();
+
+                // 1. Check if the patient already has a booking for this timeslot
+                // This prevents the same user from booking the same slot twice
+                ArrayList<AppointmentBean> existingApps = adb.queryAppByUserId(patientId);
+                boolean alreadyBooked = false;
+                for (AppointmentBean existing : existingApps) {
+                    if (existing.getTimeslotId() == timeslotid && !"Cancelled".equals(existing.getStatus())) {
+                        alreadyBooked = true;
+                        break;
+                    }
+                }
+
+                if (alreadyBooked) {
+                    response.sendRedirect("patient/patientHome.jsp?error=alreadyBooked");
+                    return;
+                }
+
+                // 2. Check slot capacity (quotaPerSlot vs current confirmed appointments)
+                TimeslotBean tb = tdb.queryTimeslotByTsId(timeslotid);
+                int currentBookings = adb.countAppointmentsByTimeslotId(timeslotid); // You may need to add this method to AppointmentDB
+
+                if (currentBookings >= tb.getQuotaPerSlot()) {
+                    response.sendRedirect("patient/patientHome.jsp?error=full");
+                    return;
+                }
+
+                // 3. Proceed with booking if checks pass
                 AppointmentBean ab = new AppointmentBean();
-                ab.setPatientId(user.getUserId());
+                ab.setPatientId(patientId);
                 ab.setTimeslotId(timeslotid);
                 ab.setStatus("Confirmed");
+
                 if (adb.addRecord(ab)) {
-                    TimeslotBean tb = tdb.queryTimeslotByTsId(timeslotid);
-                    nb.setUserId(user.getUserId());
-                    nb.setMessage("You have successfully make a booking.  "
-                            + "<br/>Clinic: " + tb.getClinicName()
+                    // Notification logic
+                    nb = new NotificationBean();
+                    nb.setUserId(patientId);
+                    nb.setMessage("You have successfully made a booking.<br/>Clinic: " + tb.getClinicName()
                             + "<br/>Service: " + tb.getServiceName()
                             + "<br/>Date: " + tb.getDate()
-                            + "<br/>Time: " + tb.getOpenTime()
-                    );
-                    ndb.addRecord(nb); // Save to notification table
+                            + "<br/>Time: " + tb.getOpenTime());
+                    ndb.addRecord(nb);
+
                     forwardBooking(request, response, user.getUserId());
                 } else {
                     response.sendRedirect("error.jsp");

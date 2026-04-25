@@ -171,6 +171,35 @@ public class AppointmentDB {
                 + "HAVING remaining > 0; ", clinicId, date);
     }
 
+    public int countAppointmentsByTimeslotId(int timeslotid) {
+        Connection cnnct = null;
+        PreparedStatement pStmnt = null;
+        int count = 0;
+        try {
+            cnnct = getConnection();
+            // Only count appointments that are not cancelled
+            String preQueryStatement = "SELECT COUNT(*) FROM appointment WHERE timeslotId = ? AND status != 'Cancelled'";
+            pStmnt = cnnct.prepareStatement(preQueryStatement);
+            pStmnt.setInt(1, timeslotid);
+
+            ResultSet rs = pStmnt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+            pStmnt.close();
+            cnnct.close();
+        } catch (SQLException ex) {
+            while (ex != null) {
+                ex.printStackTrace();
+                ex = ex.getNextException();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return count;
+    }
+
     public boolean delRecord(String custId) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;

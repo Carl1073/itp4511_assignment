@@ -20,14 +20,14 @@ public class handleAdmin extends HttpServlet {
     private ServiceDB sdb;
     private TimeslotDB tdb;
     private AppointmentDB adb;
-    private IncidentLogDB ildb; 
+    private IncidentLogDB ildb;
 
     @Override
     public void init() {
         String dbUser = this.getServletContext().getInitParameter("dbUser");
         String dbPassword = this.getServletContext().getInitParameter("dbPassword");
         String dbUrl = this.getServletContext().getInitParameter("dbUrl");
-        
+
         udb = new UserDB(dbUrl, dbUser, dbPassword);
         cdb = new ClinicDB(dbUrl, dbUser, dbPassword);
         sdb = new ServiceDB(dbUrl, dbUser, dbPassword);
@@ -44,7 +44,8 @@ public class handleAdmin extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+            System.out.println("test");
+
         String action = request.getParameter("action");
         HttpSession session = request.getSession(true);
         UserBean user = (UserBean) session.getAttribute("userBean");
@@ -59,10 +60,14 @@ public class handleAdmin extends HttpServlet {
 
         if ("manageUsers".equalsIgnoreCase(action)) {
             // Fetch all users to display in the management table
-            ArrayList<UserBean> users = udb.queryUser(); 
-            request.setAttribute("users", users);
-            targetJSP = "/admin/manageUsers.jsp";
 
+            ArrayList<UserBean> users = udb.queryUser();
+            String status = request.getParameter("status");
+            request.setAttribute("users", users);
+            if (status != null) {
+                request.setAttribute("status", "success");
+            }
+            targetJSP = "/admin/manageUsers.jsp";
         } else if ("configClinic".equalsIgnoreCase(action)) {
             ArrayList<ClinicBean> clinics = cdb.queryClinic();
             ArrayList<ServiceBean> services = sdb.queryService();
@@ -85,6 +90,16 @@ public class handleAdmin extends HttpServlet {
         } else if ("settings".equalsIgnoreCase(action)) {
             targetJSP = "/admin/systemSettings.jsp";
 
+        } else if ("editUserPage".equalsIgnoreCase(action)) {
+            String idStr = request.getParameter("id");
+            if (idStr != null) {
+                // Fetch specific user data for the edit form
+                int id = Integer.parseInt(idStr);
+                UserBean userToEdit = udb.queryUserByID(id);
+                request.setAttribute("editUser", userToEdit);
+            }
+            // Forward to the form page (if no ID, it's "Add" mode)
+            targetJSP = "/admin/editUser.jsp";
         } else {
             // Handle unknown actions
             response.setContentType("text/html;charset=UTF-8");

@@ -21,7 +21,7 @@
             <jsp:useBean id="userBean" class="ict.bean.UserBean" scope="session"/>
             <%-- Check if the errorMessage attribute exists in the request --%>
             <c:if test="${not empty errorMessage}">
-                <div id="errorAlert" style="background-color: #f8d7da; color: #721c24; padding: 15px; border: 1px solid #f5c6cb; border-radius: 4px; position: relative; margin-bottom: 20px;">
+                <div id="errorAlert" class="red">
                     <strong>Error:</strong> ${errorMessage}
 
                     <span onclick="this.parentElement.style.display = 'none'" 
@@ -39,7 +39,7 @@
                     boolean isReschedule = request.getParameter("action") != null
                             && request.getParameter("action").contains("Reschedule");
             %>
-            <div style="background: #e8f5e9; padding: 15px; border: 1px solid #c8e6c9; margin-bottom: 20px; border-radius: 8px;">
+            <div class="green">
                 <h2 style="margin-top: 0; color: #2e7d32;">
                     <%= isReschedule ? "Appointment Updated!" : "Booking Successful!"%>
                 </h2>
