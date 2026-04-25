@@ -132,6 +132,11 @@ public class ClinicDB {
     public ArrayList<ClinicBean> queryClinic() {
         return executeGenericQuery("");
     }
+    
+        public ClinicBean getClinicById(int id) {
+        ArrayList<ClinicBean> results = executeGenericQuery(query + " WHERE appId = ? ", id);
+        return results.isEmpty() ? null : results.get(0);
+    }
 
     public boolean delRecord(String custId) {
         Connection cnnct = null;
