@@ -4,6 +4,7 @@ import ict.bean.*;
 import ict.db.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Time;
 import java.util.ArrayList;
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
@@ -68,13 +69,13 @@ public class handleAdminProcess extends HttpServlet {
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
             String gender = request.getParameter("gender");
-            
+
             UserBean ub = udb.queryUserByUsername(username);
-            boolean isTaken = (ub == null)? false: true ;
-             if (isTaken && idStr == null) {
-                    response.sendRedirect("admin/adminHome.jsp?error=isTaken&username=" + username);
-                    return;
-                }
+            boolean isTaken = (ub == null) ? false : true;
+            if (isTaken && idStr == null) {
+                response.sendRedirect("admin/adminHome.jsp?error=isTaken&username=" + username);
+                return;
+            }
 
             ub = new UserBean();
             ub.setUsername(username);
@@ -121,18 +122,18 @@ public class handleAdminProcess extends HttpServlet {
             String openTimeStr = request.getParameter("openTime");
             String closeTimeStr = request.getParameter("closeTime");
             String isWalkinStr = request.getParameter("isWalkinEnabled");
-            
+
             boolean isWalkinEnabled = "true".equalsIgnoreCase(isWalkinStr) || "on".equalsIgnoreCase(isWalkinStr);
-            
+
             ClinicBean cb = new ClinicBean();
             cb.setClinicName(clinicName);
             cb.setAddress(address);
             cb.setOpenTime(java.sql.Time.valueOf(openTimeStr + ":00"));
             cb.setCloseTime(java.sql.Time.valueOf(closeTimeStr + ":00"));
             cb.setIsWalkinEnabled(isWalkinEnabled);
-            
+
             boolean success = cdb.addRecord(cb);
-            
+
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&successMsg=Clinic added successfully!");
             } else {
@@ -148,19 +149,25 @@ public class handleAdminProcess extends HttpServlet {
             String openTimeStr = request.getParameter("openTime");
             String closeTimeStr = request.getParameter("closeTime");
             String isWalkinStr = request.getParameter("isWalkinEnabled");
-            
+            if (openTimeStr != null && openTimeStr.length() == 5) {
+                openTimeStr += ":00";
+            }
+            if (closeTimeStr != null && closeTimeStr.length() == 5) {
+                closeTimeStr += ":00";
+            }
+
             boolean isWalkinEnabled = "true".equalsIgnoreCase(isWalkinStr) || "on".equalsIgnoreCase(isWalkinStr);
-            
+
             ClinicBean cb = new ClinicBean();
             cb.setClinicId(Integer.parseInt(clinicIdStr));
             cb.setClinicName(clinicName);
             cb.setAddress(address);
-            cb.setOpenTime(java.sql.Time.valueOf(openTimeStr + ":00"));
-            cb.setCloseTime(java.sql.Time.valueOf(closeTimeStr + ":00"));
+            cb.setOpenTime(java.sql.Time.valueOf(openTimeStr));
+            cb.setCloseTime(java.sql.Time.valueOf(closeTimeStr));
             cb.setIsWalkinEnabled(isWalkinEnabled);
-            
+
             int result = cdb.editRecord(cb);
-            
+
             if (result > 0) {
                 response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&successMsg=Clinic updated successfully!");
             } else {
@@ -171,13 +178,171 @@ public class handleAdminProcess extends HttpServlet {
         } else if ("deleteClinic".equalsIgnoreCase(action)) {
             // Delete clinic
             String clinicIdStr = request.getParameter("clinicId");
+            System.out.println("Delete Clinic - clinicIdStr: " + clinicIdStr);
+            System.out.println("Delete Clinic - action: " + action);
+
+            if (clinicIdStr == null || clinicIdStr.trim().isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&errorMsg=No clinic ID provided for deletion!");
+                return;
+            }
+
+            try {
+                int clinicId = Integer.parseInt(clinicIdStr);
+                boolean success = cdb.delRecord(clinicId);
+
+                if (success) {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&successMsg=Clinic deleted successfully!");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&errorMsg=Failed to delete clinic!");
+                }
+            } catch (NumberFormatException e) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&errorMsg=Invalid clinic ID format!");
+            }
+            return;
+
+        } else if ("addService".equalsIgnoreCase(action)) {
+            // Add new service
+            String serviceName = request.getParameter("serviceName");
+            String description = request.getParameter("description");
+            String priceStr = request.getParameter("price");
+            String durationStr = request.getParameter("duration");
             
-            boolean success = cdb.delRecord(clinicIdStr);
+            double price = Double.parseDouble(priceStr);
+            int duration = Integer.parseInt(durationStr);
+            
+            ServiceBean sb = new ServiceBean();
+            sb.setServiceName(serviceName);
+            sb.setDescription(description);
+            sb.setPrice(price);
+            sb.setDuration(duration);
+            
+            boolean success = sdb.addRecord(sb);
             
             if (success) {
-                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&successMsg=Clinic deleted successfully!");
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&successMsg=Service added successfully!");
             } else {
-                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&errorMsg=Failed to delete clinic!");
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&errorMsg=Failed to add service!");
+            }
+            return;
+
+        } else if ("updateService".equalsIgnoreCase(action)) {
+            // Update existing service
+            String serviceIdStr = request.getParameter("serviceId");
+            String serviceName = request.getParameter("serviceName");
+            String description = request.getParameter("description");
+            String priceStr = request.getParameter("price");
+            String durationStr = request.getParameter("duration");
+            
+            double price = Double.parseDouble(priceStr);
+            int duration = Integer.parseInt(durationStr);
+            
+            ServiceBean sb = new ServiceBean();
+            sb.setServiceId(Integer.parseInt(serviceIdStr));
+            sb.setServiceName(serviceName);
+            sb.setDescription(description);
+            sb.setPrice(price);
+            sb.setDuration(duration);
+            
+            int result = sdb.editRecord(sb);
+            
+            if (result > 0) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&successMsg=Service updated successfully!");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&errorMsg=Failed to update service!");
+            }
+            return;
+
+        } else if ("deleteService".equalsIgnoreCase(action)) {
+            // Delete service
+            String serviceIdStr = request.getParameter("serviceId");
+            System.out.println("Delete Service - serviceIdStr: " + serviceIdStr);
+            System.out.println("Delete Service - action: " + action);
+
+            if (serviceIdStr == null || serviceIdStr.trim().isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&errorMsg=No service ID provided for deletion!");
+                return;
+            }
+
+            try {
+                int serviceId = Integer.parseInt(serviceIdStr);
+                boolean success = sdb.delRecord(serviceId);
+
+                if (success) {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&successMsg=Service deleted successfully!");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&errorMsg=Failed to delete service!");
+                }
+            } catch (NumberFormatException e) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&errorMsg=Invalid service ID format!");
+            }
+            return;
+
+        } else if ("updateTimeslotQuotas".equalsIgnoreCase(action)) {
+            // Update timeslot quotas
+            String clinicIdStr = request.getParameter("clinicId");
+            String dateStr = request.getParameter("date");
+            
+            if (clinicIdStr == null || clinicIdStr.trim().isEmpty() || dateStr == null || dateStr.trim().isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&errorMsg=Clinic and date are required!");
+                return;
+            }
+            
+            try {
+                int clinicId = Integer.parseInt(clinicIdStr);
+                java.sql.Date date = java.sql.Date.valueOf(dateStr);
+                
+                // Get all services
+                ArrayList<ServiceBean> services = sdb.queryService();
+                
+                // Process each timeslot (every hour from clinic opening to closing time)
+                ClinicBean clinic = cdb.getClinicById(clinicId);
+                if (clinic == null) {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&errorMsg=Clinic not found!");
+                    return;
+                }
+                
+                // Calculate timeslots (every 60 minutes)
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                cal.setTime(clinic.getOpenTime());
+                java.util.Date closeTime = clinic.getCloseTime();
+                
+                boolean success = true;
+                while (cal.getTime().before(closeTime) || cal.getTime().equals(closeTime)) {
+                    Time slotTime = new Time(cal.getTime().getTime());
+                    
+                    // For each service, update/create timeslot
+                    for (ServiceBean service : services) {
+                        String quotaParam = "quota_" + service.getServiceId() + "_" + 
+                                          String.format("%02d", cal.get(java.util.Calendar.HOUR_OF_DAY)) + 
+                                          String.format("%02d", cal.get(java.util.Calendar.MINUTE));
+                        String quotaStr = request.getParameter(quotaParam);
+                        
+                        if (quotaStr != null && !quotaStr.trim().isEmpty()) {
+                            try {
+                                int quota = Integer.parseInt(quotaStr);
+                                boolean result = tdb.createOrUpdateTimeslot(clinicId, service.getServiceId(), date, slotTime, quota);
+                                if (!result) {
+                                    success = false;
+                                }
+                            } catch (NumberFormatException e) {
+                                success = false;
+                            }
+                        }
+                    }
+                    
+                    // Move to next hour
+                    cal.add(java.util.Calendar.HOUR_OF_DAY, 1);
+                }
+                
+                if (success) {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&clinicId=" + clinicId + "&date=" + dateStr + "&successMsg=Timeslot quotas updated successfully!");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&clinicId=" + clinicId + "&date=" + dateStr + "&errorMsg=Failed to update some timeslot quotas!");
+                }
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&errorMsg=Invalid parameters!");
             }
             return;
         } else {

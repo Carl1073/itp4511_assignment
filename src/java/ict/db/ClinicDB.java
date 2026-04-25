@@ -132,37 +132,57 @@ public class ClinicDB {
     public ArrayList<ClinicBean> queryClinic() {
         return executeGenericQuery("");
     }
-    
+
     public ClinicBean getClinicById(int id) {
         ArrayList<ClinicBean> results = executeGenericQuery(" WHERE clinicId = ? ", id);
         return results.isEmpty() ? null : results.get(0);
     }
 
-    public boolean delRecord(String custId) {
+// In your DAO / Database class
+    public boolean delRecord(int clinicId) {
         Connection cnnct = null;
-        PreparedStatement pStmnt = null;
-
         boolean isSuccess = false;
-
         try {
             cnnct = getConnection();
-            String preQueryStatement = "DELETE FROM clinic WHERE CLINICID = ?";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setString(1, custId);
+            cnnct.setAutoCommit(false); // Start transaction
 
-            int rowCount = pStmnt.executeUpdate();
+            // 1. Delete associated timeslots first
+            PreparedStatement ps1 = cnnct.prepareStatement("DELETE FROM timeslot WHERE clinicId = ?");
+            ps1.setInt(1, clinicId);
+            ps1.executeUpdate();
+
+            // 2. Delete associated queue records
+            PreparedStatement ps2 = cnnct.prepareStatement("DELETE FROM queue WHERE clinicId = ?");
+            ps2.setInt(1, clinicId);
+            ps2.executeUpdate();
+
+            // 3. Finally, delete the clinic
+            PreparedStatement ps3 = cnnct.prepareStatement("DELETE FROM clinic WHERE clinicId = ?");
+            ps3.setInt(1, clinicId);
+
+            int rowCount = ps3.executeUpdate();
             if (rowCount >= 1) {
                 isSuccess = true;
+                cnnct.commit(); // Save changes
+            } else {
+                cnnct.rollback();
             }
-            pStmnt.close();
-            cnnct.close();
-        } catch (SQLException ex) {
-            while (ex != null) {
-                ex.printStackTrace();
-                ex = ex.getNextException();
+        } catch (SQLException | IOException ex) {
+            if (cnnct != null) {
+                try {
+                    cnnct.rollback();
+                } catch (SQLException e) {
+                }
             }
-        } catch (IOException ex) {
             ex.printStackTrace();
+        } finally {
+            // Always close connections in finally block
+            if (cnnct != null) {
+                try {
+                    cnnct.close();
+                } catch (SQLException e) {
+                }
+            }
         }
         return isSuccess;
     }

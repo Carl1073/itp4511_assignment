@@ -171,7 +171,7 @@ public class ServiceDB {
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "UPDATE serivce SET serviceName = ?, description = ?, price = ?, duration = ? "
+            String preQueryStatement = "UPDATE service SET serviceName = ?, description = ?, price = ?, duration = ? "
                     + " WHERE serviceId =  ?";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setString(1, sb.getServiceName());
