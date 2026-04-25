@@ -138,6 +138,7 @@ public class IncidentLogDB {
         String sql = query + " where l.userid = ?";
         return executeGenericQuery(sql, userId);
     }
+    
 
     public boolean delRecord(String custId) {
         Connection cnnct = null;
