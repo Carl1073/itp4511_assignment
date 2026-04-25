@@ -33,7 +33,7 @@ public class ClinicDB {
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
-        return DriverManager.getConnection(url, username, password);
+        return DriverManager.getConnection(url + "?useSSL=false", username, password);
     }
 
     public void createDB(String createDB) {
