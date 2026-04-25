@@ -68,13 +68,13 @@ public class handleAdminProcess extends HttpServlet {
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
             String gender = request.getParameter("gender");
-            
+
             UserBean ub = udb.queryUserByUsername(username);
-            boolean isTaken = (ub == null)? false: true ;
-             if (isTaken && idStr == null) {
-                    response.sendRedirect("admin/adminHome.jsp?error=isTaken&username=" + username);
-                    return;
-                }
+            boolean isTaken = (ub == null) ? false : true;
+            if (isTaken && idStr == null) {
+                response.sendRedirect("admin/adminHome.jsp?error=isTaken&username=" + username);
+                return;
+            }
 
             ub = new UserBean();
             ub.setUsername(username);
@@ -121,18 +121,18 @@ public class handleAdminProcess extends HttpServlet {
             String openTimeStr = request.getParameter("openTime");
             String closeTimeStr = request.getParameter("closeTime");
             String isWalkinStr = request.getParameter("isWalkinEnabled");
-            
+
             boolean isWalkinEnabled = "true".equalsIgnoreCase(isWalkinStr) || "on".equalsIgnoreCase(isWalkinStr);
-            
+
             ClinicBean cb = new ClinicBean();
             cb.setClinicName(clinicName);
             cb.setAddress(address);
             cb.setOpenTime(java.sql.Time.valueOf(openTimeStr + ":00"));
             cb.setCloseTime(java.sql.Time.valueOf(closeTimeStr + ":00"));
             cb.setIsWalkinEnabled(isWalkinEnabled);
-            
+
             boolean success = cdb.addRecord(cb);
-            
+
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&successMsg=Clinic added successfully!");
             } else {
@@ -148,19 +148,25 @@ public class handleAdminProcess extends HttpServlet {
             String openTimeStr = request.getParameter("openTime");
             String closeTimeStr = request.getParameter("closeTime");
             String isWalkinStr = request.getParameter("isWalkinEnabled");
-            
+            if (openTimeStr != null && openTimeStr.length() == 5) {
+                openTimeStr += ":00";
+            }
+            if (closeTimeStr != null && closeTimeStr.length() == 5) {
+                closeTimeStr += ":00";
+            }
+
             boolean isWalkinEnabled = "true".equalsIgnoreCase(isWalkinStr) || "on".equalsIgnoreCase(isWalkinStr);
-            
+
             ClinicBean cb = new ClinicBean();
             cb.setClinicId(Integer.parseInt(clinicIdStr));
             cb.setClinicName(clinicName);
             cb.setAddress(address);
-            cb.setOpenTime(java.sql.Time.valueOf(openTimeStr + ":00"));
-            cb.setCloseTime(java.sql.Time.valueOf(closeTimeStr + ":00"));
+            cb.setOpenTime(java.sql.Time.valueOf(openTimeStr));
+            cb.setCloseTime(java.sql.Time.valueOf(closeTimeStr));
             cb.setIsWalkinEnabled(isWalkinEnabled);
-            
+
             int result = cdb.editRecord(cb);
-            
+
             if (result > 0) {
                 response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&successMsg=Clinic updated successfully!");
             } else {
@@ -171,9 +177,10 @@ public class handleAdminProcess extends HttpServlet {
         } else if ("deleteClinic".equalsIgnoreCase(action)) {
             // Delete clinic
             String clinicIdStr = request.getParameter("clinicId");
-            
-            boolean success = cdb.delRecord(clinicIdStr);
-            
+            System.out.println(clinicIdStr);
+
+            boolean success = cdb.delRecord(Integer.parseInt(clinicIdStr));
+
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&successMsg=Clinic deleted successfully!");
             } else {

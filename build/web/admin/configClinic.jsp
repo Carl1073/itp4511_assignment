@@ -14,7 +14,7 @@
                 flex-wrap: wrap;
             }
 
-            button, input[type="submit"] {
+            button, input[type="submit"], .btn-back {
                 padding: 10px 20px;
                 border: none;
                 border-radius: 4px;
