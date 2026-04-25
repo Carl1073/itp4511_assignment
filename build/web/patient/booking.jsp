@@ -19,6 +19,17 @@
 
         <div style="padding: 30px;">
             <jsp:useBean id="userBean" class="ict.bean.UserBean" scope="session"/>
+            <%-- Check if the errorMessage attribute exists in the request --%>
+            <c:if test="${not empty errorMessage}">
+                <div id="errorAlert" style="background-color: #f8d7da; color: #721c24; padding: 15px; border: 1px solid #f5c6cb; border-radius: 4px; position: relative; margin-bottom: 20px;">
+                    <strong>Error:</strong> ${errorMessage}
+
+                    <span onclick="this.parentElement.style.display = 'none'" 
+                          style="position: absolute; top: 10px; right: 15px; font-size: 20px; font-weight: bold; cursor: pointer;">
+                        &times;
+                    </span>
+                </div>
+            </c:if>
 
             <%-- 1. Show Confirmation for the most recent booking / reschedule --%>
             <%

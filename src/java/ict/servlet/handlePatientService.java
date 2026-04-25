@@ -63,7 +63,7 @@ public class handlePatientService extends HttpServlet {
                             + "<br/>Time: " + tb.getOpenTime()
                     );
                     ndb.addRecord(nb); // Save to notification table
-                    refreshAndForward(request, response, user.getUserId());
+                    forwardBooking(request, response, user.getUserId());
                 } else {
                     response.sendRedirect("error.jsp");
                 }
@@ -93,31 +93,50 @@ public class handlePatientService extends HttpServlet {
                         break;
                     }
                 }
-                refreshAndForward(request, response, user.getUserId());
+                forwardBooking(request, response, user.getUserId());
             }
         } else if ("reschedule".equalsIgnoreCase(action)) {
-            // 1. Get the ID of the appointment the user wants to change
             String appIdStr = request.getParameter("appId");
 
             if (appIdStr != null) {
                 int appId = Integer.parseInt(appIdStr);
-
-                // 2. Fetch the specific appointment details
                 AppointmentBean targetApp = adb.queryAppByAppID(appId);
-                System.out.println(targetApp);
 
-                // 3. Fetch all possible options for the user to choose from
+                // --- CUTOFF TIME LOGIC START ---
+                if (targetApp != null) {
+                    // 1. Get the appointment date and time from the targetApp
+                    // Assuming targetApp contains a TimeslotBean or has access to the date/time strings
+                    java.time.LocalDate appDate = java.time.LocalDate.parse(targetApp.getTimeslotBean().getDate().toString());
+                    java.time.LocalTime appTime = java.time.LocalTime.parse(targetApp.getTimeslotBean().getOpenTime().toString());
+
+                    // 2. Combine into a LocalDateTime object
+                    java.time.LocalDateTime appointmentDateTime = java.time.LocalDateTime.of(appDate, appTime);
+                    java.time.LocalDateTime now = java.time.LocalDateTime.now();
+
+                    // 3. Check if 'now' is within 1 hour of the appointment
+                    // Duration.between(start, end) -> positive if end is after start
+                    long minutesUntilAppointment = java.time.Duration.between(now, appointmentDateTime).toMinutes();
+
+                    if (minutesUntilAppointment < 60) {
+                        // If it's less than 60 mins away (or already passed), block rescheduling
+                        request.setAttribute("errorMessage", "You cannot reschedule an appointment within 1 hour of its start time.");
+                        // Redirect back to the appointment list or dashboard
+                        forwardBooking(request, response, user.getUserId());
+                        return; // Stop execution here
+                    }
+                }
+                // --- CUTOFF TIME LOGIC END ---
+
+                // Fetch options for the JSP
                 ArrayList<ServiceBean> services = sdb.queryService();
                 ArrayList<ClinicBean> clinics = cdb.queryClinic();
-                // You might also want to fetch all available timeslots here
                 ArrayList<TimeslotBean> availableSlots = tdb.queryAllAvailableTimeslots();
-                // 4. Set attributes for the JSP
+
                 request.setAttribute("targetApp", targetApp);
                 request.setAttribute("services", services);
                 request.setAttribute("clinics", clinics);
                 request.setAttribute("availableSlots", availableSlots);
 
-                // 5. CRITICAL: Use Forward, NOT sendRedirect
                 RequestDispatcher rd = request.getRequestDispatcher("patient/reschedule.jsp");
                 rd.forward(request, response);
             }
@@ -154,7 +173,7 @@ public class handlePatientService extends HttpServlet {
                     ndb.addRecord(nb); // Save to notification table
 
                     // 4. Reload all appointments and forward to booking.jsp
-                    refreshAndForward(request, response, user.getUserId());
+                    forwardBooking(request, response, user.getUserId());
                 } else {
                     response.sendRedirect("error.jsp");
                 }
@@ -234,7 +253,7 @@ public class handlePatientService extends HttpServlet {
     }
 
     // Helper method to reload list and forward to booking page
-    private void refreshAndForward(HttpServletRequest request, HttpServletResponse response, int userId)
+    private void forwardBooking(HttpServletRequest request, HttpServletResponse response, int userId)
             throws ServletException, IOException {
         ArrayList<AppointmentBean> list = adb.queryAppByUserId(userId);
         request.setAttribute("allAppointments", list);
