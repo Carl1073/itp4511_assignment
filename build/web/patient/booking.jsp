@@ -6,10 +6,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>My Appointment Records</title>
         <style>
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-family: Arial, sans-serif; }
-            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-            th { background-color: #0056b3; color: white; }
-            tr:nth-child(even) { background-color: #f9f9f9; }
             .status-tag { padding: 4px 8px; border-radius: 4px; font-size: 0.9em; font-weight: bold; }
             .status-Confirmed { background-color: #d4edda; color: #155724; }
             .status-Cancelled { background-color: #f8d7da; color: #721c24; }

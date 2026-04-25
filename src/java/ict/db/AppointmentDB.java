@@ -146,6 +146,11 @@ public class AppointmentDB {
         ArrayList<AppointmentBean> results = executeGenericQuery(query + " WHERE appId = ? ", id);
         return results.isEmpty() ? null : results.get(0);
     }
+   
+      public AppointmentBean queryAppByTsID(int id) {
+        ArrayList<AppointmentBean> results = executeGenericQuery(query + " WHERE a.timeslotId = ? ", id);
+        return results.isEmpty() ? null : results.get(0);
+    }
     
     public ArrayList<AppointmentBean> queryAppByUserId(int userId) {
         return executeGenericQuery(query + " Where u.userid = ? ", userId);

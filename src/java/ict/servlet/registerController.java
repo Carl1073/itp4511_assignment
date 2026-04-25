@@ -69,7 +69,7 @@ public class registerController extends HttpServlet {
         StringBuilder errorMsg = new StringBuilder();
 
         // 2. Validation
-        if (db.queryCustByUsername(ub.getUsername()) != null) {
+        if (db.queryUserByUsername(ub.getUsername()) != null) {
             errorMsg.append("Username is already taken.<br/>");
         }
         if (!ub.getPassword().equals(cpw)) {

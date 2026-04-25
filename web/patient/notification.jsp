@@ -19,10 +19,12 @@
 
 
             <table border="1" style="width: 100%; border-collapse: collapse;">
-                <tr style="background-color: #f2f2f2;">
-                    <th style="padding: 10px;">Message</th>
-                    <th style="padding: 10px;">Date & Time</th>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>Message</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
                 <c:forEach var="note" items="${notifications}">
                     <tr class="notif-row ${note.isRead ? 'read' : 'unread'}" 
                         data-id="${note.notifId}" 

@@ -6,9 +6,11 @@
     <input type="hidden" name="action" value="logout"/>
 
     <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/patient/patientHome.jsp">Home</a>
-        <a href="${pageContext.request.contextPath}/handlePatient?action=booking">Booking</a>
-        <a href="${pageContext.request.contextPath}/handlePatient?action=service">Service</a>
+        <a href="${pageContext.request.contextPath}/staff/staffHome.jsp">Home</a>
+        <a href="${pageContext.request.contextPath}/handleStaff?action=queue">Queue</a>
+        <a href="${pageContext.request.contextPath}/handleStaff?action=booking">Booking</a>
+        <a href="${pageContext.request.contextPath}/handleStaff?action=outcome">Outcome</a>
+        <a href="${pageContext.request.contextPath}/handleStaff?action=service">Issue</a>
     </div>
 
     <input type="submit" class="logout-btn" name="logoutButton" value="Logout"/>

@@ -49,7 +49,7 @@ public class CheckUsernameServlet extends HttpServlet {
 //            return;
 //        }
 
-        UserBean ub = db.queryCustByUsername(username);
+        UserBean ub = db.queryUserByUsername(username);
         boolean isTaken = (ub == null)? false: true ;
 
         System.out.println(username);

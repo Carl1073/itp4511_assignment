@@ -139,7 +139,7 @@ public class TimeslotDB {
     }
 
     public TimeslotBean queryTimeslotByTsId(int timeslotid) {
-        ArrayList<TimeslotBean> results = executeGenericQuery(" where timeslotId = ?", timeslotid);
+        ArrayList<TimeslotBean> results = executeGenericQuery(query + " where timeslotId = ?", timeslotid);
         return results.isEmpty() ? null : results.get(0);
     }
 

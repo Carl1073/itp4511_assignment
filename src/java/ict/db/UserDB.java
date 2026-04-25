@@ -156,25 +156,25 @@ private ArrayList<UserBean> executeGenericQuery(String sql, Object... params) {
         return ubs;
     }
 
-    public ArrayList<UserBean> queryCust() {
+    public ArrayList<UserBean> queryUser() {
         return executeGenericQuery("");
     }
 
-    public UserBean queryCustByID(String id) {
+    public UserBean queryUserByID(String id) {
         ArrayList<UserBean> results = executeGenericQuery(" WHERE userid = ?", id);
         return results.isEmpty() ? null : results.get(0);
     }
 
-    public ArrayList<UserBean> queryCustByName(String name) {
+    public ArrayList<UserBean> queryUserByName(String name) {
         return executeGenericQuery(" WHERE fullName LIKE ?", "%" + name + "%");
     }
 
-    public UserBean queryCustByUsername(String username) {
+    public UserBean queryUserByUsername(String username) {
         ArrayList<UserBean> results = executeGenericQuery(" WHERE username LIKE ?", "%" + username + "%");
         return results.isEmpty() ? null : results.get(0);
     }
 
-    public ArrayList<UserBean> queryCustByPhone(String phone) {
+    public ArrayList<UserBean> queryUserByPhone(String phone) {
         return executeGenericQuery(" WHERE phone LIKE ?", "%" + phone + "%");
     }
 

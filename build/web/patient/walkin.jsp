@@ -40,7 +40,7 @@
             </div>
 
             <%-- Queue Entry Form --%>
-            <form id="walkinForm" action="handlePatient" method="POST">
+            <form id="walkinForm" action="handlePatientService" method="POST">
                 <input type="hidden" name="action" value="joinQueue">
 
                 <div style="margin-bottom: 15px;">

@@ -6,9 +6,13 @@
     <input type="hidden" name="action" value="logout"/>
 
     <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/patient/patientHome.jsp">Home</a>
-        <a href="${pageContext.request.contextPath}/handlePatient?action=booking">Booking</a>
-        <a href="${pageContext.request.contextPath}/handlePatient?action=service">Service</a>
+        <a href="${pageContext.request.contextPath}/admin/adminHome.jsp">Home</a>
+        <a href="${pageContext.request.contextPath}/handleAdmin?action=manageUsers">Users</a>
+        <a href="${pageContext.request.contextPath}/handleAdmin?action=configClinic">Clinics & Services</a>
+        <a href="${pageContext.request.contextPath}/handleAdmin?action=manageQuota">Quotas</a>
+        <a href="${pageContext.request.contextPath}/handleAdmin?action=reports">Reports</a>
+        <a href="${pageContext.request.contextPath}/handleAdmin?action=viewLogs">Incident Logs</a>
+        <a href="${pageContext.request.contextPath}/handleAdmin?action=settings">Policy Settings</a>
     </div>
 
     <input type="submit" class="logout-btn" name="logoutButton" value="Logout"/>

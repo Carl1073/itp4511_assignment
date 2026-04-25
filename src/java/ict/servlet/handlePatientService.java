@@ -17,6 +17,7 @@ public class handlePatientService extends HttpServlet {
     private TimeslotDB tdb;
     private QueueDB qdb;
     private NotificationDB ndb;
+    private UserDB udb;
 
     @Override
     public void init() {
@@ -29,6 +30,7 @@ public class handlePatientService extends HttpServlet {
         tdb = new TimeslotDB(dbUrl, dbUser, dbPassword);
         qdb = new QueueDB(dbUrl, dbUser, dbPassword);
         ndb = new NotificationDB(dbUrl, dbUser, dbPassword);
+        udb = new UserDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -51,16 +53,14 @@ public class handlePatientService extends HttpServlet {
                 ab.setPatientId(user.getUserId());
                 ab.setTimeslotId(timeslotid);
                 ab.setStatus("Confirmed");
-                TimeslotBean tb = tdb.queryTimeslotByTsId(timeslotid);
-                System.out.println(tb);
                 if (adb.addRecord(ab)) {
+                    TimeslotBean tb = tdb.queryTimeslotByTsId(timeslotid);
                     nb.setUserId(user.getUserId());
-                    
                     nb.setMessage("You have successfully make a booking.  "
-                            + "Clinic: " + tb.getClinicName()
-                            + "Service: " + tb.getServiceName()
-                            + "Date: " + ab.getTimeslotBean().getDate()
-                            + "Time: " + ab.getTimeslotBean().getOpenTime()
+                            + "<br/>Clinic: " + tb.getClinicName()
+                            + "<br/>Service: " + tb.getServiceName()
+                            + "<br/>Date: " + tb.getDate()
+                            + "<br/>Time: " + tb.getOpenTime()
                     );
                     ndb.addRecord(nb); // Save to notification table
                     refreshAndForward(request, response, user.getUserId());
@@ -77,6 +77,17 @@ public class handlePatientService extends HttpServlet {
 
                 for (AppointmentBean ab : apps) {
                     if (ab.getAppId() == targetId) {
+                        TimeslotBean tb = tdb.queryTimeslotByTsId(targetId);
+                        System.out.println("TimeslotBean: " + tb);
+                        nb.setUserId(user.getUserId());
+                        nb.setMessage("You have successfully cancel a booking.  "
+                                + "<br/>Clinic: " + tb.getClinicName()
+                                + "<br/>Service: " + tb.getServiceName()
+                                + "<br/>Date: " + tb.getDate()
+                                + "<br/>Time: " + tb.getOpenTime()
+                        );
+                        ndb.addRecord(nb); // Save to notification table
+
                         ab.setStatus("Cancelled");
                         adb.editRecord(ab);
                         break;
@@ -131,6 +142,16 @@ public class handlePatientService extends HttpServlet {
                     // 3. Fetch the fully populated bean (including names) for the success notification
                     AppointmentBean freshBean = adb.queryAppByAppID(appId);
                     request.setAttribute("appBean", freshBean);
+                    TimeslotBean tb = tdb.queryTimeslotByTsId(appId);
+                    System.out.println("TimeslotBean: " + tb);
+                    nb.setUserId(user.getUserId());
+                    nb.setMessage("You have successfully cancel a booking.  "
+                            + "<br/>Clinic: " + tb.getClinicName()
+                            + "<br/>Service: " + tb.getServiceName()
+                            + "<br/>Date: " + tb.getDate()
+                            + "<br/>Time: " + tb.getOpenTime()
+                    );
+                    ndb.addRecord(nb); // Save to notification table
 
                     // 4. Reload all appointments and forward to booking.jsp
                     refreshAndForward(request, response, user.getUserId());
@@ -160,7 +181,7 @@ public class handlePatientService extends HttpServlet {
             if (qdb.addRecord(qb)) {
                 // Store message in session so it survives the redirect
                 nb.setUserId(user.getUserId());
-                nb.setMessage("You have successfully joined the walk-in queue. Your number is: " + nextNum);
+                nb.setMessage("You have successfully joined the walk-in queue. <br/>Your number is: " + nextNum);
                 ndb.addRecord(nb); // Save to notification table
                 session.setAttribute("msg", "Successfully joined! Your number is: " + nextNum);
             } else {
@@ -170,6 +191,42 @@ public class handlePatientService extends HttpServlet {
             // Redirect back to the walk-in page (PRG Pattern)
             response.sendRedirect("handlePatient?action=walkin");
             return; // Ensure no further code is executed after redirect
+        } else if ("editProfile".equalsIgnoreCase(action)) {
+            // 1. Get parameters from request
+            String fullName = request.getParameter("fullName");
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String cpw = request.getParameter("cpw");
+            String gender = request.getParameter("gender");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+
+            // 2. Simple Validation
+            if (!password.equals(cpw)) {
+                request.setAttribute("errorMsg", "Passwords do not match!");
+                request.getRequestDispatcher("/patient/profile.jsp").forward(request, response);
+                return;
+            }
+
+            // 3. Update the bean and Database
+            user.setFullName(fullName);
+            user.setUsername(username);
+            user.setPassword(password);
+            user.setGender(gender);
+            user.setEmail(email);
+            user.setPhone(phone);
+
+            int result = udb.editRecord(user);
+
+            if (result > 0) {
+                request.setAttribute("successMsg", "Profile updated successfully!");
+                // Update session bean to reflect changes immediately
+                session.setAttribute("userBean", user);
+            } else {
+                request.setAttribute("errorMsg", "Failed to update profile. Please try again.");
+            }
+
+            request.getRequestDispatcher("/patient/profile.jsp").forward(request, response);
         } else {
             response.setContentType("text/html;charset=UTF-8");
             response.getWriter().println("No such action!!!");

@@ -50,13 +50,21 @@
             <label for="date">Clinic</label>
             ${clinic}
         </div>
-        <table><tr><th>Time</th> <th>Slot</th><th>Action</th></tr>
-                    <%
-                            for (int i = 0; i < timeslots.size(); i++) {
-                                TimeslotBean t = timeslots.get(i);
-                                out.println("<tr>");
-                                out.println("<th>" + t.getOpenTime() + "</th>");
-                                out.println("<th>" + t.getRemaining() + "/" + t.getQuotaPerSlot() + "</th>");
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Slot</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                        for (int i = 0; i < timeslots.size(); i++) {
+                            TimeslotBean t = timeslots.get(i);
+                            out.println("<tr>");
+                            out.println("<td>" + t.getOpenTime() + "</td>");
+                                out.println("<td>" + t.getRemaining() + "/" + t.getQuotaPerSlot() + "</td>");
                                 if (t.getRemaining() > 0) {
                                         out.println("<td><a href='handlePatientService?action=booking&tsId=" + t.getTimeslotId() + "' class='btn'>Book</a></td>");
                                     } else {
