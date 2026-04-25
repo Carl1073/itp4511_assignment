@@ -82,7 +82,19 @@ public class handleAdmin extends HttpServlet {
 
         } else if ("configService".equalsIgnoreCase(action)) {
             ArrayList<ServiceBean> services = sdb.queryService();
-            request.setAttribute("services", services);
+            request.setAttribute("serviceList", services);
+            targetJSP = "/admin/configService.jsp";
+
+        } else if ("editService".equalsIgnoreCase(action)) {
+            ArrayList<ServiceBean> services = sdb.queryService();
+            request.setAttribute("serviceList", services);
+            
+            String serviceIdStr = request.getParameter("serviceId");
+            if (serviceIdStr != null && !serviceIdStr.isEmpty()) {
+                int serviceId = Integer.parseInt(serviceIdStr);
+                ServiceBean selectedService = sdb.queryServiceId(serviceId);
+                request.setAttribute("service", selectedService);
+            }
             targetJSP = "/admin/configService.jsp";
 
         } else if ("manageQuota".equalsIgnoreCase(action)) {

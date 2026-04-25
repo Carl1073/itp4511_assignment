@@ -177,14 +177,102 @@ public class handleAdminProcess extends HttpServlet {
         } else if ("deleteClinic".equalsIgnoreCase(action)) {
             // Delete clinic
             String clinicIdStr = request.getParameter("clinicId");
-            System.out.println(clinicIdStr);
+            System.out.println("Delete Clinic - clinicIdStr: " + clinicIdStr);
+            System.out.println("Delete Clinic - action: " + action);
 
-            boolean success = cdb.delRecord(Integer.parseInt(clinicIdStr));
+            if (clinicIdStr == null || clinicIdStr.trim().isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&errorMsg=No clinic ID provided for deletion!");
+                return;
+            }
 
+            try {
+                int clinicId = Integer.parseInt(clinicIdStr);
+                boolean success = cdb.delRecord(clinicId);
+
+                if (success) {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&successMsg=Clinic deleted successfully!");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&errorMsg=Failed to delete clinic!");
+                }
+            } catch (NumberFormatException e) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&errorMsg=Invalid clinic ID format!");
+            }
+            return;
+
+        } else if ("addService".equalsIgnoreCase(action)) {
+            // Add new service
+            String serviceName = request.getParameter("serviceName");
+            String description = request.getParameter("description");
+            String priceStr = request.getParameter("price");
+            String durationStr = request.getParameter("duration");
+            
+            double price = Double.parseDouble(priceStr);
+            int duration = Integer.parseInt(durationStr);
+            
+            ServiceBean sb = new ServiceBean();
+            sb.setServiceName(serviceName);
+            sb.setDescription(description);
+            sb.setPrice(price);
+            sb.setDuration(duration);
+            
+            boolean success = sdb.addRecord(sb);
+            
             if (success) {
-                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&successMsg=Clinic deleted successfully!");
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&successMsg=Service added successfully!");
             } else {
-                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&errorMsg=Failed to delete clinic!");
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&errorMsg=Failed to add service!");
+            }
+            return;
+
+        } else if ("updateService".equalsIgnoreCase(action)) {
+            // Update existing service
+            String serviceIdStr = request.getParameter("serviceId");
+            String serviceName = request.getParameter("serviceName");
+            String description = request.getParameter("description");
+            String priceStr = request.getParameter("price");
+            String durationStr = request.getParameter("duration");
+            
+            double price = Double.parseDouble(priceStr);
+            int duration = Integer.parseInt(durationStr);
+            
+            ServiceBean sb = new ServiceBean();
+            sb.setServiceId(Integer.parseInt(serviceIdStr));
+            sb.setServiceName(serviceName);
+            sb.setDescription(description);
+            sb.setPrice(price);
+            sb.setDuration(duration);
+            
+            int result = sdb.editRecord(sb);
+            
+            if (result > 0) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&successMsg=Service updated successfully!");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&errorMsg=Failed to update service!");
+            }
+            return;
+
+        } else if ("deleteService".equalsIgnoreCase(action)) {
+            // Delete service
+            String serviceIdStr = request.getParameter("serviceId");
+            System.out.println("Delete Service - serviceIdStr: " + serviceIdStr);
+            System.out.println("Delete Service - action: " + action);
+
+            if (serviceIdStr == null || serviceIdStr.trim().isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&errorMsg=No service ID provided for deletion!");
+                return;
+            }
+
+            try {
+                int serviceId = Integer.parseInt(serviceIdStr);
+                boolean success = sdb.delRecord(serviceId);
+
+                if (success) {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&successMsg=Service deleted successfully!");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&errorMsg=Failed to delete service!");
+                }
+            } catch (NumberFormatException e) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&errorMsg=Invalid service ID format!");
             }
             return;
         } else {

@@ -148,7 +148,7 @@
 
             <%-- Main Form --%>
             <form action="handleAdminProcess" method="POST" name="clinicForm">
-                <input type="hidden" name="action" value="<%= (selectedClinic != null) ? "updateClinic" : "addClinic"%>">
+                <%-- No hidden action input - buttons will set the action --%>
                 <% if (selectedClinic != null) {%>
                 <input type="hidden" name="clinicId" value="<%= selectedClinic.getClinicId()%>">
                 <% }%>
@@ -186,38 +186,29 @@
                 <div class="container">
                     <%-- ... Dropdown Selection Code ... --%>
 
-                    <form action="handleAdminProcess" method="POST">
-                        <%-- Set the action based on whether a clinic is selected--%>
-                        <input type="hidden" name="action" value="<%= (selectedClinic != null) ? "updateClinic" : "addClinic"%>">
+                    <%-- Form Rows for Name, Address, etc. --%>
 
-                        <% if (selectedClinic != null) {%>
-                        <input type="hidden" name="clinicId" value="<%= selectedClinic.getClinicId()%>">
+                    <div class="form-row">
+                        <label for="isWalkinEnabled">Walk-in Support:</label>
+                        <div class="radio-group" style="margin-left: 150px;">
+                            <label>
+                                <input type="checkbox" id="isWalkinEnabled" name="isWalkinEnabled" value="true" 
+                                       <%= (selectedClinic != null && selectedClinic.getIsWalkinEnabled()) ? "checked" : ""%> />
+                                Enable walk-ins for this clinic
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <% if (selectedClinic != null) { %>
+                        <button type="submit" name="action" value="updateClinic" class="btn-primary">💾 Save Changes</button>
+                        <button type="submit" name="action" value="deleteClinic" class="btn-secondary" 
+                                onclick="return confirm('⚠️ Are you sure?');">🗑️ Delete Clinic</button>
+                        <% } else { %>
+                        <button type="submit" name="action" value="addClinic" class="btn-primary">➕ Create Clinic</button>
                         <% }%>
-
-                        <%-- Form Rows for Name, Address, etc. --%>
-
-                        <div class="form-row">
-                            <label for="isWalkinEnabled">Walk-in Support:</label>
-                            <div class="radio-group" style="margin-left: 150px;">
-                                <label>
-                                    <input type="checkbox" id="isWalkinEnabled" name="isWalkinEnabled" value="true" 
-                                           <%= (selectedClinic != null && selectedClinic.getIsWalkinEnabled()) ? "checked" : ""%> />
-                                    Enable walk-ins for this clinic
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="button-group">
-                            <% if (selectedClinic != null) { %>
-                            <button type="submit" class="btn-primary">💾 Save Changes</button>
-                            <button type="submit" name="action" value="deleteClinic" class="btn-secondary" 
-                                    onclick="return confirm('⚠️ Are you sure?');">🗑️ Delete Clinic</button>
-                            <% } else { %>
-                            <button type="submit" class="btn-primary">➕ Create Clinic</button>
-                            <% }%>
-                            <a href="handleAdmin?action=configClinic" class="btn-back">← Back to Clinic List</a>
-                        </div>
-                    </form>
+                        <a href="handleAdmin?action=configClinic" class="btn-back">← Back to Clinic List</a>
+                    </div>
                 </div>
             </form>
         </div>
