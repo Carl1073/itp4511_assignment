@@ -19,7 +19,7 @@ public class IncidentLogDB {
     private String url = "";
     private String username = "";
     private String password = "";
-    private String query = "SELECT l.*, u.fullName, u.email, u.phone "
+    private String query = "SELECT l.*, u.fullName, u.email, u.phone,  "
             + "FROM incident_log l "
             + "LEFT JOIN user u ON l.userId = u.userId ";
 
@@ -71,11 +71,13 @@ public class IncidentLogDB {
             String sql = "CREATE TABLE IF NOT EXISTS incident_log ("
                     + "logId INT AUTO_INCREMENT,"
                     + "userId INT NOT NULL," // Target patient or staff
-                    + "eventType VARCHAR(50) NOT NULL," // e.g., "Repeated No-show" or "Service Suspension"
+                    + "eventType VARCHAR(50) NOT NULL,"
                     + "description TEXT," // Details for Admin review
                     + "createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                    + "appId INT, "
                     + "PRIMARY KEY (logId),"
                     + "FOREIGN KEY (userId) REFERENCES user(userId)"
+                    + "FOREIGN KEY (appId) REFERENCES appointment(appId)"
                     + ")";
             stmnt.execute(sql);
             stmnt.close();
@@ -91,11 +93,13 @@ public class IncidentLogDB {
         boolean isSuccess = false;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "INSERT INTO incident_log (userId, eventType, description) VALUES (?,?,?)";
+            String preQueryStatement = "INSERT INTO incident_log (userId, eventType, description, appId) VALUES (?,?,?,?)";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setInt(1, ib.getUserId());
             pStmnt.setString(2, ib.getEventType());
             pStmnt.setString(3, ib.getDescription());
+            pStmnt.setInt(4, ib.getAppId());
+
             int rowCount = pStmnt.executeUpdate();
             if (rowCount >= 1) {
                 isSuccess = true;
@@ -138,7 +142,6 @@ public class IncidentLogDB {
         String sql = query + " where l.userid = ?";
         return executeGenericQuery(sql, userId);
     }
-    
 
     public boolean delRecord(String custId) {
         Connection cnnct = null;
@@ -226,6 +229,7 @@ public class IncidentLogDB {
         ib.setEventType(rs.getString(3));
         ib.setDescription(rs.getString(4));
         ib.setCreatedAt(rs.getTimestamp(5));
+        ib.setAppId(rs.getInt(6));
 
         UserBean ub = new UserBean();
         // ub.setUserId(rs.getInt("userId")); // From user table

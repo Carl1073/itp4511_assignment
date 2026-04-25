@@ -20,8 +20,8 @@ import javax.servlet.http.*;
  *
  * @author Tong
  */
-@WebServlet(name = "handleStaff", urlPatterns = {"/handleStaff"})
-public class handleStaff extends HttpServlet {
+@WebServlet(name = "handleStaffProcess", urlPatterns = {"/handleStaffProcess"})
+public class handleStaffProcess extends HttpServlet {
 
     private ServiceDB sdb;
     private ClinicDB cdb;
@@ -29,6 +29,7 @@ public class handleStaff extends HttpServlet {
     private NotificationDB ndb;
     private AppointmentDB adb;
     private QueueDB qdb;
+    private IncidentLogDB ildb;
 
     @Override
     public void init() {
@@ -41,6 +42,7 @@ public class handleStaff extends HttpServlet {
         ndb = new NotificationDB(dbUrl, dbUser, dbPassword);
         adb = new AppointmentDB(dbUrl, dbUser, dbPassword);
         qdb = new QueueDB(dbUrl, dbUser, dbPassword);
+        ildb = new IncidentLogDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -55,49 +57,30 @@ public class handleStaff extends HttpServlet {
         String action = request.getParameter("action");
         HttpSession session = request.getSession(true);
         UserBean user = (UserBean) session.getAttribute("userBean");
-        System.out.println(action);
         // Inside handleStaff.java doPost/doGet
-        if ("queue".equalsIgnoreCase(action)) {
-            // 1. Fetch clinics and services for the dropdown filters
-            ArrayList<ClinicBean> clinics = cdb.queryClinic();
-            ArrayList<ServiceBean> services = sdb.queryService();
-            request.setAttribute("clinics", clinics);
-            request.setAttribute("services", services);
+        if ("submitIssue".equalsIgnoreCase(action)) {
+            // 1. Extract form data
+            String eventType = request.getParameter("eventType");
+            String description = request.getParameter("description");
+            int staffId = user.getUserId(); //
 
-            // 2. Get filter parameters (default to first clinic if not provided)
-            String cIdParam = request.getParameter("clinicId");
-            String sIdParam = request.getParameter("serviceId");
+            // 2. Prepare the Bean
+            IncidentLogBean ib = new IncidentLogBean();
+            ib.setUserId(staffId);
+            ib.setEventType(eventType);
+            ib.setDescription(description);
 
-            if (cIdParam != null && sIdParam != null) {
-                int clinicId = Integer.parseInt(cIdParam);
-                int serviceId = Integer.parseInt(sIdParam);
+            // 3. Database operation using IncidentLogDB
+            boolean success = ildb.addRecord(ib);
 
-                // 3. Query daily appointments for this clinic/service 
-                Date date = Date.valueOf(LocalDate.now());
-
-                ArrayList<AppointmentBean> apps = adb.queryAppByClinicServiceDate(clinicId, serviceId, date);
-                System.out.println(apps);
-                request.setAttribute("dailyAppointments", apps);
-
-                // 4. Query live walk-in queue for this clinic/service 
-                ArrayList<QueueBean> queues = qdb.queryQueueByClinicService(clinicId, serviceId);
-                request.setAttribute("walkinQueues", queues);
+            // 4. Use Redirect instead of Forward
+            if (success) {
+                // Redirect to a success page or home with a query parameter
+                response.sendRedirect("staff/staffHome.jsp?status=success");
+            } else {
+                // Redirect to the form again with an error flag
+                response.sendRedirect("staff/reportIssue.jsp?status=error");
             }
-
-            RequestDispatcher rd = getServletContext().getRequestDispatcher("/staff/manageQueue.jsp");
-            rd.forward(request, response);
-        } else if ("process".equalsIgnoreCase(action)) {
-            RequestDispatcher rd;
-            rd = getServletContext().getRequestDispatcher("/staff/pendingBookings.jsp");
-            rd.forward(request, response);
-        } else if ("outcome".equalsIgnoreCase(action)) {
-            RequestDispatcher rd;
-            rd = getServletContext().getRequestDispatcher("/staff/visitOutcome.jsp");
-            rd.forward(request, response);
-        } else if ("issue".equalsIgnoreCase(action)) {
-            RequestDispatcher rd;
-            rd = getServletContext().getRequestDispatcher("/staff/reportIssue.jsp");
-            rd.forward(request, response);
         } else {
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();

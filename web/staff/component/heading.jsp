@@ -7,8 +7,8 @@
 
     <div class="nav-links">
         <a href="${pageContext.request.contextPath}/staff/staffHome.jsp">Home</a>
-        <a href="${pageContext.request.contextPath}/handleStaff?action=queue">Queue</a>
-        <a href="${pageContext.request.contextPath}/handleStaff?action=booking">Booking</a>
+        <a href="${pageContext.request.contextPath}/handleStaff?action=queue">Current queue</a>
+        <a href="${pageContext.request.contextPath}/handleStaff?action=process">Process queue</a>
         <a href="${pageContext.request.contextPath}/handleStaff?action=outcome">Outcome</a>
         <a href="${pageContext.request.contextPath}/handleStaff?action=issue">Issue</a>
     </div>

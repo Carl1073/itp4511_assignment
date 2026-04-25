@@ -11,6 +11,8 @@ public class IncidentLogBean implements Serializable {
     private String eventType;
     private String description;
     private Timestamp createdAt;
+    private int appId;
+    private AppointmentBean appointmentBean;
 
     // Default No-argument Constructor
     public IncidentLogBean() {
@@ -72,6 +74,22 @@ public class IncidentLogBean implements Serializable {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public int getAppId() {
+        return appId;
+    }
+
+    public AppointmentBean getAppointmentBean() {
+        return appointmentBean;
+    }
+
+    public void setAppId(int appId) {
+        this.appId = appId;
+    }
+
+    public void setAppointmentBean(AppointmentBean appointmentBean) {
+        this.appointmentBean = appointmentBean;
     }
 
     public String toString() {
