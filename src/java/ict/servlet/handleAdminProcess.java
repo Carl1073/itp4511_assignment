@@ -4,6 +4,7 @@ import ict.bean.*;
 import ict.db.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Time;
 import java.util.ArrayList;
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
@@ -273,6 +274,75 @@ public class handleAdminProcess extends HttpServlet {
                 }
             } catch (NumberFormatException e) {
                 response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&errorMsg=Invalid service ID format!");
+            }
+            return;
+
+        } else if ("updateTimeslotQuotas".equalsIgnoreCase(action)) {
+            // Update timeslot quotas
+            String clinicIdStr = request.getParameter("clinicId");
+            String dateStr = request.getParameter("date");
+            
+            if (clinicIdStr == null || clinicIdStr.trim().isEmpty() || dateStr == null || dateStr.trim().isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&errorMsg=Clinic and date are required!");
+                return;
+            }
+            
+            try {
+                int clinicId = Integer.parseInt(clinicIdStr);
+                java.sql.Date date = java.sql.Date.valueOf(dateStr);
+                
+                // Get all services
+                ArrayList<ServiceBean> services = sdb.queryService();
+                
+                // Process each timeslot (every hour from clinic opening to closing time)
+                ClinicBean clinic = cdb.getClinicById(clinicId);
+                if (clinic == null) {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&errorMsg=Clinic not found!");
+                    return;
+                }
+                
+                // Calculate timeslots (every 60 minutes)
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                cal.setTime(clinic.getOpenTime());
+                java.util.Date closeTime = clinic.getCloseTime();
+                
+                boolean success = true;
+                while (cal.getTime().before(closeTime) || cal.getTime().equals(closeTime)) {
+                    Time slotTime = new Time(cal.getTime().getTime());
+                    
+                    // For each service, update/create timeslot
+                    for (ServiceBean service : services) {
+                        String quotaParam = "quota_" + service.getServiceId() + "_" + 
+                                          String.format("%02d", cal.get(java.util.Calendar.HOUR_OF_DAY)) + 
+                                          String.format("%02d", cal.get(java.util.Calendar.MINUTE));
+                        String quotaStr = request.getParameter(quotaParam);
+                        
+                        if (quotaStr != null && !quotaStr.trim().isEmpty()) {
+                            try {
+                                int quota = Integer.parseInt(quotaStr);
+                                boolean result = tdb.createOrUpdateTimeslot(clinicId, service.getServiceId(), date, slotTime, quota);
+                                if (!result) {
+                                    success = false;
+                                }
+                            } catch (NumberFormatException e) {
+                                success = false;
+                            }
+                        }
+                    }
+                    
+                    // Move to next hour
+                    cal.add(java.util.Calendar.HOUR_OF_DAY, 1);
+                }
+                
+                if (success) {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&clinicId=" + clinicId + "&date=" + dateStr + "&successMsg=Timeslot quotas updated successfully!");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&clinicId=" + clinicId + "&date=" + dateStr + "&errorMsg=Failed to update some timeslot quotas!");
+                }
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&errorMsg=Invalid parameters!");
             }
             return;
         } else {

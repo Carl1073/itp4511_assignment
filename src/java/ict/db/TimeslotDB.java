@@ -147,8 +147,12 @@ public class TimeslotDB {
         return executeGenericQuery(query + "where date = ? ", date);
     }
 
-    public ArrayList<TimeslotBean> queryTimeslotbyDateClinicService(Date date, int clinicId, int serviceId) {
-        return executeGenericQuery(query + "where date = ? and t.clinicId = ? and t.serviceId = ?", date, clinicId, serviceId);
+    public ArrayList<TimeslotBean> queryTimeslotbyDateClinic(Date date, int clinicId) {
+        return executeGenericQuery(query + " WHERE t.date = ? AND t.clinicId = ? ORDER BY t.openTime", date, clinicId);
+    }
+
+    public ArrayList<TimeslotBean> queryTimeslotbyClinic(int clinicId) {
+        return executeGenericQuery(query + " WHERE t.clinicId = ? ORDER BY t.date, t.openTime", clinicId);
     }
 
     public ArrayList<TimeslotBean> queryAvailableTimeslots(Date date, int clinicId, int serviceId) {
@@ -294,17 +298,16 @@ public class TimeslotDB {
         return isSuccess;
     }
 
-    public int editRecord(TimeslotBean tb) {
+    public int updateTimeslotQuota(int timeslotId, int newQuota) {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
 
         try {
             cnnct = getConnection();
-            String preQueryStatement = "UPDATE timeslot SET quotaPerSlot = ?, DURATION = ? WHERE CLINICID = ? and SERVICEID = ?";
+            String preQueryStatement = "UPDATE timeslot SET quotaPerSlot = ? WHERE timeslotId = ?";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
-            pStmnt.setInt(1, tb.getQuotaPerSlot());
-            pStmnt.setInt(2, tb.getClinicId());
-            pStmnt.setInt(3, tb.getServiceId());
+            pStmnt.setInt(1, newQuota);
+            pStmnt.setInt(2, timeslotId);
 
             int rs = pStmnt.executeUpdate();
             pStmnt.close();
@@ -319,6 +322,62 @@ public class TimeslotDB {
             ex.printStackTrace();
         }
         return 0;
+    }
+
+    public boolean createOrUpdateTimeslot(int clinicId, int serviceId, Date date, Time openTime, int quota) {
+        Connection cnnct = null;
+        PreparedStatement pStmnt = null;
+
+        try {
+            cnnct = getConnection();
+            
+            // First check if timeslot exists
+            String checkQuery = "SELECT timeslotId FROM timeslot WHERE clinicId = ? AND serviceId = ? AND date = ? AND openTime = ?";
+            pStmnt = cnnct.prepareStatement(checkQuery);
+            pStmnt.setInt(1, clinicId);
+            pStmnt.setInt(2, serviceId);
+            pStmnt.setDate(3, date);
+            pStmnt.setTime(4, openTime);
+            
+            ResultSet rs = pStmnt.executeQuery();
+            if (rs.next()) {
+                // Update existing
+                int timeslotId = rs.getInt("timeslotId");
+                rs.close();
+                pStmnt.close();
+                
+                String updateQuery = "UPDATE timeslot SET quotaPerSlot = ? WHERE timeslotId = ?";
+                pStmnt = cnnct.prepareStatement(updateQuery);
+                pStmnt.setInt(1, quota);
+                pStmnt.setInt(2, timeslotId);
+            } else {
+                // Insert new
+                rs.close();
+                pStmnt.close();
+                
+                String insertQuery = "INSERT INTO timeslot (clinicId, serviceId, quotaPerSlot, date, openTime) VALUES (?, ?, ?, ?, ?)";
+                pStmnt = cnnct.prepareStatement(insertQuery);
+                pStmnt.setInt(1, clinicId);
+                pStmnt.setInt(2, serviceId);
+                pStmnt.setInt(3, quota);
+                pStmnt.setDate(4, date);
+                pStmnt.setTime(5, openTime);
+            }
+            
+            int result = pStmnt.executeUpdate();
+            pStmnt.close();
+            cnnct.close();
+            return result > 0;
+            
+        } catch (SQLException ex) {
+            while (ex != null) {
+                ex.printStackTrace();
+                ex = ex.getNextException();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 
     public void dropCustTable() {

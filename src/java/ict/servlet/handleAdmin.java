@@ -98,7 +98,38 @@ public class handleAdmin extends HttpServlet {
             targetJSP = "/admin/configService.jsp";
 
         } else if ("manageQuota".equalsIgnoreCase(action)) {
-            // Logic to fetch capacity/timeslots
+            // Fetch all clinics for dropdown
+            ArrayList<ClinicBean> clinics = cdb.queryClinic();
+            request.setAttribute("clinicList", clinics);
+            
+            // Fetch all services for the table
+            ArrayList<ServiceBean> services = sdb.queryService();
+            request.setAttribute("serviceList", services);
+            
+            // Check if clinic and date are selected
+            String clinicIdStr = request.getParameter("clinicId");
+            String dateStr = request.getParameter("date");
+            
+            
+            if (clinicIdStr != null && !clinicIdStr.isEmpty() && dateStr != null && !dateStr.isEmpty()) {
+                try {
+                    int clinicId = Integer.parseInt(clinicIdStr);
+                    java.sql.Date date = java.sql.Date.valueOf(dateStr);
+                    
+                    // Fetch existing timeslots for this clinic and date
+                    ArrayList<TimeslotBean> existingTimeslots = tdb.queryTimeslotbyDateClinic(date, clinicId);
+                    request.setAttribute("existingTimeslots", existingTimeslots);
+                    
+                    // Set selected clinic and date
+                    ClinicBean selectedClinic = cdb.getClinicById(clinicId);
+                    request.setAttribute("selectedClinic", selectedClinic);
+                    request.setAttribute("selectedDate", dateStr);
+                    System.out.println(dateStr);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            
             targetJSP = "/admin/configTimeslot.jsp";
 
         } else if ("reports".equalsIgnoreCase(action)) {
