@@ -33,7 +33,7 @@ public class StartUp {
         userDB = new UserDB(url, username, password);
         userDB.createTable();
 
-        ClinicDB clinicDB = new ClinicDB(url, username, password);
+        clinicDB = new ClinicDB(url, username, password);
         clinicDB.createTable();
         if (clinicDB.queryClinic().isEmpty()) {
             clinicDB.addRecord(new ClinicBean(1, "Chai Wan", "12, ABC Street, Chai Wan", Time.valueOf("09:00:00"), Time.valueOf("18:00:00"), true));
@@ -43,7 +43,7 @@ public class StartUp {
             clinicDB.addRecord(new ClinicBean(5, "Tsing Yi", "90, BNM Street, Tsing Yi", Time.valueOf("09:00:00"), Time.valueOf("18:00:00"), true));
         }
 
-        ServiceDB serviceDB = new ServiceDB(url, username, password);
+        serviceDB = new ServiceDB(url, username, password);
         serviceDB.createTable();
         if (serviceDB.queryService().isEmpty()) {
             serviceDB.addRecord(new ServiceBean(1, "General consultation",
@@ -67,7 +67,7 @@ public class StartUp {
         timeslotDB.createTable();
         Date today = Date.valueOf(LocalDate.now());
         generateTimeslot(today);
-        
+
         // Calculate the date for tomorrow
         LocalDate tomorrowLocalDate = LocalDate.now().plusDays(1);
         Date tomorrow = Date.valueOf(tomorrowLocalDate);

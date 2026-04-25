@@ -37,7 +37,7 @@ public class QueueDB {
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
-        return DriverManager.getConnection(url, username, password);
+        return DriverManager.getConnection(url + "?useSSL=false", username, password);
     }
 
     public void createDB(String createDB) {
@@ -76,7 +76,7 @@ public class QueueDB {
                     + "clinicId INT NOT NULL,"
                     + "serviceId INT NOT NULL,"
                     + "queueNumber INT NOT NULL,"
-                    + "entryTime TIME DEFAULT CURRENT_TIMESTAMP,"
+                    + "entryTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                     + "status ENUM('Waiting', 'Called', 'Skipped', 'Served') DEFAULT 'Waiting',"
                     + "PRIMARY KEY (queueId),"
                     + "FOREIGN KEY (patientId) REFERENCES user(userId),"
@@ -86,7 +86,7 @@ public class QueueDB {
             stmnt.execute(sql);
             stmnt.close();
             cnnct.close();
-        } catch (Exception ex) {
+        } catch (SQLException | IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -180,8 +180,8 @@ public class QueueDB {
     public ArrayList<QueueBean> queryQueue() {
         return executeGenericQuery("");
     }
-    
-        public ArrayList<QueueBean> queryQueueByClinicService(int clinicId, int serviceId) {
+
+    public ArrayList<QueueBean> queryQueueByClinicService(int clinicId, int serviceId) {
         return executeGenericQuery(" where q.patientId = ? and q.serviceId = ? ", clinicId, serviceId);
     }
 

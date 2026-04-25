@@ -42,7 +42,7 @@ public class AppointmentDB {
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
-        return DriverManager.getConnection(url, username, password);
+        return DriverManager.getConnection(url + "?useSSL=false", username, password);
     }
 
     public void createDB(String createDB) {
@@ -141,22 +141,22 @@ public class AppointmentDB {
     public ArrayList<AppointmentBean> queryApp() {
         return executeGenericQuery(query);
     }
-    
-   public AppointmentBean queryAppByAppID(int id) {
+
+    public AppointmentBean queryAppByAppID(int id) {
         ArrayList<AppointmentBean> results = executeGenericQuery(query + " WHERE appId = ? ", id);
         return results.isEmpty() ? null : results.get(0);
     }
-   
-      public AppointmentBean queryAppByTsID(int id) {
+
+    public AppointmentBean queryAppByTsID(int id) {
         ArrayList<AppointmentBean> results = executeGenericQuery(query + " WHERE a.timeslotId = ? ", id);
         return results.isEmpty() ? null : results.get(0);
     }
-    
+
     public ArrayList<AppointmentBean> queryAppByUserId(int userId) {
         return executeGenericQuery(query + " Where u.userid = ? ", userId);
     }
-    
-        public ArrayList<AppointmentBean> queryAppByClinicServiceDate(int clinicId, int serviceId, Date date) {
+
+    public ArrayList<AppointmentBean> queryAppByClinicServiceDate(int clinicId, int serviceId, Date date) {
         return executeGenericQuery(query + " Where c.clinicId = ? and s.serviceId = ? and t.date = ? ", clinicId, serviceId, date);
     }
 
@@ -200,67 +200,68 @@ public class AppointmentDB {
         return isSuccess;
     }
 
-public int editRecord(AppointmentBean ab) {
-    Connection cnnct = null;
-    PreparedStatement pStmnt = null;
+    public int editRecord(AppointmentBean ab) {
+        Connection cnnct = null;
+        PreparedStatement pStmnt = null;
 
-    try {
-        cnnct = getConnection();
-        
-        // Start building the query
-        StringBuilder sql = new StringBuilder("UPDATE appointment SET ");
-        ArrayList<Object> params = new ArrayList<>();
+        try {
+            cnnct = getConnection();
 
-        // Check each field and add to SQL if not null/zero
-        if (ab.getPatientId() != 0) {
-            sql.append("patientId = ?, ");
-            params.add(ab.getPatientId());
-        }
-        if (ab.getTimeslotId() != 0) {
-            sql.append("timeslotId = ?, ");
-            params.add(ab.getTimeslotId());
-        }
-        if (ab.getStatus() != null) {
-            sql.append("status = ?, ");
-            params.add(ab.getStatus());
-        }
-        if (ab.getCancelReason() != null) {
-            sql.append("cancelReason = ?, ");
-            params.add(ab.getCancelReason());
-        }
+            // Start building the query
+            StringBuilder sql = new StringBuilder("UPDATE appointment SET ");
+            ArrayList<Object> params = new ArrayList<>();
 
-        // Remove the trailing comma and space
-        if (params.isEmpty()) {
-            return 0; // Nothing to update
-        }
-        sql.setLength(sql.length() - 2);
+            // Check each field and add to SQL if not null/zero
+            if (ab.getPatientId() != 0) {
+                sql.append("patientId = ?, ");
+                params.add(ab.getPatientId());
+            }
+            if (ab.getTimeslotId() != 0) {
+                sql.append("timeslotId = ?, ");
+                params.add(ab.getTimeslotId());
+            }
+            if (ab.getStatus() != null) {
+                sql.append("status = ?, ");
+                params.add(ab.getStatus());
+            }
+            if (ab.getCancelReason() != null) {
+                sql.append("cancelReason = ?, ");
+                params.add(ab.getCancelReason());
+            }
 
-        // Add the WHERE clause
-        sql.append(" WHERE appId = ?");
-        params.add(ab.getAppId());
+            // Remove the trailing comma and space
+            if (params.isEmpty()) {
+                return 0; // Nothing to update
+            }
+            sql.setLength(sql.length() - 2);
 
-        pStmnt = cnnct.prepareStatement(sql.toString());
+            // Add the WHERE clause
+            sql.append(" WHERE appId = ?");
+            params.add(ab.getAppId());
 
-        // Set parameters dynamically
-        for (int i = 0; i < params.size(); i++) {
-            pStmnt.setObject(i + 1, params.get(i));
-        }
+            pStmnt = cnnct.prepareStatement(sql.toString());
 
-        int rs = pStmnt.executeUpdate();
-        pStmnt.close();
-        cnnct.close();
-        return rs;
+            // Set parameters dynamically
+            for (int i = 0; i < params.size(); i++) {
+                pStmnt.setObject(i + 1, params.get(i));
+            }
 
-    } catch (SQLException ex) {
-        while (ex != null) {
+            int rs = pStmnt.executeUpdate();
+            pStmnt.close();
+            cnnct.close();
+            return rs;
+
+        } catch (SQLException ex) {
+            while (ex != null) {
+                ex.printStackTrace();
+                ex = ex.getNextException();
+            }
+        } catch (IOException ex) {
             ex.printStackTrace();
-            ex = ex.getNextException();
         }
-    } catch (IOException ex) {
-        ex.printStackTrace();
+        return 0;
     }
-    return 0;
-}
+
     public void dropCustTable() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
