@@ -18,10 +18,19 @@ import java.util.ArrayList;
  */
 public class StartUp {
 
+    private static UserDB userDB;
+    private static ClinicDB clinicDB;
+    private static ServiceDB serviceDB;
+    private static QueueDB queueDB;
+    private static AppointmentDB appointmentDB;
+    private static TimeslotDB timeslotDB;
+    private static IncidentLogDB incidentLogDB;
+    private static NotificationDB notificationDB;
+
     // Change the method to accept parameters
     public static void startUp(String url, String username, String password) {
 
-        UserDB userDB = new UserDB(url, username, password);
+        userDB = new UserDB(url, username, password);
         userDB.createTable();
 
         ClinicDB clinicDB = new ClinicDB(url, username, password);
@@ -48,38 +57,31 @@ public class StartUp {
                     200, 60));
         }
 
-        QueueDB queueDB = new QueueDB(url, username, password);
+        queueDB = new QueueDB(url, username, password);
         queueDB.createTable();
 
-        AppointmentDB appointmentDB = new AppointmentDB(url, username, password);
+        appointmentDB = new AppointmentDB(url, username, password);
         appointmentDB.createTable();
 
-        TimeslotDB timeslotDB = new TimeslotDB(url, username, password);
+        timeslotDB = new TimeslotDB(url, username, password);
         timeslotDB.createTable();
         Date today = Date.valueOf(LocalDate.now());
-        if (timeslotDB.queryTimeslotbyDate(today).isEmpty()) {
-            // for every clinic
-            ArrayList<ClinicBean> ClinicBeans = clinicDB.queryClinic();
-            for (ClinicBean clinicBean : ClinicBeans) {
-                LocalTime startTime = clinicBean.getOpenTime().toLocalTime();
-                LocalTime endTime = clinicBean.getCloseTime().toLocalTime();
-                ArrayList<ServiceBean> serviceBeans = serviceDB.queryService();
-                for (ServiceBean serviceBean : serviceBeans) {
-                    int duration = serviceBean.getDuration();
-                    for (LocalTime t = startTime; t.isBefore(endTime); t = t.plusMinutes(duration)) {
-                        timeslotDB.addRecord(new TimeslotBean(0, clinicBean.getClinicId(), serviceBean.getServiceId(), today, Time.valueOf(t), 2));
-                        System.out.println("Generating slot for: " + t);
-                    }
-                }
-            }
-        }
-
+        generateTimeslot(today);
+        
         // Calculate the date for tomorrow
         LocalDate tomorrowLocalDate = LocalDate.now().plusDays(1);
         Date tomorrow = Date.valueOf(tomorrowLocalDate);
+        generateTimeslot(tomorrow);
 
-        // Check if tomorrow's slots already exist
-        if (timeslotDB.queryTimeslotbyDate(tomorrow).isEmpty()) {
+        incidentLogDB = new IncidentLogDB(url, username, password);
+        incidentLogDB.createTable();
+
+        notificationDB = new NotificationDB(url, username, password);
+        notificationDB.createTable();
+    }
+
+    public static void generateTimeslot(Date date) {
+        if (timeslotDB.queryTimeslotbyDate(date).isEmpty()) {
 
             ArrayList<ClinicBean> clinicBeans = clinicDB.queryClinic();
             for (ClinicBean clinicBean : clinicBeans) {
@@ -93,19 +95,13 @@ public class StartUp {
 
                     for (LocalTime t = startTime; t.isBefore(endTime); t = t.plusMinutes(duration)) {
                         // Pass 'tomorrow' instead of 'today'
-                        TimeslotBean newSlot = new TimeslotBean(0, clinicBean.getClinicId(), serviceBean.getServiceId(), tomorrow, Time.valueOf(t), 2);
+                        TimeslotBean newSlot = new TimeslotBean(0, clinicBean.getClinicId(), serviceBean.getServiceId(), date, Time.valueOf(t), 2);
                         timeslotDB.addRecord(newSlot);
 
-                        System.out.println("Generating slot for tomorrow (" + tomorrow + ") at: " + t);
+                        System.out.println("Generating slot for tomorrow (" + date + ") at: " + t);
                     }
                 }
             }
         }
-
-        IncidentLogDB incidentLogDB = new IncidentLogDB(url, username, password);
-        incidentLogDB.createTable();
-
-        NotificationDB notificationDB = new NotificationDB(url, username, password);
-        notificationDB.createTable();
     }
 }
