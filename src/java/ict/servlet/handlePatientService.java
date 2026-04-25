@@ -273,8 +273,8 @@ public class handlePatientService extends HttpServlet {
             } else {
                 request.setAttribute("errorMsg", "Failed to update profile. Please try again.");
             }
-
-            request.getRequestDispatcher("/patient/profile.jsp").forward(request, response);
+            String targetUrl = "/" + user.getRole().toLowerCase() + "/profile.jsp";
+            request.getRequestDispatcher(targetUrl).forward(request, response);
         } else {
             response.setContentType("text/html;charset=UTF-8");
             response.getWriter().println("No such action!!!");

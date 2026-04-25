@@ -13,6 +13,8 @@
         <a href="${pageContext.request.contextPath}/handleAdmin?action=reports">Reports</a>
         <a href="${pageContext.request.contextPath}/handleAdmin?action=viewLogs">Incident Logs</a>
         <a href="${pageContext.request.contextPath}/handleAdmin?action=settings">Policy Settings</a>
+                <a href="${pageContext.request.contextPath}/handleAdmin?action=profile">Profile</a>
+
     </div>
 
     <input type="submit" class="logout-btn" name="logoutButton" value="Logout"/>

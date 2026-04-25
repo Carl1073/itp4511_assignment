@@ -1,9 +1,12 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="ict.bean.UserBean"%>
+<%@page import="ict.bean.UserBean, ict.bean.ClinicBean, java.util.ArrayList"%>
 <%
     // Check if we are in Edit mode (bean exists) or Add mode (attributes might exist from previous failed submit)
     UserBean editUser = (UserBean) request.getAttribute("editUser");
     boolean isEdit = (editUser != null);
+
+    // Get the list of clinics from the request attribute
+    ArrayList<ClinicBean> clinics = (ArrayList<ClinicBean>) request.getAttribute("clinics");
 
     // Helper logic to get values: priority to Bean (Edit mode), then Request (validation), then Empty
     String fullName = isEdit ? editUser.getFullName() : (request.getAttribute("fullName") != null ? (String) request.getAttribute("fullName") : "");
@@ -11,6 +14,9 @@
     String email = isEdit ? editUser.getEmail() : (request.getAttribute("email") != null ? (String) request.getAttribute("email") : "");
     String phone = isEdit ? editUser.getPhone() : (request.getAttribute("phone") != null ? (String) request.getAttribute("phone") : "");
     String role = isEdit ? editUser.getRole() : (request.getAttribute("role") != null ? (String) request.getAttribute("role") : "");
+
+    // Check if the current role is either Staff or Admin to set initial visibility
+    boolean showClinic = "Staff".equalsIgnoreCase(role) || "Admin".equalsIgnoreCase(role);
 %>
 <!DOCTYPE html>
 <html>
@@ -84,6 +90,27 @@
                     <input type="text" id="phone" name="phone" value="<%= phone%>" required/>
                 </div>
 
+                <div class="form-row" id="clinic-row" style="<%= showClinic ? "display:flex;" : "display:none;"%>">
+                    <label for="clinicId">Assign Clinic:</label>
+                    <select name="clinicId" id="clinicId">
+                        <option value="">-- Select a Clinic --</option>
+                        <%
+                            if (clinics != null) {
+                                for (ClinicBean clinic : clinics) {
+                                    // Check if this clinic is the one currently assigned
+                                    int selectClinicId = isEdit ? editUser.getClinicId() : 0;
+                                    String selected = (clinic.getClinicId() == selectClinicId) ? "selected" : "";
+                        %>
+                        <option value="<%= clinic.getClinicId()%>" <%= selected%>>
+                            <%= clinic.getClinicName()%>
+                        </option>
+                        <%
+                                }
+                            }
+                        %>
+                    </select>
+                </div>
+
                 <div class="form-row">
                     <label></label>
                     <div class="button-group">
@@ -94,4 +121,26 @@
             </form>
         </div>
     </body>
+    <script type="text/javascript">
+        function toggleClinicField() {
+            var role = document.getElementById("role").value;
+            var clinicRow = document.getElementById("clinic-row");
+
+            // Show if role is Staff OR Admin
+            if (role === "Staff" || role === "Admin") {
+                clinicRow.style.display = "flex";
+            } else {
+                clinicRow.style.display = "none";
+                document.getElementById("clinicId").value = ""; // Reset value if hidden
+            }
+        }
+
+        // Ensure the function is called when the page loads to set correct initial state
+        window.onload = function () {
+            var roleSelect = document.getElementById("role");
+            if (roleSelect) {
+                roleSelect.onchange = toggleClinicField;
+            }
+        };
+    </script>
 </html>

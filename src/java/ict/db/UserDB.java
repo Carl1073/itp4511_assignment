@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import ict.bean.UserBean;
+import ict.bean.ClinicBean;
 
 /**
  *
@@ -176,6 +177,29 @@ private ArrayList<UserBean> executeGenericQuery(String sql, Object... params) {
 
     public ArrayList<UserBean> queryUserByPhone(String phone) {
         return executeGenericQuery(" WHERE phone LIKE ?", "%" + phone + "%");
+    }
+
+    
+    public ArrayList<UserBean> queryUserWithClinic() {
+        ArrayList<UserBean> ubs = new ArrayList<>();
+        String sql = "SELECT u.*, c.clinicName FROM user u LEFT JOIN clinic c ON u.clinicId = c.clinicId";
+        try (Connection cnnct = getConnection();
+             PreparedStatement pStmnt = cnnct.prepareStatement(sql);
+             ResultSet rs = pStmnt.executeQuery()) {
+            
+            while (rs.next()) {
+                UserBean ub = this.resultSetToBean(rs);
+                if (ub.getClinicId() != 0) {
+                    ClinicBean cb = new ClinicBean();
+                    cb.setClinicId(ub.getClinicId());
+                    cb.setClinicName(rs.getString("clinicName"));
+                }
+                ubs.add(ub);
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return ubs;
     }
 
     public boolean delRecord(int custId) {

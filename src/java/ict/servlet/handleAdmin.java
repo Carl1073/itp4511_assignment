@@ -44,7 +44,7 @@ public class handleAdmin extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            System.out.println("test");
+        System.out.println("test");
 
         String action = request.getParameter("action");
         HttpSession session = request.getSession(true);
@@ -91,6 +91,8 @@ public class handleAdmin extends HttpServlet {
             targetJSP = "/admin/systemSettings.jsp";
 
         } else if ("editUserPage".equalsIgnoreCase(action)) {
+            ArrayList<ClinicBean> clinics = cdb.queryClinic();
+            request.setAttribute("clinics", clinics);
             String idStr = request.getParameter("id");
             if (idStr != null) {
                 // Fetch specific user data for the edit form
@@ -100,7 +102,11 @@ public class handleAdmin extends HttpServlet {
             }
             // Forward to the form page (if no ID, it's "Add" mode)
             targetJSP = "/admin/editUser.jsp";
-        } else {
+        } else if ("profile".equalsIgnoreCase(action)) {
+            RequestDispatcher rd;
+            rd = getServletContext().getRequestDispatcher("/admin/profile.jsp");
+            rd.forward(request, response);
+        }else {
             // Handle unknown actions
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();

@@ -15,6 +15,7 @@ public class UserBean implements Serializable {
     private String gender; // M, F, or O
     private String role;   // Patient, Staff, or Admin
     private int clinicId = 0;  // for Staff and Admin
+    private String clinicName; // for Staff and Admin
 
     // Default No-argument Constructor
     public UserBean() {
@@ -103,7 +104,15 @@ public class UserBean implements Serializable {
 
     public void setClinicId(int clinicId) {
         this.clinicId = clinicId;
-    }    
+    }
+
+    public String getClinicName() {
+        return clinicName;
+    }
+
+    public void setClinicName(String clinicName) {
+        this.clinicName = clinicName;
+    }
     
     public String toString(){
         return "UserBean id" + userId;
