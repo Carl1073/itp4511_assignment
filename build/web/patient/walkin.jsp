@@ -11,6 +11,50 @@
             <script>
                 $(window).on('load', function () {
                     let isAlerted = false;
+
+                    async function callTTS(currentQueueNumber) {
+                        // 1. Submit TTS request
+                        const API_KEY = 'sk-tts-8f4ee1e79b3849faae4a10fd67636017';
+                        const BASE = 'https://api.tts.ai';
+                        const resp = await fetch(BASE + '/v1/tts/', {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": 'Bearer ' + API_KEY
+                            },
+                            body: JSON.stringify({
+                                model: "piper",
+                                text: "Ticket number " + currentQueueNumber + ", please proceed.",
+                                voice: "Amy (US)"
+                            })
+                        });
+                        const data = await resp.json();
+                        const uuid = data.uuid;
+
+                        // 2. Poll for result
+                        let result;
+                        while (true) {
+                            const poll = await fetch(BASE + '/v1/speech/results/?uuid=' + uuid, {
+                                headers: { "Authorization": 'Bearer ' + API_KEY }
+                            });
+                            result = await poll.json();
+
+                            if (result.status === "completed") {
+                                const audioResp = await fetch(result.result_url);
+                                const blob = await audioResp.blob();
+                                const url = URL.createObjectURL(blob);
+                                const player = document.getElementById("player");
+                                player.src = url;
+                                player.play();
+                                break;
+                            } else if (result.status === "failed") {
+                                console.error("Generation failed:", result.error);
+                                break;
+                            }
+                            await new Promise(r => setTimeout(r, 1500));
+                        }
+                    }
+
                     async function updateQueueStats() {
                         var clinicId = $('#clinicId').val();
                         var serviceId = $('#serviceId').val();
@@ -29,8 +73,9 @@
                             $('#statusDetail').text("* Showing status for " + serviceName + " in " + clinicName);
 
                             if (!isAlerted && current === currentQueueNumber) {
-                                alert("Dear patient, your ticket #" + currentQueueNumber + " is now being called. Please make your way to the clinic.");
+                                callTTS(currentQueueNumber);
                                 isAlerted = true;
+                                alert("Dear patient, your ticket #" + currentQueueNumber + " is now being called. Please make your way to the clinic.");
                             }
                         }
                     }
@@ -134,7 +179,7 @@
                                             </c:forEach>
                                         </select>
                                     </div>
-
+                                    <audio id="player" style="display: none;"></audio>
                                     <input type="submit" value="Get Queue Number"
                                         style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
                                 </form>

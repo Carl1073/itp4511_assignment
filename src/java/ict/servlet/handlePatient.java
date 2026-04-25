@@ -84,18 +84,6 @@ public class handlePatient extends HttpServlet {
             ArrayList<ClinicBean> clinics = cdb.queryClinic();
             ArrayList<ServiceBean> services = sdb.queryService();
 
-            // Optional: If you want to show the status for the FIRST clinic/service by default
-            if (!clinics.isEmpty() && !services.isEmpty()) {
-                int defaultClinicId = clinics.get(0).getClinicId();
-                int defaultServiceId = services.get(0).getServiceId();
-
-                int latestJoined = qdb.getNextQueueNumber(defaultClinicId, defaultServiceId) - 1;
-                int currentProgress = qdb.getCurrentCallingNumber(defaultClinicId, defaultServiceId);
-
-                request.setAttribute("latestJoined", latestJoined < 0 ? 0 : latestJoined);
-                request.setAttribute("currentProgress", currentProgress);
-            }
-
             request.setAttribute("clinics", clinics);
             request.setAttribute("services", services);
 
@@ -119,7 +107,7 @@ public class handlePatient extends HttpServlet {
             if (qb != null) {
                 if (qb.getStatus().equalsIgnoreCase("waiting")) {
                     queueNumber = String.valueOf(qb.getQueueNumber());
-                } else if ((qb.getStatus().equalsIgnoreCase("called") && latestJoined == qb.getQueueNumber())) {
+                } else if ((qb.getStatus().equalsIgnoreCase("called") && currentProgress == qb.getQueueNumber())) {
                     queueNumber = String.valueOf(qb.getQueueNumber());
                 }
             }
