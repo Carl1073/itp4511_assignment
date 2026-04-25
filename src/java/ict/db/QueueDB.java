@@ -180,6 +180,10 @@ public class QueueDB {
     public ArrayList<QueueBean> queryQueue() {
         return executeGenericQuery("");
     }
+    
+        public ArrayList<QueueBean> queryQueueByClinicService(int clinicId, int serviceId) {
+        return executeGenericQuery(" where q.patientId = ? and q.serviceId = ? ", clinicId, serviceId);
+    }
 
     public QueueBean queryQueueById(int queueId) {
         ArrayList<QueueBean> qbs = executeGenericQuery("WHERE q.queueId = ?", queueId);

@@ -155,6 +155,10 @@ public class AppointmentDB {
     public ArrayList<AppointmentBean> queryAppByUserId(int userId) {
         return executeGenericQuery(query + " Where u.userid = ? ", userId);
     }
+    
+        public ArrayList<AppointmentBean> queryAppByClinicServiceDate(int clinicId, int serviceId, Date date) {
+        return executeGenericQuery(query + " Where c.clinicId = ? and s.serviceId = ? and t.date = ? ", clinicId, serviceId, date);
+    }
 
     public ArrayList<AppointmentBean> queryAvailableSlot(int clinicId, Date date) {
         return executeGenericQuery("SELECT  t.*, "

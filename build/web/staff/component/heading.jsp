@@ -10,7 +10,7 @@
         <a href="${pageContext.request.contextPath}/handleStaff?action=queue">Queue</a>
         <a href="${pageContext.request.contextPath}/handleStaff?action=booking">Booking</a>
         <a href="${pageContext.request.contextPath}/handleStaff?action=outcome">Outcome</a>
-        <a href="${pageContext.request.contextPath}/handleStaff?action=service">Issue</a>
+        <a href="${pageContext.request.contextPath}/handleStaff?action=issue">Issue</a>
     </div>
 
     <input type="submit" class="logout-btn" name="logoutButton" value="Logout"/>
