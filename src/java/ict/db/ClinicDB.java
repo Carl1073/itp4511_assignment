@@ -133,8 +133,8 @@ public class ClinicDB {
         return executeGenericQuery("");
     }
     
-        public ClinicBean getClinicById(int id) {
-        ArrayList<ClinicBean> results = executeGenericQuery(query + " WHERE appId = ? ", id);
+    public ClinicBean getClinicById(int id) {
+        ArrayList<ClinicBean> results = executeGenericQuery(" WHERE clinicId = ? ", id);
         return results.isEmpty() ? null : results.get(0);
     }
 

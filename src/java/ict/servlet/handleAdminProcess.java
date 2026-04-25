@@ -113,6 +113,73 @@ public class handleAdminProcess extends HttpServlet {
             // 3. Redirect back to user list
             response.sendRedirect("admin/adminHome.jsp?deleted=" + success);
             return;
+
+        } else if ("addClinic".equalsIgnoreCase(action)) {
+            // Add new clinic
+            String clinicName = request.getParameter("clinicName");
+            String address = request.getParameter("address");
+            String openTimeStr = request.getParameter("openTime");
+            String closeTimeStr = request.getParameter("closeTime");
+            String isWalkinStr = request.getParameter("isWalkinEnabled");
+            
+            boolean isWalkinEnabled = "true".equalsIgnoreCase(isWalkinStr) || "on".equalsIgnoreCase(isWalkinStr);
+            
+            ClinicBean cb = new ClinicBean();
+            cb.setClinicName(clinicName);
+            cb.setAddress(address);
+            cb.setOpenTime(java.sql.Time.valueOf(openTimeStr + ":00"));
+            cb.setCloseTime(java.sql.Time.valueOf(closeTimeStr + ":00"));
+            cb.setIsWalkinEnabled(isWalkinEnabled);
+            
+            boolean success = cdb.addRecord(cb);
+            
+            if (success) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&successMsg=Clinic added successfully!");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&errorMsg=Failed to add clinic!");
+            }
+            return;
+
+        } else if ("updateClinic".equalsIgnoreCase(action)) {
+            // Update existing clinic
+            String clinicIdStr = request.getParameter("clinicId");
+            String clinicName = request.getParameter("clinicName");
+            String address = request.getParameter("address");
+            String openTimeStr = request.getParameter("openTime");
+            String closeTimeStr = request.getParameter("closeTime");
+            String isWalkinStr = request.getParameter("isWalkinEnabled");
+            
+            boolean isWalkinEnabled = "true".equalsIgnoreCase(isWalkinStr) || "on".equalsIgnoreCase(isWalkinStr);
+            
+            ClinicBean cb = new ClinicBean();
+            cb.setClinicId(Integer.parseInt(clinicIdStr));
+            cb.setClinicName(clinicName);
+            cb.setAddress(address);
+            cb.setOpenTime(java.sql.Time.valueOf(openTimeStr + ":00"));
+            cb.setCloseTime(java.sql.Time.valueOf(closeTimeStr + ":00"));
+            cb.setIsWalkinEnabled(isWalkinEnabled);
+            
+            int result = cdb.editRecord(cb);
+            
+            if (result > 0) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&successMsg=Clinic updated successfully!");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&errorMsg=Failed to update clinic!");
+            }
+            return;
+
+        } else if ("deleteClinic".equalsIgnoreCase(action)) {
+            // Delete clinic
+            String clinicIdStr = request.getParameter("clinicId");
+            
+            boolean success = cdb.delRecord(clinicIdStr);
+            
+            if (success) {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&successMsg=Clinic deleted successfully!");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configClinic&errorMsg=Failed to delete clinic!");
+            }
+            return;
         } else {
             // Handle unknown actions
             response.setContentType("text/html;charset=UTF-8");
