@@ -160,7 +160,7 @@ private ArrayList<UserBean> executeGenericQuery(String sql, Object... params) {
         return executeGenericQuery("");
     }
 
-    public UserBean queryUserByID(int id) {
+    public UserBean queryUserByID(String id) {
         ArrayList<UserBean> results = executeGenericQuery(" WHERE userid = ?", id);
         return results.isEmpty() ? null : results.get(0);
     }

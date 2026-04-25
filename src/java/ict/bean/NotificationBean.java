@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 public class NotificationBean implements Serializable {
+
     private int notifId;
     private int userId;
     private UserBean userBean;
@@ -22,6 +23,11 @@ public class NotificationBean implements Serializable {
         this.message = message;
         this.isRead = isRead;
         this.createdAt = createdAt;
+    }
+
+    public NotificationBean(int userId, String message) {
+        this.userId = userId;
+        this.message = message;
     }
 
     // Getters and Setters

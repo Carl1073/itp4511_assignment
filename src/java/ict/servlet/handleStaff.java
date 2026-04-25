@@ -88,6 +88,8 @@ public class handleStaff extends HttpServlet {
             rd.forward(request, response);
         } else if ("process".equalsIgnoreCase(action)) {
             RequestDispatcher rd;
+            request.setAttribute("clinics", cdb.queryClinic());
+            request.setAttribute("services", sdb.queryService());
             rd = getServletContext().getRequestDispatcher("/staff/pendingBookings.jsp");
             rd.forward(request, response);
         } else if ("outcome".equalsIgnoreCase(action)) {
