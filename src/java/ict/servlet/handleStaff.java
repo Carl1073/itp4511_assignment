@@ -100,7 +100,11 @@ public class handleStaff extends HttpServlet {
             RequestDispatcher rd;
             rd = getServletContext().getRequestDispatcher("/staff/reportIssue.jsp");
             rd.forward(request, response);
-        } else {
+        } else if ("profile".equalsIgnoreCase(action)) {
+            RequestDispatcher rd;
+            rd = getServletContext().getRequestDispatcher("/staff/profile.jsp");
+            rd.forward(request, response);
+        }else {
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();
             out.println("No such action!!!");

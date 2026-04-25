@@ -85,7 +85,23 @@ public class handleAdmin extends HttpServlet {
         } else if ("settings".equalsIgnoreCase(action)) {
             targetJSP = "/admin/systemSettings.jsp";
 
-        } else {
+        } else if ("editUserPage".equalsIgnoreCase(action)) {
+            ArrayList<ClinicBean> clinics = cdb.queryClinic();
+            request.setAttribute("clinics", clinics);
+            String idStr = request.getParameter("id");
+            if (idStr != null) {
+                // Fetch specific user data for the edit form
+                int id = Integer.parseInt(idStr);
+                UserBean userToEdit = udb.queryUserByID(id);
+                request.setAttribute("editUser", userToEdit);
+            }
+            // Forward to the form page (if no ID, it's "Add" mode)
+            targetJSP = "/admin/editUser.jsp";
+        } else if ("profile".equalsIgnoreCase(action)) {
+            RequestDispatcher rd;
+            rd = getServletContext().getRequestDispatcher("/admin/profile.jsp");
+            rd.forward(request, response);
+        }else {
             // Handle unknown actions
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();

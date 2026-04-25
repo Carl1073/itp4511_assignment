@@ -14,8 +14,49 @@
     </head>
     <body>
         <%@ include file="component/heading.jsp" %>
+<<<<<<< HEAD
         <jsp:useBean id="userBean" class="ict.bean.UserBean" scope="session"/>
         <ict:hello name="${userBean.fullName}"/>
         <h1>This is home page.</h1>
     </body>
 </html>
+=======
+
+
+        <h2>User Management</h2>
+        <a href="${pageContext.request.contextPath}/handleAdmin?action=editUserPage">Add New User</a>
+        <br/><br/>
+        <table border="1" style="width:100%; border-collapse: collapse;">
+            <tr>
+                <th>ID</th><th>Username</th><th>Full Name</th><th>Role</th><th>Clinic</th><th>Actions</th>
+            </tr>
+            <%
+                ArrayList<UserBean> users = (ArrayList<UserBean>) request.getAttribute("users");
+                if (users != null) {
+                    for (UserBean u : users) {
+            %>
+            <tr>
+                <td><%= u.getUserId()%></td>
+                <td><%= u.getUsername()%></td>
+                <td><%= u.getFullName()%></td>
+                <td><%= u.getRole()%></td>
+                <td>
+                    <%-- Check if the role is staff to display clinic name --%>
+                    <% if ("staff".equalsIgnoreCase(u.getRole()) || "admin".equalsIgnoreCase(u.getRole())) {%>
+                    <%= u.getClinicName()%>
+                    <% } else { %>
+                    N/A
+                    <% }%>
+                </td>
+                <td>
+                    <a href="${pageContext.request.contextPath}/handleAdmin?action=editUserPage&id=<%= u.getUserId()%>">Edit</a> | 
+                    <a href="javascript:confirmDelete('<%= u.getUserId()%>')">Delete</a>
+                </td>
+            </tr>
+            <% }
+                }%>
+        </table>
+    </div>
+</body>
+</html>
+>>>>>>> 0a5e955506cd77d67007995aeea5d712fa813eea
