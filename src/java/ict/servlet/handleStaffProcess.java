@@ -56,29 +56,36 @@ public class handleStaffProcess extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
         HttpSession session = request.getSession(true);
+        session.removeAttribute("description");
         UserBean user = (UserBean) session.getAttribute("userBean");
         // Inside handleStaff.java doPost/doGet
         if ("submitIssue".equalsIgnoreCase(action)) {
-            // 1. Extract form data
+            // 1. Get parameters
+            String appId = request.getParameter("appId");
             String eventType = request.getParameter("eventType");
-            String description = request.getParameter("description");
-            int staffId = user.getUserId(); //
-
-            // 2. Prepare the Bean
+            String rawDescription = request.getParameter("description");
             IncidentLogBean ib = new IncidentLogBean();
-            ib.setUserId(staffId);
-            ib.setEventType(eventType);
-            ib.setDescription(description);
 
-            // 3. Database operation using IncidentLogDB
+            // 2. Format description to include App ID if provided
+            String finalDescription = rawDescription;
+            if (appId != null && !appId.trim().isEmpty()) {
+                ib.setAppId(Integer.parseInt(appId));
+                finalDescription = "[AppID: " + appId + "] " + rawDescription;
+            }
+
+            // 3. Prepare the Bean
+            ib.setUserId(user.getUserId()); // Get staff ID from session
+            ib.setEventType(eventType);
+            ib.setDescription(finalDescription);
+
+            // 4. Save to DB
             boolean success = ildb.addRecord(ib);
 
-            // 4. Use Redirect instead of Forward
+            // 5. Redirect back to staff home with status
             if (success) {
-                // Redirect to a success page or home with a query parameter
-                response.sendRedirect("staff/staffHome.jsp?status=success");
+                response.sendRedirect("staff/reportIssue.jsp?status=reported");
             } else {
-                // Redirect to the form again with an error flag
+                session.setAttribute("description", rawDescription);
                 response.sendRedirect("staff/reportIssue.jsp?status=error");
             }
         } else {

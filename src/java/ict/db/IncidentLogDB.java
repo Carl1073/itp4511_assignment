@@ -76,7 +76,7 @@ public class IncidentLogDB {
                     + "createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                     + "appId INT, "
                     + "PRIMARY KEY (logId),"
-                    + "FOREIGN KEY (userId) REFERENCES user(userId)"
+                    + "FOREIGN KEY (userId) REFERENCES user(userId), "
                     + "FOREIGN KEY (appId) REFERENCES appointment(appId)"
                     + ")";
             stmnt.execute(sql);
@@ -93,12 +93,18 @@ public class IncidentLogDB {
         boolean isSuccess = false;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "INSERT INTO incident_log (userId, eventType, description, appId) VALUES (?,?,?,?)";
-            pStmnt = cnnct.prepareStatement(preQueryStatement);
+            String preQueryStatement;
+            if (ib.getAppId() == 0) {
+                preQueryStatement = "INSERT INTO incident_log (userId, eventType, description) VALUES (?,?,?)";
+                pStmnt = cnnct.prepareStatement(preQueryStatement);
+            } else {
+                preQueryStatement = "INSERT INTO incident_log (userId, eventType, description, appId) VALUES (?,?,?,?)";
+                pStmnt = cnnct.prepareStatement(preQueryStatement);
+                pStmnt.setInt(4, ib.getAppId());
+            }
             pStmnt.setInt(1, ib.getUserId());
             pStmnt.setString(2, ib.getEventType());
             pStmnt.setString(3, ib.getDescription());
-            pStmnt.setInt(4, ib.getAppId());
 
             int rowCount = pStmnt.executeUpdate();
             if (rowCount >= 1) {
