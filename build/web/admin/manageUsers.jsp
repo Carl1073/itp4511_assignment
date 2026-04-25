@@ -1,9 +1,4 @@
-<%-- 
-    Document   : clientHome
-    Created on : 2026年3月24日, 下午08:54:57
-    Author     : Tong
---%>
-
+<%@page import="java.util.ArrayList, ict.bean.UserBean"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>

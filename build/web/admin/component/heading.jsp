@@ -8,12 +8,13 @@
     <div class="nav-links">
         <a href="${pageContext.request.contextPath}/admin/adminHome.jsp">Home</a>
         <a href="${pageContext.request.contextPath}/handleAdmin?action=manageUsers">Users</a>
-        <a href="${pageContext.request.contextPath}/handleAdmin?action=configClinic">Clinics & Services</a>
+        <a href="${pageContext.request.contextPath}/handleAdmin?action=configClinic">Clinics</a>
+        <a href="${pageContext.request.contextPath}/handleAdmin?action=configService">Services</a>
         <a href="${pageContext.request.contextPath}/handleAdmin?action=manageQuota">Quotas</a>
         <a href="${pageContext.request.contextPath}/handleAdmin?action=reports">Reports</a>
         <a href="${pageContext.request.contextPath}/handleAdmin?action=viewLogs">Incident Logs</a>
         <a href="${pageContext.request.contextPath}/handleAdmin?action=settings">Policy Settings</a>
-                <a href="${pageContext.request.contextPath}/handleAdmin?action=profile">Profile</a>
+        <a href="${pageContext.request.contextPath}/handleAdmin?action=profile">Profile</a>
 
     </div>
 

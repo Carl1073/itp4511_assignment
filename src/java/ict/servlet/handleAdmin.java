@@ -65,10 +65,25 @@ public class handleAdmin extends HttpServlet {
 
         } else if ("configClinic".equalsIgnoreCase(action)) {
             ArrayList<ClinicBean> clinics = cdb.queryClinic();
-            ArrayList<ServiceBean> services = sdb.queryService();
-            request.setAttribute("clinics", clinics);
-            request.setAttribute("services", services);
+            request.setAttribute("clinicList", clinics);
             targetJSP = "/admin/configClinic.jsp";
+
+        } else if ("editClinic".equalsIgnoreCase(action)) {
+            ArrayList<ClinicBean> clinics = cdb.queryClinic();
+            request.setAttribute("clinicList", clinics);
+            
+            String clinicIdStr = request.getParameter("clinicId");
+            if (clinicIdStr != null && !clinicIdStr.isEmpty()) {
+                int clinicId = Integer.parseInt(clinicIdStr);
+                ClinicBean selectedClinic = cdb.getClinicById(clinicId);
+                request.setAttribute("clinic", selectedClinic);
+            }
+            targetJSP = "/admin/configClinic.jsp";
+
+        } else if ("configService".equalsIgnoreCase(action)) {
+            ArrayList<ServiceBean> services = sdb.queryService();
+            request.setAttribute("services", services);
+            targetJSP = "/admin/configService.jsp";
 
         } else if ("manageQuota".equalsIgnoreCase(action)) {
             // Logic to fetch capacity/timeslots

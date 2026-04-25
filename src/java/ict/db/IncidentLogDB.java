@@ -76,7 +76,7 @@ public class IncidentLogDB {
                     + "createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                     + "appId INT, "
                     + "PRIMARY KEY (logId),"
-                    + "FOREIGN KEY (userId) REFERENCES user(userId)"
+                    + "FOREIGN KEY (userId) REFERENCES user(userId),"
                     + "FOREIGN KEY (appId) REFERENCES appointment(appId)"
                     + ")";
             stmnt.execute(sql);
