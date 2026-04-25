@@ -138,6 +138,11 @@ public class TimeslotDB {
         return executeGenericQuery(query);
     }
 
+    public TimeslotBean queryTimeslotByTsId(int timeslotid) {
+        ArrayList<TimeslotBean> results = executeGenericQuery(" where timeslotId = ?", timeslotid);
+        return results.isEmpty() ? null : results.get(0);
+    }
+
     public ArrayList<TimeslotBean> queryTimeslotbyDate(Date date) {
         return executeGenericQuery(query + "where date = ? ", date);
     }
@@ -203,8 +208,8 @@ public class TimeslotDB {
         }
         return null;
     }
-    
-        public ArrayList<TimeslotBean> queryAllAvailableTimeslots() {
+
+    public ArrayList<TimeslotBean> queryAllAvailableTimeslots() {
         Connection cnnct = null;
         PreparedStatement pStmnt = null;
         try {

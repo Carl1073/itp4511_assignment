@@ -15,6 +15,7 @@ import ict.bean.*;
  * @author 240708635
  */
 public class QueueDB {
+
     private String url = "";
     private String username = "";
     private String password = "";
@@ -113,6 +114,46 @@ public class QueueDB {
             ex.printStackTrace();
         }
         return isSuccess;
+    }
+
+    // Add this to QueueDB.java
+    public int getCurrentCallingNumber(int clinicId, int serviceId) {
+        int currentNum = 0;
+        // We look for the maximum number that is NOT 'Waiting' to see who was last called
+        String sql = "SELECT MAX(queueNumber) FROM queue WHERE clinicId = ? AND serviceId = ? "
+                + "AND status IN ('Called', 'Served') AND DATE(entryTime) = CURDATE()";
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+            pStmnt.setInt(1, clinicId);
+            pStmnt.setInt(2, serviceId);
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                if (rs.next()) {
+                    currentNum = rs.getInt(1);
+                }
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return currentNum;
+    }
+
+    // Add this method to QueueDB.java
+    public int getNextQueueNumber(int clinicId, int serviceId) {
+        int nextNum = 1;
+        String sql = "SELECT MAX(queueNumber) FROM queue WHERE clinicId = ? AND serviceId = ? AND DATE(entryTime) = CURDATE()";
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+            pStmnt.setInt(1, clinicId);
+            pStmnt.setInt(2, serviceId);
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                if (rs.next()) {
+                    nextNum = rs.getInt(1) + 1;
+                }
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return nextNum;
     }
 
     private ArrayList<QueueBean> executeGenericQuery(String sql, Object... params) {

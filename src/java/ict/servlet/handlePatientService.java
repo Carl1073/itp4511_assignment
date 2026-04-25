@@ -15,6 +15,8 @@ public class handlePatientService extends HttpServlet {
     private ClinicDB cdb;
     private AppointmentDB adb;
     private TimeslotDB tdb;
+    private QueueDB qdb;
+    private NotificationDB ndb;
 
     @Override
     public void init() {
@@ -25,6 +27,8 @@ public class handlePatientService extends HttpServlet {
         cdb = new ClinicDB(dbUrl, dbUser, dbPassword);
         adb = new AppointmentDB(dbUrl, dbUser, dbPassword);
         tdb = new TimeslotDB(dbUrl, dbUser, dbPassword);
+        qdb = new QueueDB(dbUrl, dbUser, dbPassword);
+        ndb = new NotificationDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -33,6 +37,7 @@ public class handlePatientService extends HttpServlet {
         String action = request.getParameter("action");
         HttpSession session = request.getSession(true);
         UserBean user = (UserBean) session.getAttribute("userBean");
+        NotificationBean nb = new NotificationBean();
         if (user == null) {
             response.sendRedirect("login.jsp");
             return;
@@ -46,8 +51,18 @@ public class handlePatientService extends HttpServlet {
                 ab.setPatientId(user.getUserId());
                 ab.setTimeslotId(timeslotid);
                 ab.setStatus("Confirmed");
-
+                TimeslotBean tb = tdb.queryTimeslotByTsId(timeslotid);
+                System.out.println(tb);
                 if (adb.addRecord(ab)) {
+                    nb.setUserId(user.getUserId());
+                    
+                    nb.setMessage("You have successfully make a booking.  "
+                            + "Clinic: " + tb.getClinicName()
+                            + "Service: " + tb.getServiceName()
+                            + "Date: " + ab.getTimeslotBean().getDate()
+                            + "Time: " + ab.getTimeslotBean().getOpenTime()
+                    );
+                    ndb.addRecord(nb); // Save to notification table
                     refreshAndForward(request, response, user.getUserId());
                 } else {
                     response.sendRedirect("error.jsp");
@@ -63,7 +78,7 @@ public class handlePatientService extends HttpServlet {
                 for (AppointmentBean ab : apps) {
                     if (ab.getAppId() == targetId) {
                         ab.setStatus("Cancelled");
-                        adb.editRecord(ab); // Assuming editRecord handles the update
+                        adb.editRecord(ab);
                         break;
                     }
                 }
@@ -123,6 +138,38 @@ public class handlePatientService extends HttpServlet {
                     response.sendRedirect("error.jsp");
                 }
             }
+        } else if ("joinQueue".equalsIgnoreCase(action)) {
+            int clinicId = Integer.parseInt(request.getParameter("clinicId"));
+            int serviceId = Integer.parseInt(request.getParameter("serviceId"));
+
+            ArrayList<ServiceBean> services = sdb.queryService();
+            request.setAttribute("services", services);
+            ArrayList<ClinicBean> clinics = cdb.queryClinic();
+            request.setAttribute("clinics", clinics);
+
+            QueueBean qb = new QueueBean();
+            qb.setPatientId(user.getUserId());
+            qb.setClinicId(clinicId);
+            qb.setServiceId(serviceId);
+            qb.setStatus("Waiting");
+
+            // Logic to calculate the next number using the updated QueueDB
+            int nextNum = qdb.getNextQueueNumber(clinicId, serviceId);
+            qb.setQueueNumber(nextNum);
+
+            if (qdb.addRecord(qb)) {
+                // Store message in session so it survives the redirect
+                nb.setUserId(user.getUserId());
+                nb.setMessage("You have successfully joined the walk-in queue. Your number is: " + nextNum);
+                ndb.addRecord(nb); // Save to notification table
+                session.setAttribute("msg", "Successfully joined! Your number is: " + nextNum);
+            } else {
+                session.setAttribute("msg", "Failed to join queue. Please try again.");
+            }
+
+            // Redirect back to the walk-in page (PRG Pattern)
+            response.sendRedirect("handlePatient?action=walkin");
+            return; // Ensure no further code is executed after redirect
         } else {
             response.setContentType("text/html;charset=UTF-8");
             response.getWriter().println("No such action!!!");

@@ -27,6 +27,7 @@ public class handlePatient extends HttpServlet {
     private TimeslotDB tdb;
     private NotificationDB ndb;
     private AppointmentDB adb;
+    private QueueDB qdb;
 
     @Override
     public void init() {
@@ -38,6 +39,7 @@ public class handlePatient extends HttpServlet {
         tdb = new TimeslotDB(dbUrl, dbUser, dbPassword);
         ndb = new NotificationDB(dbUrl, dbUser, dbPassword);
         adb = new AppointmentDB(dbUrl, dbUser, dbPassword);
+        qdb = new QueueDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -68,8 +70,8 @@ public class handlePatient extends HttpServlet {
             rd = getServletContext().getRequestDispatcher("/patient/booking.jsp");
             rd.forward(request, response);
         } else if ("notification".equalsIgnoreCase(action)) {
-            ArrayList<ServiceBean> services = sdb.queryService();
-            request.setAttribute("services", services);
+            ArrayList<NotificationBean> notifications = ndb.queryNotificationByUserId(user.getUserId());
+            request.setAttribute("notifications", notifications);
             RequestDispatcher rd;
             rd = getServletContext().getRequestDispatcher("/patient/notification.jsp");
             rd.forward(request, response);
@@ -78,9 +80,40 @@ public class handlePatient extends HttpServlet {
             rd = getServletContext().getRequestDispatcher("/patient/profile.jsp");
             rd.forward(request, response);
         } else if ("walkin".equalsIgnoreCase(action)) {
-            RequestDispatcher rd;
-            rd = getServletContext().getRequestDispatcher("/patient/walkin.jsp");
+            ArrayList<ClinicBean> clinics = cdb.queryClinic();
+            ArrayList<ServiceBean> services = sdb.queryService();
+
+            // Optional: If you want to show the status for the FIRST clinic/service by default
+            if (!clinics.isEmpty() && !services.isEmpty()) {
+                int defaultClinicId = clinics.get(0).getClinicId();
+                int defaultServiceId = services.get(0).getServiceId();
+
+                int latestJoined = qdb.getNextQueueNumber(defaultClinicId, defaultServiceId) - 1;
+                int currentProgress = qdb.getCurrentCallingNumber(defaultClinicId, defaultServiceId);
+
+                request.setAttribute("latestJoined", latestJoined < 0 ? 0 : latestJoined);
+                request.setAttribute("currentProgress", currentProgress);
+            }
+
+            request.setAttribute("clinics", clinics);
+            request.setAttribute("services", services);
+
+            RequestDispatcher rd = getServletContext().getRequestDispatcher("/patient/walkin.jsp");
             rd.forward(request, response);
+        } else if ("getQueueStatus".equalsIgnoreCase(action)) {
+            int clinicId = Integer.parseInt(request.getParameter("clinicId"));
+            int serviceId = Integer.parseInt(request.getParameter("serviceId"));
+
+            int latestJoined = qdb.getNextQueueNumber(clinicId, serviceId) - 1;
+            int currentProgress = qdb.getCurrentCallingNumber(clinicId, serviceId);
+
+            // Return data as simple JSON
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            String json = "{\"latest\":" + (latestJoined < 0 ? 0 : latestJoined)
+                    + ", \"current\":" + currentProgress + "}";
+            response.getWriter().write(json);
+            return; // Stop further processing
         } else if ("search".equalsIgnoreCase(action)) {
             ArrayList<ServiceBean> services = sdb.queryService();
             request.setAttribute("services", services);

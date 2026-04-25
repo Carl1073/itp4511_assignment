@@ -6,6 +6,7 @@
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/patientHome.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handlePatientService.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/booking.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handleNotification.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/service.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/bean/TimeslotBean.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/bean/AppointmentBean.java</file>
@@ -15,23 +16,23 @@
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/Database.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/ServiceDB.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/processBooking.java</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/WEB-INF/ict-taglib.tld</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/QueueDB.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/TimeslotDB.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/profile.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/reschedule.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/UserDB.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/loginController.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/bean/NotificationBean.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/bean/IncidentLogBean.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/AppointmentDB.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/CheckUsernameServlet.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/java/StartUp.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/registerController.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/tag/DropdownTag.java</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/ClinicDB.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handlePatient.java</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/bean/ClinicBean.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/ClinicDB.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/registerSuccess.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/CSS/styles.css</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/WEB-INF/web.xml</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/IncidentLogDB.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/walkin.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/bean/QueueBean.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/component/heading.jsp</file>

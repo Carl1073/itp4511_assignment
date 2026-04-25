@@ -101,7 +101,6 @@ tbody tr:nth-of-type(even) {
 /* Hover effect to help users track rows */
 tbody tr:hover {
     background-color: #f1f1f1;
-    cursor: pointer;
 }
 
 /* Select Menu Styling */
@@ -208,3 +207,31 @@ body {
     gap: 20px; 
     align-items: center;
 }
+
+/* Button Styling */
+    .btn{
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background-color: #15a7bb;
+        color: white;
+        text-decoration: none;
+        border-radius: 9999px; /* Pill shape */
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: transform 0.1s;
+    }
+
+    .btn:hover {
+        transform: scale(1.05);
+        background-color: #047857;
+    }
+
+    .btn-disable {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background-color: #e2e8f0;
+        color: #64748b;
+        border-radius: 9999px;
+        font-size: 0.85rem;
+        cursor: not-allowed;
+    }

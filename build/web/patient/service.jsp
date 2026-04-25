@@ -21,19 +21,19 @@
             <div class="search">
                 <div class="form-row">
                     <label for="Service">Service</label>
-                    <select id="serviceId"  name="serviceId">
+                    <select id="serviceId"  name="serviceId" required>
                         <ict:dropdown items="${services}" name="serviceId" option="serviceName" />
                     </select>
                 </div>
                 <div class="form-row">
                     <label for="Clinic">Clinic</label>
-                    <select  id="clinicId" name="clinicId">
+                    <select  id="clinicId" name="clinicId" required>
                         <ict:dropdown items="${clinics}" name="clinicId" option="clinicName" />
                     </select>
                 </div>
                 <div class="form-row">
                     <label for="date">Date</label>
-                    <input name="date"  id="date" type="date"/>
+                    <input name="date"  id="date" type="date" required/>
                 </div>
             </div>
             <input type="submit" value="Search"/>
@@ -57,7 +57,11 @@
                                 out.println("<tr>");
                                 out.println("<th>" + t.getOpenTime() + "</th>");
                                 out.println("<th>" + t.getRemaining() + "/" + t.getQuotaPerSlot() + "</th>");
-                                out.println("<th><a href='handlePatientService?action=booking&tsId=" + t.getTimeslotId() + "'>Book</th>");
+                                if (t.getRemaining() > 0) {
+                                        out.println("<td><a href='handlePatientService?action=booking&tsId=" + t.getTimeslotId() + "' class='btn'>Book</a></td>");
+                                    } else {
+                                        out.println("<td><span class='btn-disabled'>Full</span></td>");
+                                    }
                                 out.println("</tr>");
                             }
                             out.println("</table>");
@@ -69,23 +73,5 @@
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('date').value = today;
 
-        document.getElementById('searchForm').addEventListener('submit', function (e) {
-            const serviceSelect = document.getElementById('serviceId');
-            const clinicSelect = document.getElementById('clinicId');
-
-            // Check Service
-            if (!serviceSelect.value) {
-                e.preventDefault(); // This stops the redirect/reload
-                alert('Please select a service.');
-                return false; // Exit the function so we don't alert twice
-            }
-
-            // Check Clinic
-            if (!clinicSelect.value) {
-                e.preventDefault();
-                alert('Please select a clinic.');
-                return false;
-            }
-        });
     </script>
 </html>

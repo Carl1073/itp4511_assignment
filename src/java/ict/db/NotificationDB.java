@@ -92,11 +92,10 @@ public class NotificationDB {
         boolean isSuccess = false;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "INSERT INTO notification (userId, message, isRead) VALUES (?,?,?)";
+            String preQueryStatement = "INSERT INTO notification (userId, message) VALUES (?,?)";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setInt(1, nb.getUserId());
             pStmnt.setString(2, nb.getMessage());
-            pStmnt.setBoolean(3, nb.getIsRead());
             int rowCount = pStmnt.executeUpdate();
             if (rowCount >= 1) {
                 isSuccess = true;
@@ -113,7 +112,7 @@ public class NotificationDB {
         ArrayList<NotificationBean> nbs = new ArrayList<>();
         // Try-with-resources automatically closes Connection, Statement, and ResultSet
         try (Connection cnnct = getConnection();
-                PreparedStatement pStmnt = cnnct.prepareStatement(query + sql)) {
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
 
             for (int i = 0; i < params.length; i++) {
                 pStmnt.setObject(i + 1, params[i]);
@@ -131,7 +130,11 @@ public class NotificationDB {
     }
 
     public ArrayList<NotificationBean> queryNotification() {
-        return executeGenericQuery("");
+        return executeGenericQuery(query);
+    }
+
+    public ArrayList<NotificationBean> queryNotificationByUserId(int userId) {
+        return executeGenericQuery(query + " Where u.userId = ? ORDER BY createdAt DESC ", userId);
     }
 
     public boolean delRecord(String custId) {
@@ -161,6 +164,18 @@ public class NotificationDB {
             ex.printStackTrace();
         }
         return isSuccess;
+    }
+
+    public boolean markAsRead(int notifId) {
+        String sql = "UPDATE notification SET isRead = true WHERE notifId = ?";
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+            pStmnt.setInt(1, notifId);
+            return pStmnt.executeUpdate() > 0;
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+            return false;
+        }
     }
 
     public int editRecord(NotificationBean nb) {
