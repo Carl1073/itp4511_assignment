@@ -202,7 +202,7 @@ public class handlePatientService extends HttpServlet {
             Boolean isAlreadyInQueue = qdb.isAlreadyInQueue(ub.getUserId(), clinicId, serviceId);
 
             if (isAlreadyInQueue) {
-                ndb.addRecord(new NotificationBean(ub.getUserId(), "You already has a queue number already!"));
+                ndb.addRecord(new NotificationBean(ub.getUserId(), "Sorry, you already have a queue number for this service."));
             } else if (qdb.addRecord(qb)) {
                 // Store message in session so it survives the redirect
                 nb.setUserId(user.getUserId());

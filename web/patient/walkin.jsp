@@ -11,7 +11,6 @@
             <script>
                 $(window).on('load', function () {
                     let isAlerted = false;
-
                     async function updateQueueStats() {
                         var clinicId = $('#clinicId').val();
                         var serviceId = $('#serviceId').val();
@@ -39,6 +38,20 @@
                     setInterval(async () => {
                         await updateQueueStats();
                     }, 500);
+
+                    $('#walkinForm').on('submit', function (e) {
+                        e.preventDefault();
+
+                        const $currentQueueNumber = $('#currentQueueNumber');
+
+                        if ($currentQueueNumber.text() !== '--') {
+                            alert("Sorry, you already have a queue number for this service.");
+                            return;
+                        }
+
+                        // If allowed, submit via AJAX or manually
+                        this.submit(); // native form submit, bypasses jQuery handler
+                    });
 
                     // Update when either dropdown changes
                     $('#clinicId, #serviceId').on('change', updateQueueStats);
