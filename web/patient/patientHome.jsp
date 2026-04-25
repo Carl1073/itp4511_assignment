@@ -15,28 +15,7 @@
     <body>
         <%@ include file="component/heading.jsp" %>
         <jsp:useBean id="userBean" class="ict.bean.UserBean" scope="session"/>
-                <%-- feedback messages --%>
-        <div class="message-container">
-            <%
-                String error = request.getParameter("error");
-                if ("full".equals(error)) {
-            %>
-            <div class="red">
-                <strong>Booking Failed:</strong> This timeslot is currently full. Please select another time.
-            </div>
-            <%
-            } else if ("alreadyBooked".equals(error)) {
-            %>
-            <div class="yellow">
-                <strong>Duplicate Booking:</strong> You already have an active appointment for this timeslot.
-            </div>
-            <%
-                }
-            %>
-
-        </div>
         <ict:hello name="${userBean.fullName}"/>
         <h1>This is home page.</h1>
-        
     </body>
 </html>

@@ -1,19 +1,26 @@
+<%-- 
+    Document   : clientHome
+    Created on : 2026年3月24日, 下午08:54:57
+    Author     : Tong
+--%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="ict.bean.UserBean, java.util.ArrayList"%>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>User Management</title>
-        <script type="text/javascript">
-            function confirmDelete(id) {
-                if (confirm("Are you sure you want to delete user ID: " + id + "?")) {
-                    window.location.href = "${pageContext.request.contextPath}/handleAdminProcess?action=deleteUser&id=" + id;
-                }
-            }
-        </script>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Home page</title>
+
     </head>
     <body>
         <%@ include file="component/heading.jsp" %>
+<<<<<<< HEAD
+        <jsp:useBean id="userBean" class="ict.bean.UserBean" scope="session"/>
+        <ict:hello name="${userBean.fullName}"/>
+        <h1>This is home page.</h1>
+    </body>
+</html>
+=======
 
 
         <h2>User Management</h2>
@@ -52,3 +59,4 @@
     </div>
 </body>
 </html>
+>>>>>>> 0a5e955506cd77d67007995aeea5d712fa813eea

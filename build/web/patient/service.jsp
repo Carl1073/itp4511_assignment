@@ -16,7 +16,6 @@
     <body>
         <%@ include file="component/heading.jsp" %>
         <jsp:useBean id="userBean" class="ict.bean.UserBean" scope="session"/>
-
         <form action="handlePatient" method="post" id="searchForm">
             <input type="hidden" name="action" value="search">
             <div class="search">
@@ -65,22 +64,22 @@
                             TimeslotBean t = timeslots.get(i);
                             out.println("<tr>");
                             out.println("<td>" + t.getOpenTime() + "</td>");
-                            out.println("<td>" + t.getRemaining() + "/" + t.getQuotaPerSlot() + "</td>");
-                            if (t.getRemaining() > 0) {
-                                out.println("<td><a href='handlePatientService?action=booking&tsId=" + t.getTimeslotId() + "' class='btn'>Book</a></td>");
-                            } else {
-                                out.println("<td><span class='btn-disabled'>Full</span></td>");
+                                out.println("<td>" + t.getRemaining() + "/" + t.getQuotaPerSlot() + "</td>");
+                                if (t.getRemaining() > 0) {
+                                        out.println("<td><a href='handlePatientService?action=booking&tsId=" + t.getTimeslotId() + "' class='btn'>Book</a></td>");
+                                    } else {
+                                        out.println("<td><span class='btn-disabled'>Full</span></td>");
+                                    }
+                                out.println("</tr>");
                             }
-                            out.println("</tr>");
+                            out.println("</table>");
                         }
-                        out.println("</table>");
-                    }
-                %>
+                    %>
 
-                </body>
-            <script>
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('date').value = today;
+    </body>
+    <script>
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
 
-            </script>
+    </script>
 </html>

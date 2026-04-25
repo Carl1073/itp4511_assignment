@@ -54,6 +54,7 @@ public class handlePatient extends HttpServlet {
         String action = request.getParameter("action");
         HttpSession session = request.getSession(true);
         UserBean user = (UserBean) session.getAttribute("userBean");
+
         if ("service".equalsIgnoreCase(action)) {
             ArrayList<ServiceBean> services = sdb.queryService();
             request.setAttribute("services", services);
@@ -101,18 +102,33 @@ public class handlePatient extends HttpServlet {
             RequestDispatcher rd = getServletContext().getRequestDispatcher("/patient/walkin.jsp");
             rd.forward(request, response);
         } else if ("getQueueStatus".equalsIgnoreCase(action)) {
+            int patientId = ((UserBean) request.getSession().getAttribute("userBean")).getUserId();
             int clinicId = Integer.parseInt(request.getParameter("clinicId"));
             int serviceId = Integer.parseInt(request.getParameter("serviceId"));
 
-            int latestJoined = qdb.getNextQueueNumber(clinicId, serviceId) - 1;
             int currentProgress = qdb.getCurrentCallingNumber(clinicId, serviceId);
+            int latestJoined = qdb.getNextQueueNumber(clinicId, serviceId) - 1;
 
             // Return data as simple JSON
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
+
+            String queueNumber = "\"--\"";
+
+            QueueBean qb = qdb.getQueueNumber(patientId, clinicId, serviceId);
+            if (qb != null) {
+                if (qb.getStatus().equalsIgnoreCase("waiting")) {
+                    queueNumber = String.valueOf(qb.getQueueNumber());
+                } else if ((qb.getStatus().equalsIgnoreCase("called") && latestJoined == qb.getQueueNumber())) {
+                    queueNumber = String.valueOf(qb.getQueueNumber());
+                }
+            }
+
             String json = "{\"latest\":" + (latestJoined < 0 ? 0 : latestJoined)
-                    + ", \"current\":" + currentProgress + "}";
+                    + ", \"current\":" + currentProgress
+                    + ", \"currentQueueNumber\":" + queueNumber + "}";
             response.getWriter().write(json);
+
             return; // Stop further processing
         } else if ("search".equalsIgnoreCase(action)) {
             ArrayList<ServiceBean> services = sdb.queryService();

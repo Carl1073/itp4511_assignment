@@ -49,49 +49,20 @@ public class handlePatientService extends HttpServlet {
             String tsIdStr = request.getParameter("tsId");
             if (tsIdStr != null) {
                 int timeslotid = Integer.parseInt(tsIdStr);
-                int patientId = user.getUserId();
-
-                // 1. Check if the patient already has a booking for this timeslot
-                // This prevents the same user from booking the same slot twice
-                ArrayList<AppointmentBean> existingApps = adb.queryAppByUserId(patientId);
-                boolean alreadyBooked = false;
-                for (AppointmentBean existing : existingApps) {
-                    if (existing.getTimeslotId() == timeslotid && !"Cancelled".equals(existing.getStatus())) {
-                        alreadyBooked = true;
-                        break;
-                    }
-                }
-
-                if (alreadyBooked) {
-                    response.sendRedirect("patient/patientHome.jsp?error=alreadyBooked");
-                    return;
-                }
-
-                // 2. Check slot capacity (quotaPerSlot vs current confirmed appointments)
-                TimeslotBean tb = tdb.queryTimeslotByTsId(timeslotid);
-                int currentBookings = adb.countAppointmentsByTimeslotId(timeslotid); // You may need to add this method to AppointmentDB
-
-                if (currentBookings >= tb.getQuotaPerSlot()) {
-                    response.sendRedirect("patient/patientHome.jsp?error=full");
-                    return;
-                }
-
-                // 3. Proceed with booking if checks pass
                 AppointmentBean ab = new AppointmentBean();
-                ab.setPatientId(patientId);
+                ab.setPatientId(user.getUserId());
                 ab.setTimeslotId(timeslotid);
                 ab.setStatus("Confirmed");
-
                 if (adb.addRecord(ab)) {
-                    // Notification logic
-                    nb = new NotificationBean();
-                    nb.setUserId(patientId);
-                    nb.setMessage("You have successfully made a booking.<br/>Clinic: " + tb.getClinicName()
+                    TimeslotBean tb = tdb.queryTimeslotByTsId(timeslotid);
+                    nb.setUserId(user.getUserId());
+                    nb.setMessage("You have successfully make a booking.  "
+                            + "<br/>Clinic: " + tb.getClinicName()
                             + "<br/>Service: " + tb.getServiceName()
                             + "<br/>Date: " + tb.getDate()
-                            + "<br/>Time: " + tb.getOpenTime());
-                    ndb.addRecord(nb);
-
+                            + "<br/>Time: " + tb.getOpenTime()
+                    );
+                    ndb.addRecord(nb); // Save to notification table
                     forwardBooking(request, response, user.getUserId());
                 } else {
                     response.sendRedirect("error.jsp");
@@ -225,19 +196,24 @@ public class handlePatientService extends HttpServlet {
             // Logic to calculate the next number using the updated QueueDB
             int nextNum = qdb.getNextQueueNumber(clinicId, serviceId);
             qb.setQueueNumber(nextNum);
+            UserBean ub = (UserBean) request.getSession().getAttribute("userBean");
+            System.err.println(qdb.isAlreadyInQueue(ub.getUserId(), clinicId, serviceId));
 
-            if (qdb.addRecord(qb)) {
+            Boolean isAlreadyInQueue = qdb.isAlreadyInQueue(ub.getUserId(), clinicId, serviceId);
+
+            if (isAlreadyInQueue) {
+                ndb.addRecord(new NotificationBean(ub.getUserId(), "You already has a queue number already!"));
+            } else if (qdb.addRecord(qb)) {
                 // Store message in session so it survives the redirect
                 nb.setUserId(user.getUserId());
                 nb.setMessage("You have successfully joined the walk-in queue. <br/>Your number is: " + nextNum);
-                ndb.addRecord(nb); // Save to notification table
+                ndb.addRecord(nb);
                 session.setAttribute("msg", "Successfully joined! Your number is: " + nextNum);
             } else {
                 session.setAttribute("msg", "Failed to join queue. Please try again.");
             }
-
             // Redirect back to the walk-in page (PRG Pattern)
-            response.sendRedirect("handlePatient?action=walkin");
+            response.sendRedirect("handlePatient?action=walkin&clinicId=" + clinicId + "&serviceId=" + serviceId);
             return; // Ensure no further code is executed after redirect
         } else if ("editProfile".equalsIgnoreCase(action)) {
             // 1. Get parameters from request

@@ -20,14 +20,14 @@ public class handleAdmin extends HttpServlet {
     private ServiceDB sdb;
     private TimeslotDB tdb;
     private AppointmentDB adb;
-    private IncidentLogDB ildb;
+    private IncidentLogDB ildb; 
 
     @Override
     public void init() {
         String dbUser = this.getServletContext().getInitParameter("dbUser");
         String dbPassword = this.getServletContext().getInitParameter("dbPassword");
         String dbUrl = this.getServletContext().getInitParameter("dbUrl");
-
+        
         udb = new UserDB(dbUrl, dbUser, dbPassword);
         cdb = new ClinicDB(dbUrl, dbUser, dbPassword);
         sdb = new ServiceDB(dbUrl, dbUser, dbPassword);
@@ -44,8 +44,7 @@ public class handleAdmin extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("test");
-
+        
         String action = request.getParameter("action");
         HttpSession session = request.getSession(true);
         UserBean user = (UserBean) session.getAttribute("userBean");
@@ -60,14 +59,10 @@ public class handleAdmin extends HttpServlet {
 
         if ("manageUsers".equalsIgnoreCase(action)) {
             // Fetch all users to display in the management table
-
-            ArrayList<UserBean> users = udb.queryUser();
-            String status = request.getParameter("status");
+            ArrayList<UserBean> users = udb.queryUser(); 
             request.setAttribute("users", users);
-            if (status != null) {
-                request.setAttribute("status", "success");
-            }
             targetJSP = "/admin/manageUsers.jsp";
+
         } else if ("configClinic".equalsIgnoreCase(action)) {
             ArrayList<ClinicBean> clinics = cdb.queryClinic();
             ArrayList<ServiceBean> services = sdb.queryService();

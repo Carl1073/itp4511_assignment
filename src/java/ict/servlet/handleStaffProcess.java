@@ -56,38 +56,39 @@ public class handleStaffProcess extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
         HttpSession session = request.getSession(true);
-        session.removeAttribute("description");
         UserBean user = (UserBean) session.getAttribute("userBean");
         // Inside handleStaff.java doPost/doGet
-        if ("submitIssue".equalsIgnoreCase(action)) {
-            // 1. Get parameters
-            String appId = request.getParameter("appId");
+        if (action.equalsIgnoreCase("submitIssue")) {
+            // 1. Extract form data
             String eventType = request.getParameter("eventType");
-            String rawDescription = request.getParameter("description");
+            String description = request.getParameter("description");
+            int staffId = user.getUserId(); //
+
+            // 2. Prepare the Bean
             IncidentLogBean ib = new IncidentLogBean();
-
-            // 2. Format description to include App ID if provided
-            String finalDescription = rawDescription;
-            if (appId != null && !appId.trim().isEmpty()) {
-                ib.setAppId(Integer.parseInt(appId));
-                finalDescription = "[AppID: " + appId + "] " + rawDescription;
-            }
-
-            // 3. Prepare the Bean
-            ib.setUserId(user.getUserId()); // Get staff ID from session
+            ib.setUserId(staffId);
             ib.setEventType(eventType);
-            ib.setDescription(finalDescription);
+            ib.setDescription(description);
 
-            // 4. Save to DB
+            // 3. Database operation using IncidentLogDB
             boolean success = ildb.addRecord(ib);
 
-            // 5. Redirect back to staff home with status
+            // 4. Use Redirect instead of Forward
             if (success) {
-                response.sendRedirect("staff/reportIssue.jsp?status=reported");
+                // Redirect to a success page or home with a query parameter
+                response.sendRedirect("staff/staffHome.jsp?status=success");
             } else {
-                session.setAttribute("description", rawDescription);
+                // Redirect to the form again with an error flag
                 response.sendRedirect("staff/reportIssue.jsp?status=error");
             }
+        } else if (action.equalsIgnoreCase("nextQueueNumber")) {
+            int clinicId = Integer.parseInt(request.getParameter("clinicId"));
+            int serviceId = Integer.parseInt(request.getParameter("serviceId"));
+            qdb.nextCurrentQueueNumber(clinicId, serviceId);
+        } else if (action.equalsIgnoreCase("skipQueueNumber")) {
+            int clinicId = Integer.parseInt(request.getParameter("clinicId"));
+            int serviceId = Integer.parseInt(request.getParameter("serviceId"));
+            qdb.skipCurrentQueueNumber(clinicId, serviceId);
         } else {
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();

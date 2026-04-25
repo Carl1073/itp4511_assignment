@@ -116,12 +116,31 @@ public class QueueDB {
         return isSuccess;
     }
 
+    public Boolean isAlreadyInQueue(int patientId, int clinicId, int serviceId) {
+        String sql = "select * from queue where patientId = ? and clinicId = ? and serviceId = ? and date(entryTime) = curdate() and status = 'Waiting'";
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+            pStmnt.setInt(1, patientId);
+            pStmnt.setInt(2, clinicId);
+            pStmnt.setInt(3, serviceId);
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                if (rs.next()) {
+                    return true;
+                }
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
     // Add this to QueueDB.java
     public int getCurrentCallingNumber(int clinicId, int serviceId) {
         int currentNum = 0;
-        // We look for the maximum number that is NOT 'Waiting' to see who was last called
+        // We look for the maximum number that is NOT 'Waiting' to see who was last
+        // called
         String sql = "SELECT MAX(queueNumber) FROM queue WHERE clinicId = ? AND serviceId = ? "
-                + "AND status IN ('Called', 'Served') AND DATE(entryTime) = CURDATE()";
+                + "AND status IN ('Called', 'Skipped', 'Served') AND DATE(entryTime) = CURDATE()";
         try (Connection cnnct = getConnection();
                 PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
             pStmnt.setInt(1, clinicId);
@@ -135,6 +154,59 @@ public class QueueDB {
             ex.printStackTrace();
         }
         return currentNum;
+    }
+
+    public QueueBean getQueueNumber(int patientId, int clinicId, int serviceId) {
+        String sql = "select * from queue where patientId = ? and clinicId = ? and serviceId = ? and date(entryTime) = curdate() order by queueId desc limit 1";
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+            pStmnt.setInt(1, patientId);
+            pStmnt.setInt(2, clinicId);
+            pStmnt.setInt(3, serviceId);
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                if (rs.next()) {
+                    return new QueueBean(
+                            rs.getInt("queueId"),
+                            rs.getInt("patientId"),
+                            rs.getInt("clinicId"),
+                            rs.getInt("serviceId"),
+                            rs.getInt("queueNumber"),
+                            rs.getTimestamp("entryTime"),
+                            rs.getString("status"));
+                }
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public Boolean nextCurrentQueueNumber(int clinicId, int serviceId) {
+        String sql = "update queue set status = 'Called' where clinicId = ? and serviceId = ? and date(entryTime) = curdate() and status = 'Waiting' order by queueId limit 1";
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+            pStmnt.setInt(1, clinicId);
+            pStmnt.setInt(2, serviceId);
+            int rowsAffected = pStmnt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public Boolean skipCurrentQueueNumber(int clinicId, int serviceId) {
+        String sql = "update queue set status = 'Skipped' where clinicId = ? and serviceId = ? and date(entryTime) = curdate() and status = 'Waiting' order by queueId limit 1";
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+            pStmnt.setInt(1, clinicId);
+            pStmnt.setInt(2, serviceId);
+            int rowsAffected = pStmnt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 
     // Add this method to QueueDB.java
@@ -282,28 +354,28 @@ public class QueueDB {
         qb.setStatus(rs.getString(7));
 
         UserBean ub = new UserBean();
-//        ub.setUsername(rs.getString("username"));
-//        ub.setPassword(rs.getString("password"));
+        // ub.setUsername(rs.getString("username"));
+        // ub.setPassword(rs.getString("password"));
         ub.setFullName(rs.getString("fullName"));
-//        ub.setEmail(rs.getString("email"));
-//        ub.setPhone(rs.getString("phone"));
-//        ub.setGender(rs.getString("gender"));
-//        ub.setRole(rs.getString("role"));
-//        ub.setClinicId(rs.getInt("clinicId"));
+        // ub.setEmail(rs.getString("email"));
+        // ub.setPhone(rs.getString("phone"));
+        // ub.setGender(rs.getString("gender"));
+        // ub.setRole(rs.getString("role"));
+        // ub.setClinicId(rs.getInt("clinicId"));
         qb.setUserBean(ub);
 
         ClinicBean cb = new ClinicBean();
         cb.setClinicName(rs.getString("clinicName"));
-//        cb.setAddress(rs.getString("address"));
-//        cb.setOpenTime(rs.getTime("openTime"));
-//        cb.setCloseTime(rs.getTime("closeTime"));
-//        cb.setIsWalkinEnabled(rs.getBoolean("isWalkinEnabled"));
+        // cb.setAddress(rs.getString("address"));
+        // cb.setOpenTime(rs.getTime("openTime"));
+        // cb.setCloseTime(rs.getTime("closeTime"));
+        // cb.setIsWalkinEnabled(rs.getBoolean("isWalkinEnabled"));
         qb.setClinicBean(cb);
 
         ServiceBean sb = new ServiceBean();
         sb.setServiceName(rs.getString("serviceName"));
-//        sb.setDescription(rs.getString("description"));
-//        sb.setPrice(rs.getDouble("price"));
+        // sb.setDescription(rs.getString("description"));
+        // sb.setPrice(rs.getDouble("price"));
         qb.setServiceBean(sb);
 
         return qb;

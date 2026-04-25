@@ -1,1 +1,0 @@
-ict.test.TestDropCustTable
