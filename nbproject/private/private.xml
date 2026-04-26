@@ -5,19 +5,31 @@
         <group>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/patientHome.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handlePatientService.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/configClinic.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/profile.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/booking.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handleNotification.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/pendingBookings.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/notification.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/editUser.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/analysis.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/SystemSettingsDB.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/processBooking.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/configService.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/TimeslotDB.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/manageUsers.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/loginController.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/adminHome.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/AppointmentDB.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/manageQueue.jsp</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/pendingBookings.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/registerController.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handleStaff.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/visitOutcome.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handlePatient.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/staffHome.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handleStaffProcess.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/reportIssue.jsp</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/analysis.jsp</file>
-            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/configService.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/configTimeslot.jsp</file>
         </group>
     </open-files>
 </project-private>

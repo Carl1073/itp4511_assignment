@@ -9,6 +9,23 @@
         <%@ include file="component/heading.jsp" %>
         <div class="container">
             <h2>Report Operational Issue</h2>
+            
+            <%
+                String status = request.getParameter("status");
+                if ("success".equals(status)) {
+            %>
+                <div style="color: green; padding: 10px; border: 1px solid green; margin-bottom: 20px; background-color: #d4edda;">
+                    <strong>Success!</strong> Your issue report has been submitted successfully.
+                </div>
+            <%
+                } else if ("error".equals(status)) {
+            %>
+                <div style="color: red; padding: 10px; border: 1px solid red; margin-bottom: 20px; background-color: #f8d7da;">
+                    <strong>Error!</strong> Failed to submit your issue report. Please try again.
+                </div>
+            <%
+                }
+            %>
             <form action="handleStaffProcess" method="POST">
                 <input type="hidden" name="action" value="submitIssue">
                 

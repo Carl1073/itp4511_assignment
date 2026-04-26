@@ -69,6 +69,7 @@ public class handleStaffProcess extends HttpServlet {
             ib.setUserId(staffId);
             ib.setEventType(eventType);
             ib.setDescription(description);
+            ib.setAppId(1);
 
             // 3. Database operation using IncidentLogDB
             boolean success = ildb.addRecord(ib);
@@ -76,7 +77,7 @@ public class handleStaffProcess extends HttpServlet {
             // 4. Use Redirect instead of Forward
             if (success) {
                 // Redirect to a success page or home with a query parameter
-                response.sendRedirect("staff/staffHome.jsp?status=success");
+                response.sendRedirect("staff/reportIssue.jsp?status=success");
             } else {
                 // Redirect to the form again with an error flag
                 response.sendRedirect("staff/reportIssue.jsp?status=error");
@@ -125,7 +126,7 @@ public class handleStaffProcess extends HttpServlet {
             NotificationBean nb = new NotificationBean();
             nb.setUserId(ab.getPatientId());
             nb.setMessage("Your booking is canceled by following reason: <br/>"
-                            + cancelReason
+                    + cancelReason
             );
             ndb.addRecord(nb); // Save to notification table
 
