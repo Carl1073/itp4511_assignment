@@ -17,7 +17,7 @@
             .outcomes-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
             .appointment-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
             .appointment-table th, .appointment-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-            .appointment-table th { background: #f8f9fa; font-weight: bold; }
+            .appointment-table th { background: #00509f; font-weight: bold; }
             .status-form { display: flex; align-items: center; gap: 10px; }
             .status-select { padding: 6px; border: 1px solid #ddd; border-radius: 4px; }
             .cancel-reason-container { display: none; margin-top: 10px; }
