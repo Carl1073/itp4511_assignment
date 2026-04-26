@@ -5,7 +5,13 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Home page</title>
-
+        <script>
+            function confirmDelete(userId) {
+                if (confirm("Are you sure you want to delete this user?")) {
+                    window.location.href = "${pageContext.request.contextPath}/handleAdminProcess?action=deleteUser&id=" + userId;
+                }
+            }
+        </script>
     </head>
     <body>
         <%@ include file="component/heading.jsp" %>
