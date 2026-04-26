@@ -79,6 +79,9 @@ public class StartUp {
 
         notificationDB = new NotificationDB(url, username, password);
         notificationDB.createTable();
+
+        SystemSettingsDB systemSettingsDB = new SystemSettingsDB(url, username, password);
+        systemSettingsDB.createTable();
     }
 
     public static void generateTimeslot(Date date) {

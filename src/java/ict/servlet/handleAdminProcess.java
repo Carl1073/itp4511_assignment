@@ -22,6 +22,8 @@ public class handleAdminProcess extends HttpServlet {
     private TimeslotDB tdb;
     private AppointmentDB adb;
     private IncidentLogDB ildb;
+    private SystemSettingsDB ssdb;
+    private NotificationDB ndb;
 
     @Override
     public void init() {
@@ -35,6 +37,8 @@ public class handleAdminProcess extends HttpServlet {
         tdb = new TimeslotDB(dbUrl, dbUser, dbPassword);
         adb = new AppointmentDB(dbUrl, dbUser, dbPassword);
         ildb = new IncidentLogDB(dbUrl, dbUser, dbPassword);
+        ssdb = new SystemSettingsDB(dbUrl, dbUser, dbPassword);
+        ndb = new NotificationDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -344,6 +348,48 @@ public class handleAdminProcess extends HttpServlet {
                 e.printStackTrace();
                 response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&errorMsg=Invalid parameters!");
             }
+            return;
+        } else if ("updateSetting".equalsIgnoreCase(action)) {
+            String key = request.getParameter("settingKey");
+            String value = request.getParameter("settingValue");
+
+            SystemSettingBean sb = ssdb.querySettingByKey(key);
+            if (sb != null) {
+                sb.setSettingValue(value);
+                int result = ssdb.editRecord(sb);
+
+                if (result > 0) {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=settings&successMsg=Setting updated successfully!");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/handleAdmin?action=settings&errorMsg=Failed to update setting!");
+                }
+            } else {
+                response.sendRedirect(request.getContextPath() + "/handleAdmin?action=settings&errorMsg=Setting not found!");
+            }
+            return;
+
+        } else if ("sendNotification".equalsIgnoreCase(action)) {
+            String[] userIdStrs = request.getParameterValues("userIds");
+            String message = request.getParameter("message");
+            String category = request.getParameter("category");
+            String thresholdStr = request.getParameter("threshold");
+            int threshold = 3;
+            if (thresholdStr != null) {
+                try {
+                    threshold = Integer.parseInt(thresholdStr);
+                } catch (NumberFormatException e) {}
+            }
+            boolean allSuccess = true;
+            if (userIdStrs != null && message != null) {
+                for (String userIdStr : userIdStrs) {
+                    int userId = Integer.parseInt(userIdStr);
+                    NotificationBean nb = new NotificationBean(userId, message);
+                    boolean success = ndb.addRecord(nb);
+                    if (!success) allSuccess = false;
+                }
+            }
+            String status = allSuccess ? "success" : "fail";
+            response.sendRedirect(request.getContextPath() + "/handleAdmin?action=viewLogs&category=" + category + "&threshold=" + threshold + "&notificationSent=" + status);
             return;
         } else {
             // Handle unknown actions

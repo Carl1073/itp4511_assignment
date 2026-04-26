@@ -222,6 +222,36 @@ public class IncidentLogDB {
         }
     }
 
+    public ArrayList<UserBean> getUsersWithRepeatedIncidents(String eventType, int threshold) {
+        ArrayList<UserBean> users = new ArrayList<>();
+        String sql = "SELECT u.userId, u.fullName, u.email, u.phone, COUNT(l.logId) as incidentCount " +
+                     "FROM user u " +
+                     "JOIN incident_log l ON u.userId = l.userId " +
+                     "WHERE l.eventType = ? " +
+                     "GROUP BY u.userId, u.fullName, u.email, u.phone " +
+                     "HAVING COUNT(l.logId) >= ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, eventType);
+            pstmt.setInt(2, threshold);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    UserBean ub = new UserBean();
+                    ub.setUserId(rs.getInt("userId"));
+                    ub.setFullName(rs.getString("fullName"));
+                    ub.setEmail(rs.getString("email"));
+                    ub.setPhone(rs.getString("phone"));
+                    // We can add the count as a custom field, but since UserBean doesn't have it, maybe use a wrapper or just set it in description or something.
+                    // For now, we'll just return the users.
+                    users.add(ub);
+                }
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return users;
+    }
+
     public IncidentLogBean resultSetToBean(ResultSet rs) throws SQLException {
         IncidentLogBean ib = new IncidentLogBean();
         ib.setLogId(rs.getInt(1));

@@ -20,7 +20,8 @@ public class handleAdmin extends HttpServlet {
     private ServiceDB sdb;
     private TimeslotDB tdb;
     private AppointmentDB adb;
-    private IncidentLogDB ildb; 
+    private IncidentLogDB ildb;
+    private SystemSettingsDB ssdb; 
 
     @Override
     public void init() {
@@ -33,6 +34,8 @@ public class handleAdmin extends HttpServlet {
         sdb = new ServiceDB(dbUrl, dbUser, dbPassword);
         tdb = new TimeslotDB(dbUrl, dbUser, dbPassword);
         adb = new AppointmentDB(dbUrl, dbUser, dbPassword);
+        ildb = new IncidentLogDB(dbUrl, dbUser, dbPassword);
+        ssdb = new SystemSettingsDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -133,14 +136,105 @@ public class handleAdmin extends HttpServlet {
             targetJSP = "/admin/configTimeslot.jsp";
 
         } else if ("reports".equalsIgnoreCase(action)) {
-            // Analytics logic here
-            targetJSP = "/admin/reports.jsp";
+            // Fetch filter options
+            ArrayList<ClinicBean> clinics = cdb.queryClinic();
+            ArrayList<ServiceBean> services = sdb.queryService();
+            request.setAttribute("clinicList", clinics);
+            request.setAttribute("serviceList", services);
 
+            // Get filter parameters
+            String clinicIdStr = request.getParameter("clinicId");
+            String serviceIdStr = request.getParameter("serviceId");
+            String monthYear = request.getParameter("monthYear");
+            String status = request.getParameter("status");
+            String reportType = request.getParameter("reportType");
+
+            Integer clinicId = null;
+            Integer serviceId = null;
+
+            if (clinicIdStr != null && !clinicIdStr.isEmpty()) {
+                clinicId = Integer.parseInt(clinicIdStr);
+            }
+            if (serviceIdStr != null && !serviceIdStr.isEmpty()) {
+                serviceId = Integer.parseInt(serviceIdStr);
+            }
+
+            // Default to current month if not specified
+            if (monthYear == null || monthYear.isEmpty()) {
+                java.time.LocalDate now = java.time.LocalDate.now();
+                monthYear = now.getYear() + "-" + String.format("%02d", now.getMonthValue());
+            }
+
+            if ("appointments".equals(reportType) || reportType == null) {
+                // Fetch appointment records with filters
+                ArrayList<AppointmentBean> appointments = adb.getAppointmentsWithFilters(clinicId, serviceId, monthYear, status);
+                request.setAttribute("appointments", appointments);
+                request.setAttribute("reportType", "appointments");
+            } else if ("utilisation".equals(reportType)) {
+                // Fetch utilisation data
+                ArrayList<Object[]> utilisationData = adb.getUtilisationData(monthYear);
+                request.setAttribute("utilisationData", utilisationData);
+                request.setAttribute("reportType", "utilisation");
+            } else if ("noshows".equals(reportType)) {
+                // Fetch no-show summary
+                ArrayList<Object[]> noShowData = adb.getNoShowSummary(monthYear);
+                request.setAttribute("noShowData", noShowData);
+                request.setAttribute("reportType", "noshows");
+            }
+
+            // Set filter values for form
+            request.setAttribute("selectedClinicId", clinicIdStr);
+            request.setAttribute("selectedServiceId", serviceIdStr);
+            request.setAttribute("selectedMonthYear", monthYear);
+            request.setAttribute("selectedStatus", status);
+
+            targetJSP = "/admin/reports.jsp";
         } else if ("viewLogs".equalsIgnoreCase(action)) {
             // Fetch records from incident_log table
+            String category = request.getParameter("category");
+            String thresholdStr = request.getParameter("threshold");
+            int threshold = 3; // default
+            if (thresholdStr != null && !thresholdStr.isEmpty()) {
+                try {
+                    threshold = Integer.parseInt(thresholdStr);
+                } catch (NumberFormatException e) {
+                    threshold = 3;
+                }
+            }
+
+            if ("incidentLogs".equals(category) || category == null) {
+                ArrayList<IncidentLogBean> logs = ildb.queryIncidentLog();
+                request.setAttribute("logs", logs);
+                request.setAttribute("category", "incidentLogs");
+            } else if ("noShows".equals(category)) {
+                ArrayList<UserBean> users = adb.getUsersWithRepeatedStatus("No-show", threshold);
+                request.setAttribute("users", users);
+                request.setAttribute("category", "noShows");
+                request.setAttribute("threshold", threshold);
+            } else if ("cancellations".equals(category)) {
+                ArrayList<UserBean> users = adb.getUsersWithRepeatedStatus("Cancelled", threshold);
+                request.setAttribute("users", users);
+                request.setAttribute("category", "cancellations");
+                request.setAttribute("threshold", threshold);
+            }
             targetJSP = "/admin/viewLogs.jsp";
 
         } else if ("settings".equalsIgnoreCase(action)) {
+            SystemSettingBean setting = ssdb.querySettingByKey("max_active_bookings_per_patient");
+            if (setting != null) {
+                ArrayList<SystemSettingBean> settings = new ArrayList<>();
+                settings.add(setting);
+                request.setAttribute("settings", settings);
+            } else {
+                // If not exists, create it
+                ssdb.createTable(); // This will insert defaults
+                SystemSettingBean setting2 = ssdb.querySettingByKey("max_active_bookings_per_patient");
+                if (setting2 != null) {
+                    ArrayList<SystemSettingBean> settings = new ArrayList<>();
+                    settings.add(setting2);
+                    request.setAttribute("settings", settings);
+                }
+            }
             targetJSP = "/admin/systemSettings.jsp";
 
         } else if ("editUserPage".equalsIgnoreCase(action)) {

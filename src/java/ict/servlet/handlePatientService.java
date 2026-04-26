@@ -18,6 +18,7 @@ public class handlePatientService extends HttpServlet {
     private QueueDB qdb;
     private NotificationDB ndb;
     private UserDB udb;
+    private SystemSettingsDB ssdb;
 
     @Override
     public void init() {
@@ -31,6 +32,7 @@ public class handlePatientService extends HttpServlet {
         qdb = new QueueDB(dbUrl, dbUser, dbPassword);
         ndb = new NotificationDB(dbUrl, dbUser, dbPassword);
         udb = new UserDB(dbUrl, dbUser, dbPassword);
+        ssdb = new SystemSettingsDB(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -49,6 +51,22 @@ public class handlePatientService extends HttpServlet {
             String tsIdStr = request.getParameter("tsId");
             if (tsIdStr != null) {
                 int timeslotid = Integer.parseInt(tsIdStr);
+
+                // Check policy: max active bookings per patient
+                SystemSettingBean maxSetting = ssdb.querySettingByKey("max_active_bookings_per_patient");
+                if (maxSetting != null) {
+                    int maxActive = Integer.parseInt(maxSetting.getSettingValue());
+                    int currentActive = adb.getActiveBookingsCount(user.getUserId());
+                    if (currentActive >= maxActive) {
+                        // Deny booking
+                        nb.setUserId(user.getUserId());
+                        nb.setMessage("Booking failed: You have reached the maximum number of active bookings (" + maxActive + "). Please cancel or complete existing bookings before making new ones.");
+                        ndb.addRecord(nb);
+                        forwardBooking(request, response, user.getUserId());
+                        return;
+                    }
+                }
+
                 AppointmentBean ab = new AppointmentBean();
                 ab.setPatientId(user.getUserId());
                 ab.setTimeslotId(timeslotid);
@@ -56,7 +74,7 @@ public class handlePatientService extends HttpServlet {
                 if (adb.addRecord(ab)) {
                     TimeslotBean tb = tdb.queryTimeslotByTsId(timeslotid);
                     nb.setUserId(user.getUserId());
-                    nb.setMessage("You have successfully make a booking.  "
+                    nb.setMessage("You have successfully made a booking.  "
                             + "<br/>Clinic: " + tb.getClinicName()
                             + "<br/>Service: " + tb.getServiceName()
                             + "<br/>Date: " + tb.getDate()

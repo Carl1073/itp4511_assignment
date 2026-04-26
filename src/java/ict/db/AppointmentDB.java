@@ -314,4 +314,171 @@ public class AppointmentDB {
         ab.setTimeslotBean(tb);
         return ab;
     }
+
+    public ArrayList<UserBean> getUsersWithRepeatedStatus(String status, int threshold) {
+        ArrayList<UserBean> users = new ArrayList<>();
+        String sql = "SELECT u.userId, u.fullName, u.email, u.phone, COUNT(a.appId) as incidentCount " +
+                     "FROM user u " +
+                     "JOIN appointment a ON u.userId = a.patientId " +
+                     "WHERE a.status = ? " +
+                     "GROUP BY u.userId, u.fullName, u.email, u.phone " +
+                     "HAVING COUNT(a.appId) >= ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, status);
+            pstmt.setInt(2, threshold);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    UserBean ub = new UserBean();
+                    ub.setUserId(rs.getInt("userId"));
+                    ub.setFullName(rs.getString("fullName"));
+                    ub.setEmail(rs.getString("email"));
+                    ub.setPhone(rs.getString("phone"));
+                    users.add(ub);
+                }
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return users;
+    }
+
+    public int getActiveBookingsCount(int userId) {
+        String sql = "SELECT COUNT(*) as count FROM appointment WHERE patientId = ? AND status IN ('Confirmed', 'Arrived')";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("count");
+                }
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
+    // Reports methods
+    public ArrayList<AppointmentBean> getAppointmentsWithFilters(Integer clinicId, Integer serviceId, String monthYear, String status) {
+        ArrayList<AppointmentBean> appointments = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(query);
+
+        ArrayList<Object> params = new ArrayList<>();
+
+        if (clinicId != null || serviceId != null || monthYear != null || status != null) {
+            sql.append(" WHERE ");
+            boolean first = true;
+
+            if (clinicId != null) {
+                sql.append("c.clinicId = ?");
+                params.add(clinicId);
+                first = false;
+            }
+            if (serviceId != null) {
+                if (!first) sql.append(" AND ");
+                sql.append("s.serviceId = ?");
+                params.add(serviceId);
+                first = false;
+            }
+            if (monthYear != null && !monthYear.isEmpty()) {
+                if (!first) sql.append(" AND ");
+                sql.append("DATE_FORMAT(t.date, '%Y-%m') = ?");
+                params.add(monthYear);
+                first = false;
+            }
+            if (status != null && !status.isEmpty()) {
+                if (!first) sql.append(" AND ");
+                sql.append("a.status = ?");
+                params.add(status);
+            }
+        }
+
+        sql.append(" ORDER BY t.date DESC, t.openTime DESC");
+
+        try (Connection cnnct = getConnection();
+             PreparedStatement pStmnt = cnnct.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                pStmnt.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                while (rs.next()) {
+                    appointments.add(resultSetToBean(rs));
+                }
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return appointments;
+    }
+
+    public ArrayList<Object[]> getUtilisationData(String monthYear) {
+        ArrayList<Object[]> data = new ArrayList<>();
+        String sql = "SELECT c.clinicName, s.serviceName, DATE_FORMAT(t.date, '%Y-%m') as month, " +
+                     "COUNT(DISTINCT t.timeslotId) as total_slots, " +
+                     "COUNT(a.appId) as booked_slots " +
+                     "FROM timeslot t " +
+                     "JOIN clinic c ON t.clinicId = c.clinicId " +
+                     "JOIN service s ON t.serviceId = s.serviceId " +
+                     "LEFT JOIN appointment a ON t.timeslotId = a.timeslotId AND a.status IN ('Confirmed', 'Arrived', 'Completed') " +
+                     "WHERE DATE_FORMAT(t.date, '%Y-%m') = ? " +
+                     "GROUP BY c.clinicId, c.clinicName, s.serviceId, s.serviceName, DATE_FORMAT(t.date, '%Y-%m') " +
+                     "ORDER BY c.clinicName, s.serviceName";
+
+        try (Connection cnnct = getConnection();
+             PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+
+            pStmnt.setString(1, monthYear);
+
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] row = new Object[5];
+                    row[0] = rs.getString("clinicName");
+                    row[1] = rs.getString("serviceName");
+                    row[2] = rs.getString("month");
+                    row[3] = rs.getInt("total_slots");
+                    row[4] = rs.getInt("booked_slots");
+                    data.add(row);
+                }
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return data;
+    }
+
+    public ArrayList<Object[]> getNoShowSummary(String monthYear) {
+        ArrayList<Object[]> data = new ArrayList<>();
+        String sql = "SELECT c.clinicName, s.serviceName, DATE_FORMAT(t.date, '%Y-%m') as month, " +
+                     "COUNT(a.appId) as no_show_count " +
+                     "FROM appointment a " +
+                     "JOIN timeslot t ON a.timeslotId = t.timeslotId " +
+                     "JOIN clinic c ON t.clinicId = c.clinicId " +
+                     "JOIN service s ON t.serviceId = s.serviceId " +
+                     "WHERE a.status = 'No-show' AND DATE_FORMAT(t.date, '%Y-%m') = ? " +
+                     "GROUP BY c.clinicId, c.clinicName, s.serviceId, s.serviceName, DATE_FORMAT(t.date, '%Y-%m') " +
+                     "ORDER BY c.clinicName, s.serviceName";
+
+        try (Connection cnnct = getConnection();
+             PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+
+            pStmnt.setString(1, monthYear);
+
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] row = new Object[4];
+                    row[0] = rs.getString("clinicName");
+                    row[1] = rs.getString("serviceName");
+                    row[2] = rs.getString("month");
+                    row[3] = rs.getInt("no_show_count");
+                    data.add(row);
+                }
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return data;
+    }
 }

@@ -81,4 +81,29 @@ public class AppointmentBean implements Serializable {
     public void setUserBean(UserBean userBean) {
         this.userBean = userBean;
     }
+
+    // Convenience getters for JSP
+    public int getAppointmentId() {
+        return appId;
+    }
+
+    public String getPatientName() {
+        return userBean != null ? userBean.getFullName() : "";
+    }
+
+    public String getClinicName() {
+        return timeslotBean != null ? timeslotBean.getClinicName() : "";
+    }
+
+    public String getServiceName() {
+        return timeslotBean != null ? timeslotBean.getServiceName() : "";
+    }
+
+    public java.sql.Date getDate() {
+        return timeslotBean != null ? timeslotBean.getDate() : null;
+    }
+
+    public java.sql.Time getOpenTime() {
+        return timeslotBean != null ? timeslotBean.getOpenTime() : null;
+    }
 }
