@@ -61,22 +61,73 @@
                         var clinicName = $("#clinicId option:selected").text();
                         var serviceName = $("#serviceId option:selected").text();
                         if (clinicId && serviceId) {
-                            const { current, latest, currentQueueNumber } = await $.post('handlePatient', {
+                            const response = await $.post('handlePatient', {
                                 action: 'getQueueStatus',
                                 clinicId,
                                 serviceId
                             });
+
+                            const { current, latest, currentQueueNumber, estimatedMinutes } = response;
 
                             $('#currentProgressDisplay').text(current);
                             $('#latestJoinedDisplay').text(latest);
                             $('#currentQueueNumber').text(currentQueueNumber);
                             $('#statusDetail').text("* Showing status for " + serviceName + " in " + clinicName);
 
+                            // Update estimated time
+                            updateEstimatedTime(estimatedMinutes, current);
+
                             if (!isAlerted && current === currentQueueNumber) {
                                 callTTS(currentQueueNumber);
                                 isAlerted = true;
                                 alert("Dear patient, your ticket #" + currentQueueNumber + " is now being called. Please make your way to the clinic.");
                             }
+                        }
+                    }
+
+                    let countdownInterval;
+                    let currentEstimatedMinutes = 0;
+
+                    function updateEstimatedTime(estimatedMinutes, currentProgress) {
+                        currentEstimatedMinutes = estimatedMinutes;
+                        displayEstimatedTime();
+
+                        // Clear existing countdown
+                        if (countdownInterval) {
+                            clearInterval(countdownInterval);
+                        }
+
+                        // Start countdown if there's time remaining
+                        if (currentEstimatedMinutes > 0) {
+                            currentEstimatedMinutes--; // Decrement immediately for more accurate display
+                            countdownInterval = setInterval(() => {
+                                currentEstimatedMinutes--;
+                                currentEstimatedMinutes = Math.max(0, currentEstimatedMinutes - 1);
+                                displayEstimatedTime();
+
+                                // Stop countdown when it reaches 0
+                                if (currentEstimatedMinutes <= 0) {
+                                    clearInterval(countdownInterval);
+                                }
+                            }, 60000); // Update every minute (60,000 milliseconds)
+                        }
+                    }
+
+                    function displayEstimatedTime() {
+                        const display = $('#estimatedTimeDisplay');
+                        if (currentEstimatedMinutes > 0) {
+                            const hours = Math.floor(currentEstimatedMinutes / 60);
+                            const minutes = currentEstimatedMinutes % 60;
+                            let timeString = '';
+                            if (hours > 0) {
+                                timeString += hours + 'h ';
+                            }
+                            timeString += minutes + 'm';
+                            display.text(timeString).css('color', '#e74c3c');
+                        } else if ($('#currentQueueNumber').text() !== '--') {
+                            display.text('Your turn!').css('color', '#27ae60');
+                        } else {
+                            display.text('--').css('color', '#666');
                         }
                     }
 
@@ -100,6 +151,16 @@
 
                     // Update when either dropdown changes
                     $('#clinicId, #serviceId').on('change', updateQueueStats);
+
+                    // Initialize estimated time display
+                    displayEstimatedTime();
+
+                    // Cleanup on page unload
+                    $(window).on('beforeunload', function() {
+                        if (countdownInterval) {
+                            clearInterval(countdownInterval);
+                        }
+                    });
                 });
             </script>
         </head>
@@ -141,6 +202,11 @@
                                         <p style="margin: 0; color: #666;">Your Queue Number</p>
                                         <h2 id="currentQueueNumber"
                                             style="color: #3498db; font-size: 2.5em; margin: 10px 0;">--</h2>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <p style="margin: 0; color: #666;">Estimated Wait Time</p>
+                                        <h2 id="estimatedTimeDisplay"
+                                            style="color: #666; font-size: 2.5em; margin: 10px 0;">--</h2>
                                     </div>
                                 </div>
                                 <small id="statusDetail" style="color: #888;">* Select a clinic and service to see live

@@ -102,19 +102,30 @@ public class handlePatient extends HttpServlet {
             response.setCharacterEncoding("UTF-8");
 
             String queueNumber = "\"--\"";
+            int estimatedMinutes = 0;
 
             QueueBean qb = qdb.getQueueNumber(patientId, clinicId, serviceId);
             if (qb != null) {
                 if (qb.getStatus().equalsIgnoreCase("waiting")) {
                     queueNumber = String.valueOf(qb.getQueueNumber());
+                    // Calculate estimated time: (queue number - current progress) * 15 minutes
+                    if (qb.getQueueNumber() > currentProgress) {
+                        estimatedMinutes = (qb.getQueueNumber() - currentProgress) * 15;
+                    }
                 } else if ((qb.getStatus().equalsIgnoreCase("called") && currentProgress == qb.getQueueNumber())) {
                     queueNumber = String.valueOf(qb.getQueueNumber());
+                    estimatedMinutes = 0; // Currently being called
                 }
             }
 
+            // Store in session for persistence
+            session.setAttribute("estimatedMinutes", estimatedMinutes);
+            session.setAttribute("lastCurrentProgress", currentProgress);
+
             String json = "{\"latest\":" + (latestJoined < 0 ? 0 : latestJoined)
                     + ", \"current\":" + currentProgress
-                    + ", \"currentQueueNumber\":" + queueNumber + "}";
+                    + ", \"currentQueueNumber\":" + queueNumber
+                    + ", \"estimatedMinutes\":" + estimatedMinutes + "}";
             response.getWriter().write(json);
 
             return; // Stop further processing
