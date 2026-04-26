@@ -62,33 +62,51 @@ public class loginController extends HttpServlet {
             throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        String role = request.getParameter("role");
+        String selectedRole = request.getParameter("role"); // The role the user claims to be
         String targetURL = "";
         HttpSession session = request.getSession(true);
-        System.out.println(role);
 
         UserBean ub = db.queryUserByUsername(username);
         String errorMsg = "";
 
-        if (ub == null) {  // incorrect username
-            errorMsg = "Username not register. Please register.";
+        if (ub == null) {
+            errorMsg = "Username not registered. Please register.";
+        } else if (!ub.getPassword().equals(password)) {
+            errorMsg = "Password incorrect. Please check the password.";
         } else {
-            if (!ub.getPassword().equals(password)) {  //incorrect password
-                errorMsg = "Password incorrect. Please check the password.";
+            // --- Role Hierarchy Logic ---
+            String actualRole = ub.getRole().toLowerCase();
+            String requestedRole = selectedRole.toLowerCase();
+            boolean isAuthorized = false;
+
+            if (actualRole.equals("admin")) {
+                // Admin can enter as Admin, Staff, or Patient
+                isAuthorized = true;
+            } else if (actualRole.equals("staff")) {
+                // Staff can enter as Staff or Patient, but not Admin
+                if (requestedRole.equals("staff") || requestedRole.equals("patient")) {
+                    isAuthorized = true;
+                }
+            } else if (actualRole.equals("patient")) {
+                // Patient can only enter as Patient
+                if (requestedRole.equals("patient")) {
+                    isAuthorized = true;
+                }
             }
-            if (!ub.getRole().equalsIgnoreCase(role)) {  //incorrect role
-                errorMsg = "Wrong Role. Your role should be " + ub.getRole() + ".";
+
+            if (!isAuthorized) {
+                errorMsg = "Access Denied. You do not have the permissions for the " + selectedRole + " role.";
             }
         }
 
-        if (errorMsg.equals("")) {  // no error message, means correct username and password
+        if (errorMsg.equals("")) {
             session.setAttribute("userBean", ub);
-            //check the role
-            if (role.equalsIgnoreCase("patient")) {
+            // Redirect based on the role they SELECTED to log in as
+            if (selectedRole.equalsIgnoreCase("patient")) {
                 targetURL = "patient/patientHome.jsp";
-            } else if (role.equalsIgnoreCase("staff")) {
+            } else if (selectedRole.equalsIgnoreCase("staff")) {
                 targetURL = "staff/staffHome.jsp";
-            } else { //admin
+            } else { // admin
                 targetURL = "admin/adminHome.jsp";
             }
         } else {
@@ -96,10 +114,7 @@ public class loginController extends HttpServlet {
             targetURL = "login.jsp";
         }
 
-        System.out.println(targetURL);
-
-        RequestDispatcher rd;
-        rd = getServletContext().getRequestDispatcher("/" + targetURL);
+        RequestDispatcher rd = getServletContext().getRequestDispatcher("/" + targetURL);
         rd.forward(request, response);
     }
 

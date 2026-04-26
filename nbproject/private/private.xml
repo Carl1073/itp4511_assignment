@@ -10,20 +10,30 @@
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/profile.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handleNotification.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/profile.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/bean/TimeslotBean.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/test/paul/TestClinicAddRecord.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/pendingBookings.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/notification.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handleAdminProcess.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/bean/ServiceBean.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/editUser.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/NotificationDB.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handleAdmin.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/ServiceDB.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/configService.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/TimeslotDB.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/manageUsers.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/patient/profile.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/UserDB.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/register.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/test/paul/TestIncidentAddRecord.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/adminHome.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/AppointmentDB.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/java/AppInitListener.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/manageQueue.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/CheckUsernameServlet.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/test/paul/TestQueryAvaliableSlot.java</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/java/StartUp.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/servlet/handleStaff.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/component/heading.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/ClinicDB.java</file>
@@ -32,7 +42,9 @@
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/bean/ClinicBean.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/systemSettings.jsp</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/CSS/styles.css</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/src/java/ict/db/IncidentLogDB.java</file>
             <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/staff/component/heading.jsp</file>
+            <file>file:/C:/Users/Tong/Desktop/itp4511_assignment/web/admin/configTimeslot.jsp</file>
         </group>
     </open-files>
 </project-private>
