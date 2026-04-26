@@ -192,7 +192,7 @@ private ArrayList<UserBean> executeGenericQuery(String sql, Object... params) {
                 if (ub.getClinicId() != 0) {
                     ClinicBean cb = new ClinicBean();
                     cb.setClinicId(ub.getClinicId());
-                    cb.setClinicName(rs.getString("clinicName"));
+                    ub.setClinicName(rs.getString("clinicName"));
                 }
                 ubs.add(ub);
             }

@@ -11,6 +11,7 @@
     // Helper logic to get values: priority to Bean (Edit mode), then Request (validation), then Empty
     String fullName = isEdit ? editUser.getFullName() : (request.getAttribute("fullName") != null ? (String) request.getAttribute("fullName") : "");
     String username = isEdit ? editUser.getUsername() : (request.getAttribute("username") != null ? (String) request.getAttribute("username") : "");
+    String password = isEdit ? editUser.getPassword(): (request.getAttribute("password") != null ? (String) request.getAttribute("password") : "");
     String email = isEdit ? editUser.getEmail() : (request.getAttribute("email") != null ? (String) request.getAttribute("email") : "");
     String phone = isEdit ? editUser.getPhone() : (request.getAttribute("phone") != null ? (String) request.getAttribute("phone") : "");
     String role = isEdit ? editUser.getRole() : (request.getAttribute("role") != null ? (String) request.getAttribute("role") : "");
@@ -49,7 +50,7 @@
 
                 <div class="form-row">
                     <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required />
+                    <input type="password" id="password" name="password"  value="<%= password%>" required />
                 </div>
 
                 <div class="form-row">

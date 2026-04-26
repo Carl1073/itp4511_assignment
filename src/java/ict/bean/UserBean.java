@@ -6,6 +6,7 @@ import java.io.Serializable;
  * Supports Patients, Staff, and Administrators.
  */
 public class UserBean implements Serializable {
+
     private int userId;
     private String username;
     private String password;
@@ -15,6 +16,7 @@ public class UserBean implements Serializable {
     private String gender; // M, F, or O
     private String role;   // Patient, Staff, or Admin
     private int clinicId = 0;  // for Staff and Admin
+    private ClinicBean clinicBean;  // for Staff and Admin
     private String clinicName; // for Staff and Admin
 
     // Default No-argument Constructor
@@ -106,6 +108,14 @@ public class UserBean implements Serializable {
         this.clinicId = clinicId;
     }
 
+    public ClinicBean getClinicBean() {
+        return clinicBean;
+    }
+
+    public void setClinicBean(ClinicBean clinicBean) {
+        this.clinicBean = clinicBean;
+    }
+
     public String getClinicName() {
         return clinicName;
     }
@@ -113,8 +123,8 @@ public class UserBean implements Serializable {
     public void setClinicName(String clinicName) {
         this.clinicName = clinicName;
     }
-    
-    public String toString(){
+
+    public String toString() {
         return "UserBean id" + userId;
     }
 }

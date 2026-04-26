@@ -93,6 +93,24 @@ public class handleStaff extends HttpServlet {
             rd = getServletContext().getRequestDispatcher("/staff/pendingBookings.jsp");
             rd.forward(request, response);
         } else if ("outcome".equalsIgnoreCase(action)) {
+            // Fetch today's appointments for the staff's clinic
+            int staffClinicId = user.getClinicId();
+            Date today = Date.valueOf(LocalDate.now());
+
+            // Get all appointments for today at this clinic
+            ArrayList<AppointmentBean> todaysAppointments = new ArrayList<>();
+            ArrayList<ServiceBean> services = sdb.queryService();
+
+            // For each service, get appointments for this clinic and date
+            for (ServiceBean service : services) {
+                ArrayList<AppointmentBean> serviceAppointments = adb.queryAppByClinicServiceDate(staffClinicId, service.getServiceId(), today);
+                todaysAppointments.addAll(serviceAppointments);
+            }
+
+            request.setAttribute("todaysAppointments", todaysAppointments);
+            System.out.println("Clinic: " + cdb.getClinicById(staffClinicId));
+            request.setAttribute("clinicName", cdb.getClinicById(staffClinicId).getClinicName());
+
             RequestDispatcher rd;
             rd = getServletContext().getRequestDispatcher("/staff/visitOutcome.jsp");
             rd.forward(request, response);

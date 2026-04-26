@@ -73,6 +73,7 @@ public class handleAdminProcess extends HttpServlet {
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
             String gender = request.getParameter("gender");
+            String clinicIdStr = request.getParameter("clinicId");
 
             UserBean ub = udb.queryUserByUsername(username);
             boolean isTaken = (ub == null) ? false : true;
@@ -89,6 +90,11 @@ public class handleAdminProcess extends HttpServlet {
             ub.setGender(gender);
             ub.setEmail(email);
             ub.setPhone(phone);
+            if (clinicIdStr != null && !clinicIdStr.trim().isEmpty()) {
+                ub.setClinicId(Integer.parseInt(clinicIdStr));
+            } else {
+                ub.setClinicId(0);
+            }
 
             boolean success = false;
             if (idStr == null || idStr.isEmpty()) {
@@ -210,18 +216,18 @@ public class handleAdminProcess extends HttpServlet {
             String description = request.getParameter("description");
             String priceStr = request.getParameter("price");
             String durationStr = request.getParameter("duration");
-            
+
             double price = Double.parseDouble(priceStr);
             int duration = Integer.parseInt(durationStr);
-            
+
             ServiceBean sb = new ServiceBean();
             sb.setServiceName(serviceName);
             sb.setDescription(description);
             sb.setPrice(price);
             sb.setDuration(duration);
-            
+
             boolean success = sdb.addRecord(sb);
-            
+
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&successMsg=Service added successfully!");
             } else {
@@ -236,19 +242,19 @@ public class handleAdminProcess extends HttpServlet {
             String description = request.getParameter("description");
             String priceStr = request.getParameter("price");
             String durationStr = request.getParameter("duration");
-            
+
             double price = Double.parseDouble(priceStr);
             int duration = Integer.parseInt(durationStr);
-            
+
             ServiceBean sb = new ServiceBean();
             sb.setServiceId(Integer.parseInt(serviceIdStr));
             sb.setServiceName(serviceName);
             sb.setDescription(description);
             sb.setPrice(price);
             sb.setDuration(duration);
-            
+
             int result = sdb.editRecord(sb);
-            
+
             if (result > 0) {
                 response.sendRedirect(request.getContextPath() + "/handleAdmin?action=configService&successMsg=Service updated successfully!");
             } else {
@@ -285,42 +291,42 @@ public class handleAdminProcess extends HttpServlet {
             // Update timeslot quotas
             String clinicIdStr = request.getParameter("clinicId");
             String dateStr = request.getParameter("date");
-            
+
             if (clinicIdStr == null || clinicIdStr.trim().isEmpty() || dateStr == null || dateStr.trim().isEmpty()) {
                 response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&errorMsg=Clinic and date are required!");
                 return;
             }
-            
+
             try {
                 int clinicId = Integer.parseInt(clinicIdStr);
                 java.sql.Date date = java.sql.Date.valueOf(dateStr);
-                
+
                 // Get all services
                 ArrayList<ServiceBean> services = sdb.queryService();
-                
+
                 // Process each timeslot (every hour from clinic opening to closing time)
                 ClinicBean clinic = cdb.getClinicById(clinicId);
                 if (clinic == null) {
                     response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&errorMsg=Clinic not found!");
                     return;
                 }
-                
+
                 // Calculate timeslots (every 60 minutes)
                 java.util.Calendar cal = java.util.Calendar.getInstance();
                 cal.setTime(clinic.getOpenTime());
                 java.util.Date closeTime = clinic.getCloseTime();
-                
+
                 boolean success = true;
                 while (cal.getTime().before(closeTime) || cal.getTime().equals(closeTime)) {
                     Time slotTime = new Time(cal.getTime().getTime());
-                    
+
                     // For each service, update/create timeslot
                     for (ServiceBean service : services) {
-                        String quotaParam = "quota_" + service.getServiceId() + "_" + 
-                                          String.format("%02d", cal.get(java.util.Calendar.HOUR_OF_DAY)) + 
-                                          String.format("%02d", cal.get(java.util.Calendar.MINUTE));
+                        String quotaParam = "quota_" + service.getServiceId() + "_"
+                                + String.format("%02d", cal.get(java.util.Calendar.HOUR_OF_DAY))
+                                + String.format("%02d", cal.get(java.util.Calendar.MINUTE));
                         String quotaStr = request.getParameter(quotaParam);
-                        
+
                         if (quotaStr != null && !quotaStr.trim().isEmpty()) {
                             try {
                                 int quota = Integer.parseInt(quotaStr);
@@ -333,17 +339,17 @@ public class handleAdminProcess extends HttpServlet {
                             }
                         }
                     }
-                    
+
                     // Move to next hour
                     cal.add(java.util.Calendar.HOUR_OF_DAY, 1);
                 }
-                
+
                 if (success) {
                     response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&clinicId=" + clinicId + "&date=" + dateStr + "&successMsg=Timeslot quotas updated successfully!");
                 } else {
                     response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&clinicId=" + clinicId + "&date=" + dateStr + "&errorMsg=Failed to update some timeslot quotas!");
                 }
-                
+
             } catch (Exception e) {
                 e.printStackTrace();
                 response.sendRedirect(request.getContextPath() + "/handleAdmin?action=manageQuota&errorMsg=Invalid parameters!");
@@ -377,7 +383,8 @@ public class handleAdminProcess extends HttpServlet {
             if (thresholdStr != null) {
                 try {
                     threshold = Integer.parseInt(thresholdStr);
-                } catch (NumberFormatException e) {}
+                } catch (NumberFormatException e) {
+                }
             }
             boolean allSuccess = true;
             if (userIdStrs != null && message != null) {
@@ -385,7 +392,9 @@ public class handleAdminProcess extends HttpServlet {
                     int userId = Integer.parseInt(userIdStr);
                     NotificationBean nb = new NotificationBean(userId, message);
                     boolean success = ndb.addRecord(nb);
-                    if (!success) allSuccess = false;
+                    if (!success) {
+                        allSuccess = false;
+                    }
                 }
             }
             String status = allSuccess ? "success" : "fail";

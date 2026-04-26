@@ -89,6 +89,45 @@ public class handleStaffProcess extends HttpServlet {
             int clinicId = Integer.parseInt(request.getParameter("clinicId"));
             int serviceId = Integer.parseInt(request.getParameter("serviceId"));
             qdb.skipCurrentQueueNumber(clinicId, serviceId);
+        } else if (action.equalsIgnoreCase("updateVisitOutcome")) {
+            int appointmentId = Integer.parseInt(request.getParameter("appointmentId"));
+            String status = request.getParameter("status");
+            String cancelReason = null;
+
+            // Handle cancellation reasons
+            if ("Cancelled by clinic".equals(status)) {
+                String cancelReasonType = request.getParameter("cancelReasonType");
+                String customCancelReason = request.getParameter("customCancelReason");
+
+                if ("Other".equals(cancelReasonType) && customCancelReason != null && !customCancelReason.trim().isEmpty()) {
+                    cancelReason = customCancelReason.trim();
+                } else if (cancelReasonType != null && !cancelReasonType.isEmpty()) {
+                    cancelReason = cancelReasonType;
+                } else {
+                    cancelReason = "Cancelled by clinic";
+                }
+                // Use 'Cancelled' as the status, with reason distinguishing it
+                status = "Cancelled";
+            } else {
+                // For non-cancelled statuses, clear any existing cancel reason
+                cancelReason = null;
+            }
+
+            // Update the appointment
+            AppointmentBean appointment = new AppointmentBean();
+            appointment.setAppId(appointmentId);
+            appointment.setStatus(status);
+            appointment.setCancelReason(cancelReason);
+
+            int result = adb.editRecord(appointment);
+
+            if (result > 0) {
+                // Success - redirect back to outcome page
+                response.sendRedirect(request.getContextPath() + "/handleStaff?action=outcome&status=success");
+            } else {
+                // Failure - redirect back with error
+                response.sendRedirect(request.getContextPath() + "/handleStaff?action=outcome&status=error");
+            }
         } else {
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();

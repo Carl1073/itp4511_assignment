@@ -62,8 +62,10 @@ public class handleAdmin extends HttpServlet {
 
         if ("manageUsers".equalsIgnoreCase(action)) {
             // Fetch all users to display in the management table
-            ArrayList<UserBean> users = udb.queryUser(); 
+            ArrayList<UserBean> users = udb.queryUserWithClinic(); 
             request.setAttribute("users", users);
+            ArrayList<ClinicBean> clinics = cdb.queryClinic(); 
+            request.setAttribute("clinics", clinics);
             targetJSP = "/admin/manageUsers.jsp";
 
         } else if ("configClinic".equalsIgnoreCase(action)) {

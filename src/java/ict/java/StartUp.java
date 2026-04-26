@@ -30,19 +30,24 @@ public class StartUp {
     // Change the method to accept parameters
     public static void startUp(String url, String username, String password) {
 
-        userDB = new UserDB(url, username, password);
-        userDB.createTable();
-        insertSampleData();
-
         clinicDB = new ClinicDB(url, username, password);
         clinicDB.createTable();
         if (clinicDB.queryClinic().isEmpty()) {
-            clinicDB.addRecord(new ClinicBean(1, "Chai Wan", "12, ABC Street, Chai Wan", Time.valueOf("09:00:00"), Time.valueOf("18:00:00"), true));
-            clinicDB.addRecord(new ClinicBean(2, "Tseung Kwan O", "34, DEF Street, Tseung Kwan O", Time.valueOf("09:00:00"), Time.valueOf("18:00:00"), true));
-            clinicDB.addRecord(new ClinicBean(3, "Sha Tin", "56, GHI Street, Sha Tin", Time.valueOf("09:00:00"), Time.valueOf("18:00:00"), true));
-            clinicDB.addRecord(new ClinicBean(4, "Tuen Mun", "78, JKL Street, Tuen Mun", Time.valueOf("09:00:00"), Time.valueOf("18:00:00"), true));
-            clinicDB.addRecord(new ClinicBean(5, "Tsing Yi", "90, BNM Street, Tsing Yi", Time.valueOf("09:00:00"), Time.valueOf("18:00:00"), true));
+            clinicDB.addRecord(new ClinicBean(1, "Chai Wan", "12, ABC Street, Chai Wan", Time.valueOf("09:00:00"),
+                    Time.valueOf("18:00:00"), true));
+            clinicDB.addRecord(new ClinicBean(2, "Tseung Kwan O", "34, DEF Street, Tseung Kwan O",
+                    Time.valueOf("09:00:00"), Time.valueOf("18:00:00"), true));
+            clinicDB.addRecord(new ClinicBean(3, "Sha Tin", "56, GHI Street, Sha Tin", Time.valueOf("09:00:00"),
+                    Time.valueOf("18:00:00"), true));
+            clinicDB.addRecord(new ClinicBean(4, "Tuen Mun", "78, JKL Street, Tuen Mun", Time.valueOf("09:00:00"),
+                    Time.valueOf("18:00:00"), true));
+            clinicDB.addRecord(new ClinicBean(5, "Tsing Yi", "90, BNM Street, Tsing Yi", Time.valueOf("09:00:00"),
+                    Time.valueOf("18:00:00"), true));
         }
+
+        userDB = new UserDB(url, username, password);
+        userDB.createTable();
+        insertSampleData();
 
         serviceDB = new ServiceDB(url, username, password);
         serviceDB.createTable();
@@ -99,7 +104,8 @@ public class StartUp {
 
                     for (LocalTime t = startTime; t.isBefore(endTime); t = t.plusMinutes(duration)) {
                         // Pass 'tomorrow' instead of 'today'
-                        TimeslotBean newSlot = new TimeslotBean(0, clinicBean.getClinicId(), serviceBean.getServiceId(), date, Time.valueOf(t), 2);
+                        TimeslotBean newSlot = new TimeslotBean(0, clinicBean.getClinicId(), serviceBean.getServiceId(),
+                                date, Time.valueOf(t), 2);
                         timeslotDB.addRecord(newSlot);
 
                         System.out.println("Generating slot for tomorrow (" + date + ") at: " + t);
@@ -108,46 +114,46 @@ public class StartUp {
             }
         }
     }
-    
+
     public static void insertSampleData() {
-    // 1. Patient Sample
-    UserBean patient = new UserBean();
-    patient.setUsername("patient");
-    patient.setPassword("patient");
-    patient.setFullName("John Doe");
-    patient.setEmail("john.doe@email.com");
-    patient.setPhone("0123456789");
-    patient.setGender("M");
-    patient.setRole("Patient");
-    patient.setClinicId(101);
+        // 1. Patient Sample
+        UserBean patient = new UserBean();
+        patient.setUsername("patient");
+        patient.setPassword("patient");
+        patient.setFullName("John Doe");
+        patient.setEmail("john.doe@email.com");
+        patient.setPhone("0123456789");
+        patient.setGender("M");
+        patient.setRole("Patient");
+        patient.setClinicId(1);
 
-    // 2. Staff Sample
-    UserBean staff = new UserBean();
-    staff.setUsername("staff");
-    staff.setPassword("staff");
-    staff.setFullName("Sarah Jenkins");
-    staff.setEmail("s.jenkins@clinic.com");
-    staff.setPhone("0111222333");
-    staff.setGender("F");
-    staff.setRole("Staff");
-    staff.setClinicId(101);
+        // 2. Staff Sample
+        UserBean staff = new UserBean();
+        staff.setUsername("staff");
+        staff.setPassword("staff");
+        staff.setFullName("Sarah Jenkins");
+        staff.setEmail("s.jenkins@clinic.com");
+        staff.setPhone("0111222333");
+        staff.setGender("F");
+        staff.setRole("Staff");
+        staff.setClinicId(1);
 
-    // 3. Admin Sample
-    UserBean admin = new UserBean();
-    admin.setUsername("admin");
-    admin.setPassword("admin");
-    admin.setFullName("System Administrator");
-    admin.setEmail("admin@hospital.org");
-    admin.setPhone("0999888777");
-    admin.setGender("O");
-    admin.setRole("Admin");
-    admin.setClinicId(0); // Admin might not be tied to a specific clinic
+        // 3. Admin Sample
+        UserBean admin = new UserBean();
+        admin.setUsername("admin");
+        admin.setPassword("admin");
+        admin.setFullName("System Administrator");
+        admin.setEmail("admin@hospital.org");
+        admin.setPhone("0999888777");
+        admin.setGender("O");
+        admin.setRole("Admin");
+        admin.setClinicId(0); // Admin might not be tied to a specific clinic
 
-    // Execute additions
-    userDB.addRecord(patient);
-    userDB.addRecord(staff);
-    userDB.addRecord(admin);
-    
-    System.out.println("Sample records processed successfully.");
-}
+        // Execute additions
+        userDB.addRecord(patient);
+        userDB.addRecord(staff);
+        userDB.addRecord(admin);
+
+        System.out.println("Sample records processed successfully.");
+    }
 }
