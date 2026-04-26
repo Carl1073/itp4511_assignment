@@ -91,6 +91,8 @@ public class handleStaffProcess extends HttpServlet {
             qdb.skipCurrentQueueNumber(clinicId, serviceId);
         } else if (action.equalsIgnoreCase("updateVisitOutcome")) {
             int appointmentId = Integer.parseInt(request.getParameter("appointmentId"));
+            AppointmentBean ab = new AppointmentBean();
+            ab = adb.queryAppByAppID(appointmentId);
             String status = request.getParameter("status");
             String cancelReason = null;
 
@@ -120,6 +122,12 @@ public class handleStaffProcess extends HttpServlet {
             appointment.setCancelReason(cancelReason);
 
             int result = adb.editRecord(appointment);
+            NotificationBean nb = new NotificationBean();
+            nb.setUserId(ab.getPatientId());
+            nb.setMessage("Your booking is canceled by following reason: <br/>"
+                            + cancelReason
+            );
+            ndb.addRecord(nb); // Save to notification table
 
             if (result > 0) {
                 // Success - redirect back to outcome page
