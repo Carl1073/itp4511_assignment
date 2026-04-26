@@ -114,7 +114,7 @@ public class UserDB {
         boolean isSuccess = false;
         try {
             cnnct = getConnection();
-            String preQueryStatement = "INSERT INTO user (username, password, fullName, email, phone, gender, role, clinicId) VALUES (?,?,?,?,?,?,?,?)";
+            String preQueryStatement = "INSERT IGNORE INTO user (username, password, fullName, email, phone, gender, role, clinicId) VALUES (?,?,?,?,?,?,?,?)";
             pStmnt = cnnct.prepareStatement(preQueryStatement);
             pStmnt.setString(1, ub.getUsername());
             pStmnt.setString(2, ub.getPassword());

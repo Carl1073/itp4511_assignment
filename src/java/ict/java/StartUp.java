@@ -32,6 +32,7 @@ public class StartUp {
 
         userDB = new UserDB(url, username, password);
         userDB.createTable();
+        insertSampleData();
 
         clinicDB = new ClinicDB(url, username, password);
         clinicDB.createTable();
@@ -104,4 +105,46 @@ public class StartUp {
             }
         }
     }
+    
+    public static void insertSampleData() {
+    // 1. Patient Sample
+    UserBean patient = new UserBean();
+    patient.setUsername("jdoe88");
+    patient.setPassword("pass123");
+    patient.setFullName("John Doe");
+    patient.setEmail("john.doe@email.com");
+    patient.setPhone("0123456789");
+    patient.setGender("M");
+    patient.setRole("Patient");
+    patient.setClinicId(101);
+
+    // 2. Staff Sample
+    UserBean staff = new UserBean();
+    staff.setUsername("nurse_sarah");
+    staff.setPassword("staffPass456");
+    staff.setFullName("Sarah Jenkins");
+    staff.setEmail("s.jenkins@clinic.com");
+    staff.setPhone("0111222333");
+    staff.setGender("F");
+    staff.setRole("Staff");
+    staff.setClinicId(101);
+
+    // 3. Admin Sample
+    UserBean admin = new UserBean();
+    admin.setUsername("super_admin");
+    admin.setPassword("adminSecure789");
+    admin.setFullName("System Administrator");
+    admin.setEmail("admin@hospital.org");
+    admin.setPhone("0999888777");
+    admin.setGender("O");
+    admin.setRole("Admin");
+    admin.setClinicId(0); // Admin might not be tied to a specific clinic
+
+    // Execute additions
+    userDB.addRecord(patient);
+    userDB.addRecord(staff);
+    userDB.addRecord(admin);
+    
+    System.out.println("Sample records processed successfully.");
+}
 }
