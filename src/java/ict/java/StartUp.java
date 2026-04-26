@@ -109,8 +109,8 @@ public class StartUp {
     public static void insertSampleData() {
     // 1. Patient Sample
     UserBean patient = new UserBean();
-    patient.setUsername("jdoe88");
-    patient.setPassword("pass123");
+    patient.setUsername("patient");
+    patient.setPassword("patient");
     patient.setFullName("John Doe");
     patient.setEmail("john.doe@email.com");
     patient.setPhone("0123456789");
@@ -120,8 +120,8 @@ public class StartUp {
 
     // 2. Staff Sample
     UserBean staff = new UserBean();
-    staff.setUsername("nurse_sarah");
-    staff.setPassword("staffPass456");
+    staff.setUsername("staff");
+    staff.setPassword("staff");
     staff.setFullName("Sarah Jenkins");
     staff.setEmail("s.jenkins@clinic.com");
     staff.setPhone("0111222333");
@@ -131,8 +131,8 @@ public class StartUp {
 
     // 3. Admin Sample
     UserBean admin = new UserBean();
-    admin.setUsername("super_admin");
-    admin.setPassword("adminSecure789");
+    admin.setUsername("admin");
+    admin.setPassword("admin");
     admin.setFullName("System Administrator");
     admin.setEmail("admin@hospital.org");
     admin.setPhone("0999888777");
