@@ -109,6 +109,9 @@ public class handleStaff extends HttpServlet {
 
             request.setAttribute("todaysAppointments", todaysAppointments);
             System.out.println("Clinic: " + cdb.getClinicById(staffClinicId));
+            System.out.println(user.getUsername());
+            System.out.println("a:" + staffClinicId);
+
             request.setAttribute("clinicName", cdb.getClinicById(staffClinicId).getClinicName());
 
             RequestDispatcher rd;
@@ -123,7 +126,13 @@ public class handleStaff extends HttpServlet {
             rd = getServletContext().getRequestDispatcher("/staff/profile.jsp");
             rd.forward(request, response);
         } else if ("analysis".equalsIgnoreCase(action)) {
-            
+            ArrayList<MonthlyReportBean> mrbs = qdb.getMonthlyReportBean();
+            for (MonthlyReportBean mrb : mrbs) {
+                System.out.println(mrb.getClinicName());
+            }
+            ArrayList<YearlyReportBean> yrbs = qdb.getYearlyReportBean();
+            request.setAttribute("mrbs", qdb.getMonthlyReportBean());
+            request.setAttribute("yrbs", qdb.getYearlyReportBean());
             RequestDispatcher rd;
             rd = getServletContext().getRequestDispatcher("/staff/analysis.jsp");
             rd.forward(request, response);
