@@ -12,6 +12,7 @@
         <a href="${pageContext.request.contextPath}/handleStaff?action=outcome">Outcome</a>
         <a href="${pageContext.request.contextPath}/handleStaff?action=issue">Issue</a>
         <a href="${pageContext.request.contextPath}/handleStaff?action=profile">Profile</a>
+        <a href="${pageContext.request.contextPath}/handleStaff?action=analysis">Analysis</a>
     </div>
 
     <input type="submit" class="logout-btn" name="logoutButton" value="Logout"/>

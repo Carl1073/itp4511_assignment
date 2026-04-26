@@ -156,6 +156,46 @@ public class QueueDB {
         return currentNum;
     }
 
+    public ArrayList<MonthlyReportBean> getMonthlyReportBean() {
+        String sql = "select a.clinicName, sum(b.price) as monthlyPrice, month(queue.entryTime) as monthly from queue join clinic as a using (clinicId) join service as b using (serviceId) group by a.`clinicId`, monthly";
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                ArrayList<MonthlyReportBean> mrbs = new ArrayList<>();
+                while (rs.next()) {
+                    mrbs.add(new MonthlyReportBean(
+                            rs.getString("clinicName"),
+                            rs.getInt("monthlyPrice"),
+                            rs.getInt("monthly")));
+                }
+                return mrbs;
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public ArrayList<YearlyReportBean> getYearlyReportBean() {
+        String sql = "select a.clinicName, sum(b.price) as yearlyPrice, year(queue.entryTime) as yearly from queue join clinic as a using (clinicId) join service as b using (serviceId) group by a.`clinicId`, yearly";
+        try (Connection cnnct = getConnection();
+                PreparedStatement pStmnt = cnnct.prepareStatement(sql)) {
+            try (ResultSet rs = pStmnt.executeQuery()) {
+                ArrayList<YearlyReportBean> yrbs = new ArrayList<>();
+                while (rs.next()) {
+                    yrbs.add(new YearlyReportBean(
+                            rs.getString("clinicName"),
+                            rs.getInt("yearlyPrice"),
+                            rs.getInt("yearly")));
+                }
+                return yrbs;
+            }
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
     public QueueBean getQueueNumber(int patientId, int clinicId, int serviceId) {
         String sql = "select * from queue where patientId = ? and clinicId = ? and serviceId = ? and date(entryTime) = curdate() order by queueId desc limit 1";
         try (Connection cnnct = getConnection();
